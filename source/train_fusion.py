@@ -41,18 +41,20 @@ class FusionDataset(source.dataset.Dataset):
 # =============================================
 
 def data_loader(args):
-    img_pths = [f for f in Path(args.data_root).rglob("*.tif") if "labels" in f.parts]
-    random.shuffle(img_pths)
-    split_idx = int(0.9 * len(img_pths))
-    train_pths = [str(f) for f in img_pths[:split_idx]]
-    val_pths = [str(f) for f in img_pths[split_idx:]]
+    image_paths = [f for f in Path(args.data_root).rglob("*.tif") if "labels" in f.parts]
+    random.shuffle(image_paths)
+    split_index = int(0.9 * len(image_paths))
+    train_paths = image_paths[:split_index]
+    validate_paths = image_paths[split_index:]
+    train_paths = [str(f) for f in train_paths]
+    validate_paths = [str(f) for f in validate_paths]
 
-    print("Total samples      :", len(img_pths))
-    print("Training samples   :", len(train_pths))
-    print("Validation samples :", len(val_pths))
+    print("Total samples      :", len(image_paths))
+    print("Training samples   :", len(train_paths))
+    print("Validation samples :", len(validate_paths))
 
-    trainset = FusionDataset(train_pths, classes=args.classes, size=args.crop_size, train=True)
-    validset = FusionDataset(val_pths, classes=args.classes, train=False)
+    trainset = FusionDataset(train_paths, classes=args.classes, size=args.crop_size, train=True)
+    validset = FusionDataset(validate_paths, classes=args.classes, train=False)
 
     train_loader = DataLoader(
         trainset,

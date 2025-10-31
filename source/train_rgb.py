@@ -11,41 +11,8 @@ import argparse
 import warnings
 from source import streaming as S
 from source.utils import append_epoch_log
+from source.data_loader import build_data_loaders
 warnings.filterwarnings("ignore")
-
-
-def data_loader(args):
-    # Pobierz wszystkie ścieżki do plików z etykietami
-    image_paths = [f for f in Path(args.data_root).rglob("*.tif") if "labels" in f.parts]
-    random.shuffle(image_paths)
-    split_index = int(0.9 * len(image_paths))
-    train_paths = image_paths[:split_index]
-    validate_paths = image_paths[split_index:]
-    train_paths = [str(f) for f in train_paths]
-    validate_paths = [str(f) for f in validate_paths]
-
-    print("Total samples      :", len(image_paths))
-    print("Training samples   :", len(train_paths))
-    print("Validation samples :", len(validate_paths))
-
-    trainset = RGBDataset(train_paths, classes=args.classes, size=args.crop_size, train=True)
-    validset = RGBDataset(validate_paths, classes=args.classes, train=False)
-    # Ogranicz pracowników i wyłącz pin_memory w walidacji, by zmniejszyć zużycie RAM (Windows)
-    train_loader = DataLoader(
-        trainset,
-        batch_size=args.batch_size,
-        shuffle=True,
-        num_workers=min(int(args.num_workers), 2),
-        pin_memory=False,
-    )
-    valid_loader = DataLoader(
-        validset,
-        batch_size=1,
-        shuffle=False,
-        num_workers=0,
-        pin_memory=False,
-    )
-    return train_loader, valid_loader
 
 class RGBDataset(source.dataset.Dataset):
     def __getitem__(self, idx):
@@ -61,7 +28,7 @@ class RGBDataset(source.dataset.Dataset):
 
 
 def train_model(args, model, optimizer, criterion, metric, device, scheduler=None):
-    train_data_loader, val_data_loader = data_loader(args)
+    train_data_loader, val_data_loader = build_data_loaders(args, RGBDataset)
     os.makedirs(args.save_model, exist_ok=True)
     model_name = f"RGB_Pesudo_{model.name}_s{args.seed}_{criterion.name}"
     max_score = -float("inf")
@@ -102,6 +69,7 @@ def train_model(args, model, optimizer, criterion, metric, device, scheduler=Non
         print(f"Train Acc: {logs_train.get('acc'):.6f}, Valid Acc: {logs_valid.get('acc'):.6f}")
         print(f"Train Prec: {logs_train.get('prec'):.6f}, Valid Prec: {logs_valid.get('prec'):.6f}")
         print(f"Train Rec: {logs_train.get('rec'):.6f}, Valid Rec: {logs_valid.get('rec'):.6f}")
+        #TODO Dodać jeszcze f score i iou2
 
         # --- ZAPIS DO PLIKU ---
         append_epoch_log(log_path, epoch + 1, _get_lr(optimizer), logs_train, logs_valid)
@@ -209,7 +177,7 @@ if __name__ == "__main__":
     parser.add_argument('--crop_size', default=256)
     parser.add_argument('--learning_rate', default=0.0001)
     parser.add_argument('--classes', default=[1, 2, 3, 4, 5, 6, 7, 8])
-    parser.add_argument('--data_root', default="dataset/train")
+    parser.add_argument('--data_root', default="../dataset/train")
     parser.add_argument('--save_model', default="model")
     parser.add_argument('--save_results', default="results")
     # --- SCHEDULER / EARLY STOPPING PARAMS ---

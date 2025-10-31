@@ -11,6 +11,7 @@ import argparse
 import warnings
 from source import streaming as S
 from source.utils import append_epoch_log
+from source.data_loader import build_data_loaders
 warnings.filterwarnings("ignore")
 
 # =============================================
@@ -29,45 +30,11 @@ class SARDataset(source.dataset.Dataset):
         return {"x": data["image"], "y": data["mask"], "fn": self.fns[idx]}
 
 # =============================================
-#   DataLoader (strumieniowe, oszczędne pamięciowo)
-# =============================================
-
-def data_loader(args):
-    img_pths = [f for f in Path(args.data_root).rglob("*.tif") if "labels" in f.parts]
-    random.shuffle(img_pths)
-    split_idx = int(0.9 * len(img_pths))
-    train_pths = [str(f) for f in img_pths[:split_idx]]
-    val_pths = [str(f) for f in img_pths[split_idx:]]
-
-    print("Total samples      :", len(img_pths))
-    print("Training samples   :", len(train_pths))
-    print("Validation samples :", len(val_pths))
-
-    trainset = SARDataset(train_pths, classes=args.classes, size=args.crop_size, train=True)
-    validset = SARDataset(val_pths, classes=args.classes, train=False)
-
-    train_loader = DataLoader(
-        trainset,
-        batch_size=args.batch_size,
-        shuffle=True,
-        num_workers=min(int(args.num_workers), 2),  # ogranicz dla Windows
-        pin_memory=False,
-    )
-    valid_loader = DataLoader(
-        validset,
-        batch_size=1,  # oszczędność RAM
-        shuffle=False,
-        num_workers=0,
-        pin_memory=False,
-    )
-    return train_loader, valid_loader
-
-# =============================================
 #   Główna pętla treningowa z early stopping + scheduler
 # =============================================
 
 def train_model(args, model, optimizer, criterion, device, scheduler=None):
-    train_loader, valid_loader = data_loader(args)
+    train_loader, valid_loader = build_data_loaders(args, SARDataset)
     os.makedirs(args.save_model, exist_ok=True)
     model_name = f"SAR_EfficientNetB4_s{args.seed}_{criterion.name}"
     max_score = -float("inf")
@@ -216,7 +183,7 @@ if __name__ == "__main__":
     parser.add_argument('--crop_size', type=int, default=256)
     parser.add_argument('--learning_rate', type=float, default=1e-4)
     parser.add_argument('--classes', default=[1,2,3,4,5,6,7,8])
-    parser.add_argument('--data_root', default='dataset/train')
+    parser.add_argument('--data_root', default='../dataset/train')
     parser.add_argument('--save_model', default='model')
     parser.add_argument('--scheduler', choices=['plateau','cosine','none'], default='plateau')
     parser.add_argument('--lr_patience', type=int, default=4)
