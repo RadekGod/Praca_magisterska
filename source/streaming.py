@@ -38,6 +38,7 @@ def metrics_from_cm(cm: torch.Tensor):
     dice_c = (2 * tp) / (2 * tp + fp + fn + eps)
     prec_c = tp / (tp + fp + eps)
     rec_c = tp / (tp + fn + eps)
+    f1_c = (2 * prec_c * rec_c) / (prec_c + rec_c + eps)
     acc_global = (tp.sum() / (cm.sum().float() + eps)).item()
     return {
         "iou": iou_c.mean().item(),
@@ -45,6 +46,7 @@ def metrics_from_cm(cm: torch.Tensor):
         "acc": acc_global,
         "prec": prec_c.mean().item(),
         "rec": rec_c.mean().item(),
+        "f1": f1_c.mean().item(),
     }
 
 def train_epoch_streaming(model, optimizer, criterion, dataloader, device, num_classes: int, use_amp: bool = True, grad_clip: Optional[float] = None):
@@ -97,4 +99,3 @@ def valid_epoch_streaming(model, criterion, dataloader, device, num_classes: int
     if criterion is not None and n_batches > 0:
         mets["loss"] = total_loss / n_batches
     return mets
-

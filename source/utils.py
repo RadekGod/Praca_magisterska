@@ -1,5 +1,4 @@
 import numpy as np
-import matplotlib as mpl
 import matplotlib.pyplot as plt
 import os
 
@@ -61,16 +60,7 @@ def progress(train_logs, valid_logs, loss_nm, metric_nm, nepochs, outdir, fn_out
     return
 
 
-def append_epoch_log(log_path: str, epoch_idx: int, lr_str: str, train_logs: dict, valid_logs: dict):
-    """Appenduje metryki epoki do pliku tekstowego.
-
-    Parametry:
-    - log_path: ścieżka do pliku .txt
-    - epoch_idx: numer epoki (1-based)
-    - lr_str: string z LR dla wszystkich grup paramów
-    - train_logs: dict z kluczami: loss, iou, dice, acc, prec, rec
-    - valid_logs: dict z kluczami: loss, iou, dice, acc, prec, rec
-    """
+def log_epoch_results(log_path: str, epoch_idx: int, lr_str: str, train_logs: dict, valid_logs: dict):
     os.makedirs(os.path.dirname(log_path), exist_ok=True)
     def _g(d: dict, k: str):
         return float(d.get(k, float('nan')))
@@ -82,3 +72,16 @@ def append_epoch_log(log_path: str, epoch_idx: int, lr_str: str, train_logs: dic
         f.write("Train Acc: {:.6f}, Valid Acc: {:.6f}\n".format(_g(train_logs, "acc"), _g(valid_logs, "acc")))
         f.write("Train Prec: {:.6f}, Valid Prec: {:.6f}\n".format(_g(train_logs, "prec"), _g(valid_logs, "prec")))
         f.write("Train Rec: {:.6f}, Valid Rec: {:.6f}\n\n".format(_g(train_logs, "rec"), _g(valid_logs, "rec")))
+        f.write("Train F1: {:.6f}, Valid F1: {:.6f}\n\n".format(_g(train_logs, "f1"), _g(valid_logs, "f1")))
+
+        print(f"\nEpoch: {epoch_idx} (lr: {lr_str})")
+        print(f"Train Loss: {train_logs.get('loss'):.6f}, Valid Loss: {valid_logs.get('loss'):.6f}")
+        print(f"Train IoU: {train_logs.get('iou'):.6f}, Valid IoU: {valid_logs.get('iou'):.6f}")
+        print(f"Train Dice: {train_logs.get('dice'):.6f}, Valid Dice: {valid_logs.get('dice'):.6f}")
+        print(f"Train Acc: {train_logs.get('acc'):.6f}, Valid Acc: {valid_logs.get('acc'):.6f}")
+        print(f"Train Prec: {train_logs.get('prec'):.6f}, Valid Prec: {valid_logs.get('prec'):.6f}")
+        print(f"Train Rec: {train_logs.get('rec'):.6f}, Valid Rec: {valid_logs.get('rec'):.6f}")
+        print(f"Train F1: {train_logs.get('f1'):.6f}, Valid F1: {valid_logs.get('f1'):.6f}")
+
+
+

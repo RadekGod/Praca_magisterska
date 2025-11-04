@@ -10,7 +10,7 @@ import segmentation_models_pytorch as smp
 import argparse
 import warnings
 from source import streaming as S
-from source.utils import append_epoch_log
+from source.utils import log_epoch_results
 
 warnings.filterwarnings("ignore")
 
@@ -123,7 +123,6 @@ def train_model(args, model, optimizer, criterion, device, scheduler=None):
         return ", ".join(f"{g['lr']:.6g}" for g in opt.param_groups)
 
     for epoch in range(args.n_epochs):
-        print(f"\nEpoch: {epoch + 1} (lr: {_get_lr(optimizer)})")
         logs_train = S.train_epoch_streaming(
             model=model,
             optimizer=optimizer,
@@ -142,15 +141,7 @@ def train_model(args, model, optimizer, criterion, device, scheduler=None):
             num_classes=num_classes,
             use_amp=bool(args.amp),
         )
-        print(f"Train Loss: {logs_train.get('loss'):.6f}, Valid Loss: {logs_valid.get('loss'):.6f}")
-        print(f"Train IoU: {logs_train.get('iou'):.6f}, Valid IoU: {logs_valid.get('iou'):.6f}")
-        print(f"Train Dice: {logs_train.get('dice'):.6f}, Valid Dice: {logs_valid.get('dice'):.6f}")
-        print(f"Train Acc: {logs_train.get('acc'):.6f}, Valid Acc: {logs_valid.get('acc'):.6f}")
-        print(f"Train Prec: {logs_train.get('prec'):.6f}, Valid Prec: {logs_valid.get('prec'):.6f}")
-        print(f"Train Rec: {logs_train.get('rec'):.6f}, Valid Rec: {logs_valid.get('rec'):.6f}")
-
-        # Zapis do pliku .txt (wspólna funkcja)
-        append_epoch_log(log_path, epoch + 1, _get_lr(optimizer), logs_train, logs_valid)
+        log_epoch_results(log_path, epoch + 1, _get_lr(optimizer), logs_train, logs_valid)
 
         score = logs_valid["iou"]
         if scheduler is not None:
