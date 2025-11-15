@@ -65,6 +65,7 @@ def train_model(args, model, optimizer, criterion, metric, device, scheduler=Non
 
         # --- LR scheduler ---
         score = logs_valid["iou"]
+        # TODO dlaczego jeden scheduler przyjmuje argument a drugi nie xd
         if scheduler is not None:
             if args.scheduler == "plateau":
                 scheduler.step(score)
@@ -124,14 +125,14 @@ def main(args):
     if torch.cuda.device_count() > 1:
         print("Number of GPUs :", torch.cuda.device_count())
         model = torch.nn.DataParallel(model)
-        optimizer = torch.optim.Adam(
-            [dict(params=model.module.parameters(), lr=args.learning_rate)]
-        )
+        optimizer = torch.optim.Adam([dict(params=model.module.parameters(), lr=args.learning_rate)])
+    #     TODO dlaczego mam 2 optimizxery inicjowane jeśli mnam karte graficzną?
     # Upewnij się, że model jest na tym samym urządzeniu co dane
     model = model.to(device)
 
     # --- SCHEDULER ---
     scheduler = None
+    # TODO chyba nie potrzebuje 2 schedulerów
     if args.scheduler == "plateau":
         scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(
             optimizer,
@@ -161,7 +162,7 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='Model Training RGB')
     parser.add_argument('--seed', default=0)
     parser.add_argument('--n_epochs', default=1)
-    parser.add_argument('--batch_size', default=4)
+    parser.add_argument('--batch_size', default=8)
     parser.add_argument('--num_workers', default=4)
     parser.add_argument('--crop_size', default=256)
     parser.add_argument('--learning_rate', default=0.0001)

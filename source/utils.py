@@ -71,7 +71,7 @@ def log_epoch_results(log_path: str, epoch_idx: int, lr_str: str, train_logs: di
         f.write("Train Dice: {:.6f}, Valid Dice: {:.6f}\n".format(_g(train_logs, "dice"), _g(valid_logs, "dice")))
         f.write("Train Acc: {:.6f}, Valid Acc: {:.6f}\n".format(_g(train_logs, "acc"), _g(valid_logs, "acc")))
         f.write("Train Prec: {:.6f}, Valid Prec: {:.6f}\n".format(_g(train_logs, "prec"), _g(valid_logs, "prec")))
-        f.write("Train Rec: {:.6f}, Valid Rec: {:.6f}\n\n".format(_g(train_logs, "rec"), _g(valid_logs, "rec")))
+        f.write("Train Rec: {:.6f}, Valid Rec: {:.6f}\n".format(_g(train_logs, "rec"), _g(valid_logs, "rec")))
         f.write("Train F1: {:.6f}, Valid F1: {:.6f}\n\n".format(_g(train_logs, "f1"), _g(valid_logs, "f1")))
 
         print(f"\nEpoch: {epoch_idx} (lr: {lr_str})")
