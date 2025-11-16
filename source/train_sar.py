@@ -1,17 +1,18 @@
+import argparse
 import os
 import time
-import numpy as np
-import random
-from pathlib import Path
-import torch
-from torch.utils.data import DataLoader
-import source
-import segmentation_models_pytorch as smp
-import argparse
 import warnings
+
+import numpy as np
+import segmentation_models_pytorch as smp
+import torch
+from torch.optim.lr_scheduler import ReduceLROnPlateau
+
+import source
 from source import streaming as S
-from source.utils import log_epoch_results
 from source.data_loader import build_data_loaders
+from source.utils import log_epoch_results
+
 warnings.filterwarnings("ignore")
 
 # =============================================
@@ -69,7 +70,7 @@ def train_model(args, model, optimizer, criterion, device, scheduler=None):
 
         score = logs_valid["iou"]
         if scheduler is not None:
-            if args.scheduler == "plateau":
+            if isinstance(scheduler, ReduceLROnPlateau):
                 scheduler.step(score)
             else:
                 scheduler.step()
@@ -127,14 +128,13 @@ def main(args):
 
     classes_wt = np.ones([len(args.classes)+1], dtype=np.float32)
     criterion = source.losses.CEWithLogitsLoss(weights=classes_wt)
-    optimizer = torch.optim.Adam(model.parameters(), lr=float(args.learning_rate))
 
+    model = model.to(device)
     if torch.cuda.device_count() > 1:
         print("Number of GPUs :", torch.cuda.device_count())
         model = torch.nn.DataParallel(model)
-        optimizer = torch.optim.Adam([dict(params=model.module.parameters(), lr=float(args.learning_rate))])
 
-    model = model.to(device)
+    optimizer = torch.optim.Adam(model.parameters(), lr=float(args.learning_rate))
 
     scheduler = None
     if args.scheduler == "plateau":

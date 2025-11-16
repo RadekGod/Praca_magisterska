@@ -230,14 +230,13 @@ def main(args):
 
     classes_wt = np.ones([len(args.classes)+1], dtype=np.float32)
     criterion = source.losses.CEWithLogitsLoss(weights=classes_wt)
-    optimizer = torch.optim.Adam(model.parameters(), lr=float(args.learning_rate))
 
+    model = model.to(device)
     if torch.cuda.device_count() > 1:
         print("Number of GPUs :", torch.cuda.device_count())
         model = torch.nn.DataParallel(model)
-        optimizer = torch.optim.Adam([dict(params=model.module.parameters(), lr=float(args.learning_rate))])
 
-    model = model.to(device)
+    optimizer = torch.optim.Adam(model.parameters(), lr=float(args.learning_rate))
 
     scheduler = None
     if args.scheduler == "plateau":

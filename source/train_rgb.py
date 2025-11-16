@@ -1,17 +1,18 @@
+import argparse
 import os
 import time
-import numpy as np
-import random
-from pathlib import Path
-import torch
-from torch.utils.data import DataLoader
-import source
-import segmentation_models_pytorch as smp
-import argparse
 import warnings
+
+import numpy as np
+import segmentation_models_pytorch as smp
+import torch
+from torch.optim.lr_scheduler import ReduceLROnPlateau
+
+import source
 from source import streaming as S
-from source.utils import log_epoch_results
 from source.data_loader import build_data_loaders
+from source.utils import log_epoch_results
+
 warnings.filterwarnings("ignore")
 
 class RGBDataset(source.dataset.Dataset):
@@ -27,7 +28,7 @@ class RGBDataset(source.dataset.Dataset):
         return {"x": data["image"], "y": data["mask"], "fn": self.fns[idx]}
 
 
-def train_model(args, model, optimizer, criterion, metric, device, scheduler=None):
+def train_model(args, model, optimizer, criterion, device, scheduler=None):
     train_data_loader, val_data_loader = build_data_loaders(args, RGBDataset)
     os.makedirs(args.save_model, exist_ok=True)
     model_name = f"RGB_Pesudo_{model.name}_s{args.seed}_{criterion.name}"
@@ -65,9 +66,8 @@ def train_model(args, model, optimizer, criterion, metric, device, scheduler=Non
 
         # --- LR scheduler ---
         score = logs_valid["iou"]
-        # TODO dlaczego jeden scheduler przyjmuje argument a drugi nie xd
         if scheduler is not None:
-            if args.scheduler == "plateau":
+            if isinstance(scheduler, ReduceLROnPlateau):
                 scheduler.step(score)
             else:
                 scheduler.step()
@@ -120,19 +120,16 @@ def main(args):
     print("Number of parameters: ", params)
     classes_wt = np.ones([len(args.classes)+1], dtype=np.float32)
     criterion = source.losses.CEWithLogitsLoss(weights=classes_wt)
-    metric = source.metrics.IoU2()
-    optimizer = torch.optim.Adam(model.parameters(), lr=args.learning_rate)
+
+    model = model.to(device)
     if torch.cuda.device_count() > 1:
         print("Number of GPUs :", torch.cuda.device_count())
         model = torch.nn.DataParallel(model)
-        optimizer = torch.optim.Adam([dict(params=model.module.parameters(), lr=args.learning_rate)])
-    #     TODO dlaczego mam 2 optimizxery inicjowane jeśli mnam karte graficzną?
-    # Upewnij się, że model jest na tym samym urządzeniu co dane
-    model = model.to(device)
+
+    optimizer = torch.optim.Adam(model.parameters(), lr=float(args.learning_rate))
 
     # --- SCHEDULER ---
     scheduler = None
-    # TODO chyba nie potrzebuje 2 schedulerów
     if args.scheduler == "plateau":
         scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(
             optimizer,
@@ -154,7 +151,7 @@ def main(args):
     print("Number of classes  :", len(args.classes)+1)
     print("Batch size         :", args.batch_size)
     print("Device             :", device)
-    train_model(args, model, optimizer, criterion, metric, device, scheduler)
+    train_model(args, model, optimizer, criterion, device, scheduler)
 
 if __name__ == "__main__":
     os.environ["PYTORCH_CUDA_ALLOC_CONF"] = "max_split_size_mb:24"
