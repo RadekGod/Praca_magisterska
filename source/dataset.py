@@ -1,6 +1,8 @@
 import numpy as np
 import rasterio
 from torch.utils.data import Dataset as BaseDataset
+import os
+
 from . import transforms as T
 
 
@@ -46,16 +48,6 @@ class Dataset(BaseDataset):
         self.size = size
         self.train = train
 
-        # optionally compute SAR stats from training files
-        if train and compute_stats and (sar_mean is None or sar_std is None):
-            try:
-                sar_mean_calc, sar_std_calc = T.compute_sar_stats(self.fns, load_fn=load_grayscale, verbose=True)
-                if sar_mean_calc is not None:
-                    sar_mean = sar_mean_calc
-                    sar_std = sar_std_calc
-            except Exception as e:
-                print("Warning: failed to compute SAR stats:", e)
-
         # store stats for diagnostics
         self.sar_mean = sar_mean
         self.sar_std = sar_std
@@ -80,3 +72,55 @@ class Dataset(BaseDataset):
 
     def __len__(self):
         return len(self.fns)
+
+# =============================================
+#   Dataset dla obrazów SAR (1 kanał)
+# =============================================
+class SARDataset(Dataset):
+    def __getitem__(self, idx):
+        img = self.load_grayscale(self.fns[idx].replace("labels", "sar_images"))
+        msk = self.load_grayscale(self.fns[idx])
+
+        if self.train:
+            data = self.augm({"image": img, "mask": msk}, self.size)
+        else:
+            data = self.augm({"image": img, "mask": msk}, 1024)
+        data = self.to_tensor(data)
+
+        return {"x": data["image"], "y": data["mask"], "fn": self.fns[idx]}
+
+# =============================================
+#   Dataset dla obrazów RGB (3 kanały)
+# =============================================
+class RGBDataset(Dataset):
+    def __getitem__(self, idx):
+        img = self.load_multiband(self.fns[idx].replace("labels", "rgb_images"))
+        msk = self.load_grayscale(self.fns[idx])
+        if self.train:
+            data = self.augm({"image": img, "mask": msk}, self.size)
+        else:
+            data = self.augm({"image": img, "mask": msk}, 1024)
+        data = self.to_tensor(data)
+        return {"x": data["image"], "y": data["mask"], "fn": self.fns[idx]}
+
+# =============================================
+#   Dataset dla fuzji SAR+RGB (4 kanały: R,G,B,SAR)
+# =============================================
+class FusionDataset(Dataset):
+    def __getitem__(self, idx):
+        # Ścieżki obrazów bazując na etykiecie
+        rgb_path = self.fns[idx].replace("labels", "rgb_images")
+        sar_path = self.fns[idx].replace("labels", "sar_images")
+        # Ładowanie RGB (H,W,3) i SAR (H,W)
+        rgb = self.load_multiband(rgb_path)
+        sar = self.load_grayscale(sar_path)
+        # Połączenie kanałów -> (H,W,4)
+        img = np.dstack([rgb, sar[..., None]])
+        msk = self.load_grayscale(self.fns[idx])
+        # Augmentacje zgodne z SAR/RGB (bez kolorowych specyficznych operacji)
+        if self.train:
+            data = self.augm({"image": img, "mask": msk}, self.size)
+        else:
+            data = self.augm({"image": img, "mask": msk}, 1024)
+        data = self.to_tensor(data)  # image -> [4,H,W]
+        return {"x": data["image"], "y": data["mask"], "fn": self.fns[idx]}

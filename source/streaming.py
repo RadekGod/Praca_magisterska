@@ -18,16 +18,28 @@ def to_index_targets(y: torch.Tensor) -> torch.Tensor:
 def update_confusion_matrix(cm: torch.Tensor, preds: torch.Tensor, targets: torch.Tensor, num_classes: int, chunk_size: int = 262144):
     preds = preds.reshape(-1)
     targets = targets.reshape(-1)
+    # filtr: zachowujemy tylko poprawne klasy (0..num_classes-1)
     k = (targets >= 0) & (targets < num_classes)
     preds = preds[k]
     targets = targets[k]
     n = preds.numel()
+    # przetwarzamy po kawałkach aby nie alokować ogromnych wektorów jednocześnie
     for i in range(0, n, chunk_size):
         p = preds[i:i+chunk_size]
         t = targets[i:i+chunk_size]
         inds = (t.to(torch.int64) * num_classes + p.to(torch.int64))
         cm += torch.bincount(inds, minlength=num_classes * num_classes).reshape(num_classes, num_classes)
     return cm
+
+
+# =============================================
+#   Metryki z macierzy pomyłek
+# =============================================
+# Funkcja `metrics_from_cm` wylicza klasyczne metryki segmentacji z macierzy pomyłek:
+# - dla każdej klasy oblicza TP, FP, FN
+# - IoU, Dice, Precision, Recall, F1
+# - accuracy globalna (liczona po wszystkich pikselach)
+# Zwraca słownik z uśrednionymi (mean) wartościami między klasami oraz accuracy.
 
 def metrics_from_cm(cm: torch.Tensor):
     tp = cm.diag().float()
@@ -49,6 +61,17 @@ def metrics_from_cm(cm: torch.Tensor):
         "f1": f1_c.mean().item(),
     }
 
+
+# =============================================
+#   Pętla treningowa (streaming) - per-epoch
+# `train_epoch_streaming` wykonuje jedną epokę treningową na danych strumieniowych:
+# - ustawia model w tryb train()
+# - iteruje po batchach z dataloadera (tqdm dla progress baru)
+# - zapewnia mixed precision przez torch.cuda.amp (jeśli use_amp=True)
+# - dla każdego batcha: forward, loss, backward (skalowany przez grad scaler), clip grad, optimizer.step
+# - zbiera predykcje i aktualizuje macierz pomyłek oraz sumuje straty
+# - zwraca słownik metryk oraz średnią straty na batch
+# =============================================
 def train_epoch_streaming(model, optimizer, criterion, dataloader, device, num_classes: int, use_amp: bool = True, grad_clip: Optional[float] = None):
     model.train()
     cm = torch.zeros((num_classes, num_classes), dtype=torch.int64)
@@ -79,6 +102,16 @@ def train_epoch_streaming(model, optimizer, criterion, dataloader, device, num_c
     mets["loss"] = total_loss / max(n_batches, 1)
     return mets
 
+
+# =============================================
+#   Pętla walidacyjna (streaming) - per-epoch
+# =============================================
+# `valid_epoch_streaming` wykonuje jedną epokę walidacyjną:
+# - ustawia model w tryb eval() i korzysta z torch.inference_mode() dla wydajności
+# - nie wykonuje backward/optimizer.step
+# - używa mixed precision w podobny sposób jak w treningu
+# - aktualizuje macierz pomyłek i sumuje straty (jeśli criterion != None)
+# - zwraca słownik metryk oraz średnią straty
 def valid_epoch_streaming(model, criterion, dataloader, device, num_classes: int, use_amp: bool = True):
     model.eval()
     cm = torch.zeros((num_classes, num_classes), dtype=torch.int64)

@@ -83,5 +83,12 @@ def log_epoch_results(log_path: str, epoch_idx: int, lr_str: str, train_logs: di
         print(f"Train Rec: {train_logs.get('rec'):.6f}, Valid Rec: {valid_logs.get('rec'):.6f}")
         print(f"Train F1: {train_logs.get('f1'):.6f}, Valid F1: {valid_logs.get('f1'):.6f}")
 
+def _get_lr(optimizer):
+    return ", ".join(f"{g['lr']:.6g}" for g in optimizer.param_groups)
 
-
+def log_number_of_parameters(model):
+    params = 0
+    for p in model.parameters():
+        if p.requires_grad:
+            params += p.numel()
+    print("Number of parameters: ", params)

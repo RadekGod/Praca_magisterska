@@ -10,31 +10,10 @@ import segmentation_models_pytorch as smp
 import argparse
 import warnings
 from source import streaming as S
+from source.dataset import FusionDataset
 from source.utils import log_epoch_results
 
 warnings.filterwarnings("ignore")
-
-# =============================================
-#   Dataset dla fuzji SAR+RGB (4 kanały: R,G,B,SAR)
-# =============================================
-class FusionDataset(source.dataset.Dataset):
-    def __getitem__(self, idx):
-        # Ścieżki obrazów bazując na etykiecie
-        rgb_path = self.fns[idx].replace("labels", "rgb_images")
-        sar_path = self.fns[idx].replace("labels", "sar_images")
-        # Ładowanie RGB (H,W,3) i SAR (H,W)
-        rgb = self.load_multiband(rgb_path)
-        sar = self.load_grayscale(sar_path)
-        # Połączenie kanałów -> (H,W,4)
-        img = np.dstack([rgb, sar[..., None]])
-        msk = self.load_grayscale(self.fns[idx])
-        # Augmentacje zgodne z SAR/RGB (bez kolorowych specyficznych operacji)
-        if self.train:
-            data = self.augm({"image": img, "mask": msk}, self.size)
-        else:
-            data = self.augm({"image": img, "mask": msk}, 1024)
-        data = self.to_tensor(data)  # image -> [4,H,W]
-        return {"x": data["image"], "y": data["mask"], "fn": self.fns[idx]}
 
 # =============================================
 #   DataLoader (strumieniowo, oszczędnie pamięciowo)
@@ -199,7 +178,6 @@ def main(args):
         decoder_attention_type="scse",
     )
 
-    # Diagnostyka: sprawdź pierwszą warstwę enkodera (kształt, mean/std, średnie po kanałach)
     try:
         found = False
         for name, p in model.named_parameters():
@@ -213,7 +191,6 @@ def main(args):
                 found = True
                 break
         if not found:
-            # fallback: pierwszy parametr 4D
             for name, p in model.named_parameters():
                 if p.dim() == 4:
                     print("First conv param (fallback):", name, "shape:", tuple(p.shape))
@@ -236,7 +213,26 @@ def main(args):
         print("Number of GPUs :", torch.cuda.device_count())
         model = torch.nn.DataParallel(model)
 
-    optimizer = torch.optim.Adam(model.parameters(), lr=float(args.learning_rate))
+    # build parameter groups: exclude biases and normalization params from weight decay
+    target = model.module if hasattr(model, "module") else model
+    decay_params = []
+    no_decay_params = []
+    for name, param in target.named_parameters():
+        if not param.requires_grad:
+            continue
+        lname = name.lower()
+        if name.endswith('.bias') or 'bn' in lname or 'norm' in lname:
+            no_decay_params.append(param)
+        else:
+            decay_params.append(param)
+
+    optimizer = torch.optim.AdamW(
+        [
+            {"params": decay_params, "weight_decay": 1e-3},
+            {"params": no_decay_params, "weight_decay": 0.0},
+        ],
+        lr=float(args.learning_rate),
+    )
 
     scheduler = None
     if args.scheduler == "plateau":
