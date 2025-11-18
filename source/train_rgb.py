@@ -121,6 +121,8 @@ def main(args):
     print("Number of classes  :", len(args.classes)+1)
     print("Batch size         :", args.batch_size)
     print("Device             :", device)
+    print("AMP                :", args.amp)
+    print("Grad clip          :", args.grad_clip)
     # Uruchamiamy pętlę treningową
     train_model(args, model, optimizer, criterion, device, scheduler)
 
@@ -135,12 +137,13 @@ def main(args):
 def train_model(args, model, optimizer, criterion, device, scheduler=None):
     train_data_loader, val_data_loader = build_data_loaders(args, RGBDataset)
     os.makedirs(args.save_model, exist_ok=True)
+    os.makedirs(args.save_results, exist_ok=True)
     model_name = f"RGB_Pesudo_{model.name}_s{args.seed}_{criterion.name}"
     max_score = -float("inf")
     bad_epochs = 0
     num_classes = len(args.classes) + 1
 
-    log_path = os.path.join(args.save_model, "train_rgb.txt")
+    log_path = os.path.join(args.save_results, "train_rgb.txt")
 
     for epoch in range(args.n_epochs):
         # --- trening strumieniowy ---
@@ -153,8 +156,8 @@ def train_model(args, model, optimizer, criterion, device, scheduler=None):
             dataloader=train_data_loader,
             device=device,
             num_classes=num_classes,
-            use_amp=False,
-            grad_clip=None,
+            use_amp=bool(args.amp),
+            grad_clip=float(args.grad_clip) if args.grad_clip is not None else None,
         )
         # --- walidacja strumieniowa ---
         logs_valid = S.valid_epoch_streaming(
@@ -163,7 +166,7 @@ def train_model(args, model, optimizer, criterion, device, scheduler=None):
             dataloader=val_data_loader,
             device=device,
             num_classes=num_classes,
-            use_amp=False,
+            use_amp=bool(args.amp),
         )
 
         # =============================================
@@ -230,7 +233,9 @@ if __name__ == "__main__":
     parser.add_argument('--early_patience', type=int, default=15)
     parser.add_argument('--min_delta', type=float, default=0.005)
     parser.add_argument('--min_lr', type=float, default=1e-6)
-    parser.add_argument('--t_max', type=int, default=20)
+    parser.add_argument('--t_max', type=int, default=30)
+    parser.add_argument('--amp', type=int, default=1, help='Włącz / wyłącz mixed precision (1/0)')
+    parser.add_argument('--grad_clip', type=float, default=1.0, help='Maks. norm gradientu; None aby wyłączyć')
     args = parser.parse_args()
     start = time.time()
     main(args)

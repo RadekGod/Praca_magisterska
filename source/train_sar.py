@@ -107,12 +107,13 @@ def main(args):
 def train_model(args, model, optimizer, criterion, device, scheduler=None):
     train_loader, valid_loader = build_data_loaders(args, SARDataset)
     os.makedirs(args.save_model, exist_ok=True)
+    os.makedirs(args.save_results, exist_ok=True)
     model_name = f"SAR_EfficientNetB4_s{args.seed}_{criterion.name}"
     max_score = -float("inf")
     bad_epochs = 0
     num_classes = len(args.classes) + 1
 
-    log_path = os.path.join(args.save_model, "train_sar.txt")
+    log_path = os.path.join(args.save_results, "train_sar.txt")
 
     for epoch in range(args.n_epochs):
         logs_train = S.train_epoch_streaming(
@@ -176,14 +177,16 @@ if __name__ == "__main__":
     parser.add_argument('--batch_size', type=int, default=4)
     parser.add_argument('--num_workers', type=int, default=4)
     parser.add_argument('--crop_size', type=int, default=256)
-    parser.add_argument('--learning_rate', type=float, default=1e-4)
+    parser.add_argument('--learning_rate', type=float, default=0.0001)
     parser.add_argument('--classes', default=[1,2,3,4,5,6,7,8])
     parser.add_argument('--data_root', default='../dataset/train')
     parser.add_argument('--save_model', default='model')
+    parser.add_argument('--save_results', default="results")
+
     parser.add_argument('--scheduler', choices=['plateau','cosine','none'], default='plateau')
-    parser.add_argument('--lr_patience', type=int, default=4)
+    parser.add_argument('--lr_patience', type=int, default=3)
     parser.add_argument('--early_patience', type=int, default=15)
-    parser.add_argument('--min_delta', type=float, default=0.003)
+    parser.add_argument('--min_delta', type=float, default=0.005)
     parser.add_argument('--min_lr', type=float, default=1e-6)
     parser.add_argument('--t_max', type=int, default=30)
     parser.add_argument('--amp', type=int, default=1, help='Włącz / wyłącz mixed precision (1/0)')
