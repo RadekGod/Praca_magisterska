@@ -7,6 +7,7 @@ import numpy as np
 import segmentation_models_pytorch as smp
 import torch
 from torch.optim.lr_scheduler import ReduceLROnPlateau
+import wandb
 
 import source
 from source import streaming as S
@@ -15,6 +16,7 @@ from source.dataset import SARDataset
 from source.utils import log_epoch_results, _get_lr, log_number_of_parameters
 
 warnings.filterwarnings("ignore")
+
 
 # =============================================
 #   Main
@@ -35,7 +37,7 @@ def main(args):
     device = "cuda" if torch.cuda.is_available() else "cpu"
 
     model = smp.Unet(
-        classes=len(args.classes)+1,
+        classes=len(args.classes) + 1,
         in_channels=1,
         activation=None,
         encoder_weights="imagenet",  # zostanie dostosowane do 1 kanału przez SMP
@@ -44,7 +46,7 @@ def main(args):
     )
     log_number_of_parameters(model)
 
-    classes_wt = np.ones([len(args.classes)+1], dtype=np.float32)
+    classes_wt = np.ones([len(args.classes) + 1], dtype=np.float32)
     criterion = source.losses.CEWithLogitsLoss(weights=classes_wt)
 
     model = model.to(device)
@@ -91,20 +93,56 @@ def main(args):
             eta_min=float(args.min_lr),
         )
 
-    print("Number of epochs   :", args.n_epochs)
-    print("Number of classes  :", len(args.classes)+1)
-    print("Batch size         :", args.batch_size)
-    print("Device             :", device)
-    print("AMP                :", args.amp)
-    print("Grad clip          :", args.grad_clip)
+    # Weights & Biases (opcjonalnie)
+    wandb_run = None
+    if getattr(args, "use_wandb", False):
+        wandb_config = {
+            "seed": int(args.seed),
+            "n_epochs": int(args.n_epochs),
+            "batch_size": int(args.batch_size),
+            "num_workers": int(args.num_workers),
+            "crop_size": int(args.crop_size),
+            "learning_rate": float(args.learning_rate),
+            "classes": args.classes,
+            "data_root": args.data_root,
+            "optimizer": "AdamW",
+            "scheduler": args.scheduler,
+            "lr_patience": int(args.lr_patience),
+            "early_patience": int(args.early_patience),
+            "min_delta": float(args.min_delta),
+            "min_lr": float(args.min_lr),
+            "t_max": int(args.t_max),
+            "amp": bool(args.amp),
+            "grad_clip": float(args.grad_clip) if args.grad_clip is not None else None,
+            "model_name": "Unet_efficientnet-b4_sar",
+            "criterion": criterion.name if hasattr(criterion, "name") else type(criterion).__name__,
+            "model_type": "sar",
+        }
+        wandb_run = wandb.init(
+            project=getattr(args, "wandb_project", "SAR-train"),
+            entity=getattr(args, "wandb_entity", None),
+            config=wandb_config,
+            name=f"sar_seed{args.seed}_lr{args.learning_rate}",
+        )
 
-    train_model(args, model, optimizer, criterion, device, scheduler)
+        print("Number of epochs   :", args.n_epochs)
+        print("Number of classes  :", len(args.classes) + 1)
+        print("Batch size         :", args.batch_size)
+        print("Device             :", device)
+        print("AMP                :", args.amp)
+        print("Grad clip          :", args.grad_clip)
+
+    train_model(args, model, optimizer, criterion, device, scheduler, wandb_run=wandb_run)
+
+    if wandb_run is not None:
+        wandb_run.finish()
+
 
 # =============================================
 #   Główna pętla treningowa z early stopping + scheduler
 # =============================================
 
-def train_model(args, model, optimizer, criterion, device, scheduler=None):
+def train_model(args, model, optimizer, criterion, device, scheduler=None, wandb_run=None):
     train_loader, valid_loader = build_data_loaders(args, SARDataset)
     os.makedirs(args.save_model, exist_ok=True)
     os.makedirs(args.save_results, exist_ok=True)
@@ -136,9 +174,26 @@ def train_model(args, model, optimizer, criterion, device, scheduler=None):
         )
 
         # =============================================
-        #   Logowanie wyników epoki do konsoli oraz pliku
+        #   Logowanie wyników epoki (plik + konsola)
         # =============================================
         log_epoch_results(log_path, epoch + 1, _get_lr(optimizer), logs_train, logs_valid)
+
+        # =============================================
+        #   Logowanie do Weights & Biases (jeśli włączone)
+        # Zapisujemy wszystkie metryki z train/valid oraz aktualny learning rate.
+        # =============================================
+        if wandb_run is not None:
+            log_dict = {"epoch": epoch + 1}
+            # aktualny learning rate (pierwsza grupa parametrów)
+            try:
+                log_dict["lr"] = float(optimizer.param_groups[0]["lr"])
+            except Exception:
+                pass
+            for k, v in logs_train.items():
+                log_dict[f"train/{k}"] = float(v)
+            for k, v in logs_valid.items():
+                log_dict[f"valid/{k}"] = float(v)
+            wandb_run.log(log_dict)
 
         score = logs_valid["iou"]
         if scheduler is not None:
@@ -168,22 +223,23 @@ def train_model(args, model, optimizer, criterion, device, scheduler=None):
                 print("LR osiągnął minimum i brak poprawy – zatrzymuję trening.")
                 break
 
+
 if __name__ == "__main__":
     os.environ["PYTORCH_CUDA_ALLOC_CONF"] = "max_split_size_mb:24"
     os.environ["NO_ALBUMENTATIONS_UPDATE"] = "1"
     parser = argparse.ArgumentParser(description='Training SAR (streaming, memory-efficient)')
     parser.add_argument('--seed', type=int, default=0)
-    parser.add_argument('--n_epochs', type=int, default=3)
+    parser.add_argument('--n_epochs', type=int, default=100)
     parser.add_argument('--batch_size', type=int, default=4)
     parser.add_argument('--num_workers', type=int, default=4)
     parser.add_argument('--crop_size', type=int, default=256)
     parser.add_argument('--learning_rate', type=float, default=0.0001)
-    parser.add_argument('--classes', default=[1,2,3,4,5,6,7,8])
-    parser.add_argument('--data_root', default='../dataset/train')
-    parser.add_argument('--save_model', default='model')
-    parser.add_argument('--save_results', default="results")
+    parser.add_argument('--classes', default=[1, 2, 3, 4, 5, 6, 7, 8])
+    parser.add_argument('--data_root', type=str, default='../dataset/train')
+    parser.add_argument('--save_model', type=str, default='model')
+    parser.add_argument('--save_results', type=str, default="results")
 
-    parser.add_argument('--scheduler', choices=['plateau','cosine','none'], default='plateau')
+    parser.add_argument('--scheduler', type=str, choices=['plateau', 'cosine', 'none'], default='plateau')
     parser.add_argument('--lr_patience', type=int, default=3)
     parser.add_argument('--early_patience', type=int, default=15)
     parser.add_argument('--min_delta', type=float, default=0.005)
@@ -191,6 +247,11 @@ if __name__ == "__main__":
     parser.add_argument('--t_max', type=int, default=30)
     parser.add_argument('--amp', type=int, default=1, help='Włącz / wyłącz mixed precision (1/0)')
     parser.add_argument('--grad_clip', type=float, default=1.0, help='Maks. norm gradientu; None aby wyłączyć')
+    # --- Weights & Biases ---
+    parser.add_argument('--use_wandb', type=bool, default=True, help='Włącz logowanie do Weights & Biases')
+    parser.add_argument('--wandb_project', type=str, default='SAR-train', help='Nazwa projektu w W&B')
+    parser.add_argument('--wandb_entity', type=str, default='radoslaw-godlewski00-politechnika-warszawska',
+                        help='Nazwa entity w W&B')
     args = parser.parse_args()
     start = time.time()
     main(args)

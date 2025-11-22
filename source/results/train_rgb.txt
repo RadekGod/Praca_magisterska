@@ -1,433 +1,738 @@
-Epoch: 1 (lr: 0.0001)
-Train Loss: 1.583765, Valid Loss: 0.998679
-Train IoU: 0.205942, Valid IoU: 0.335308
-Train Dice: 0.309514, Valid Dice: 0.423280
-Train Acc: 0.459489, Valid Acc: 0.664960
-Train Prec: 0.345532, Valid Prec: 0.508518
-Train Rec: 0.298080, Valid Rec: 0.442918
-Train F1: 0.309514, Valid F1: 0.423280
+Epoch: 1 (lr: 0.0001, 0.0001)
+Train Loss: 1.546051, Valid Loss: 1.008863
+Train IoU: 0.203900, Valid IoU: 0.348512
+Train Dice: 0.306369, Valid Dice: 0.449202
+Train Acc: 0.458774, Valid Acc: 0.656571
+Train Prec: 0.326527, Valid Prec: 0.469929
+Train Rec: 0.324701, Valid Rec: 0.461291
+Train F1: 0.306369, Valid F1: 0.449202
 
-Epoch: 2 (lr: 0.0001)
-Train Loss: 1.116014, Valid Loss: 0.823123
-Train IoU: 0.320525, Valid IoU: 0.429060
-Train Dice: 0.432145, Valid Dice: 0.543316
-Train Acc: 0.616176, Valid Acc: 0.718295
-Train Prec: 0.501901, Valid Prec: 0.552892
-Train Rec: 0.431256, Valid Rec: 0.543106
-Train F1: 0.432145, Valid F1: 0.543316
+Epoch: 2 (lr: 0.0001, 0.0001)
+Train Loss: 1.201772, Valid Loss: 0.851023
+Train IoU: 0.293146, Valid IoU: 0.395676
+Train Dice: 0.401741, Valid Dice: 0.491645
+Train Acc: 0.579078, Valid Acc: 0.696833
+Train Prec: 0.434154, Valid Prec: 0.558692
+Train Rec: 0.406749, Valid Rec: 0.509710
+Train F1: 0.401741, Valid F1: 0.491645
 
-Epoch: 3 (lr: 0.0001)
-Train Loss: 0.992039, Valid Loss: 0.728906
-Train IoU: 0.384362, Valid IoU: 0.469402
-Train Dice: 0.506584, Valid Dice: 0.578973
-Train Acc: 0.660374, Valid Acc: 0.748025
-Train Prec: 0.554627, Valid Prec: 0.587985
-Train Rec: 0.497629, Valid Rec: 0.575825
-Train F1: 0.506584, Valid F1: 0.578973
+Epoch: 1 (lr: 0.0001, 0.0001)
+Train Loss: 1.559802, Valid Loss: 0.982284
+Train IoU: 0.194220, Valid IoU: 0.362345
+Train Dice: 0.296328, Valid Dice: 0.463701
+Train Acc: 0.451021, Valid Acc: 0.660278
+Train Prec: 0.328483, Valid Prec: 0.460717
+Train Rec: 0.292813, Valid Rec: 0.476251
+Train F1: 0.296328, Valid F1: 0.463701
 
-Epoch: 4 (lr: 0.0001)
-Train Loss: 0.914325, Valid Loss: 0.719469
-Train IoU: 0.410915, Valid IoU: 0.457540
-Train Dice: 0.531015, Valid Dice: 0.568102
-Train Acc: 0.684041, Valid Acc: 0.738164
-Train Prec: 0.543955, Valid Prec: 0.578274
-Train Rec: 0.525168, Valid Rec: 0.585772
-Train F1: 0.531015, Valid F1: 0.568102
+Epoch: 2 (lr: 0.0001, 0.0001)
+Train Loss: 1.211292, Valid Loss: 0.878627
+Train IoU: 0.294020, Valid IoU: 0.386579
+Train Dice: 0.402771, Valid Dice: 0.485382
+Train Acc: 0.578218, Valid Acc: 0.686030
+Train Prec: 0.427302, Valid Prec: 0.573368
+Train Rec: 0.410092, Valid Rec: 0.496970
+Train F1: 0.402771, Valid F1: 0.485382
 
-Epoch: 5 (lr: 0.0001)
-Train Loss: 0.855533, Valid Loss: 0.663316
-Train IoU: 0.431757, Valid IoU: 0.493950
-Train Dice: 0.549592, Valid Dice: 0.599028
-Train Acc: 0.704349, Valid Acc: 0.765930
-Train Prec: 0.567257, Valid Prec: 0.607184
-Train Rec: 0.545603, Valid Rec: 0.596240
-Train F1: 0.549592, Valid F1: 0.599028
+Epoch: 3 (lr: 0.0001, 0.0001)
+Train Loss: 1.079760, Valid Loss: 0.880705
+Train IoU: 0.328385, Valid IoU: 0.378888
+Train Dice: 0.437919, Valid Dice: 0.478447
+Train Acc: 0.620217, Valid Acc: 0.679793
+Train Prec: 0.486002, Valid Prec: 0.541562
+Train Rec: 0.441102, Valid Rec: 0.503047
+Train F1: 0.437919, Valid F1: 0.478447
 
-Epoch: 6 (lr: 0.0001)
-Train Loss: 0.828167, Valid Loss: 0.652948
-Train IoU: 0.439033, Valid IoU: 0.506502
-Train Dice: 0.555550, Valid Dice: 0.609475
-Train Acc: 0.710786, Valid Acc: 0.774197
-Train Prec: 0.566648, Valid Prec: 0.609120
-Train Rec: 0.550462, Valid Rec: 0.612812
-Train F1: 0.555550, Valid F1: 0.609475
+Epoch: 1 (lr: 0.0001, 0.0001)
+Train Loss: 1.585385, Valid Loss: 1.050247
+Train IoU: 0.182382, Valid IoU: 0.336941
+Train Dice: 0.279863, Valid Dice: 0.437852
+Train Acc: 0.443087, Valid Acc: 0.631223
+Train Prec: 0.313747, Valid Prec: 0.450820
+Train Rec: 0.278913, Valid Rec: 0.459971
+Train F1: 0.279863, Valid F1: 0.437852
 
-Epoch: 7 (lr: 0.0001)
-Train Loss: 0.787057, Valid Loss: 0.651561
-Train IoU: 0.456697, Valid IoU: 0.498424
-Train Dice: 0.570610, Valid Dice: 0.601968
-Train Acc: 0.729583, Valid Acc: 0.765178
-Train Prec: 0.598103, Valid Prec: 0.613364
-Train Rec: 0.566249, Valid Rec: 0.627166
-Train F1: 0.570610, Valid F1: 0.601968
+Epoch: 2 (lr: 0.0001, 0.0001)
+Train Loss: 1.183306, Valid Loss: 0.860803
+Train IoU: 0.303615, Valid IoU: 0.386894
+Train Dice: 0.410787, Valid Dice: 0.484842
+Train Acc: 0.591110, Valid Acc: 0.679393
+Train Prec: 0.421407, Valid Prec: 0.521972
+Train Rec: 0.418388, Valid Rec: 0.502254
+Train F1: 0.410787, Valid F1: 0.484842
 
-Epoch: 8 (lr: 0.0001)
-Train Loss: 0.765832, Valid Loss: 0.622570
-Train IoU: 0.462719, Valid IoU: 0.508906
-Train Dice: 0.575687, Valid Dice: 0.611028
-Train Acc: 0.733217, Valid Acc: 0.778403
-Train Prec: 0.589424, Valid Prec: 0.605223
-Train Rec: 0.574051, Valid Rec: 0.627657
-Train F1: 0.575687, Valid F1: 0.611028
+Epoch: 3 (lr: 0.0001, 0.0001)
+Train Loss: 1.082049, Valid Loss: 0.836306
+Train IoU: 0.330059, Valid IoU: 0.411174
+Train Dice: 0.437533, Valid Dice: 0.516539
+Train Acc: 0.624586, Valid Acc: 0.693062
+Train Prec: 0.491737, Valid Prec: 0.566083
+Train Rec: 0.444569, Valid Rec: 0.534100
+Train F1: 0.437533, Valid F1: 0.516539
 
-Epoch: 9 (lr: 0.0001)
-Train Loss: 0.738661, Valid Loss: 0.593403
-Train IoU: 0.469944, Valid IoU: 0.524453
-Train Dice: 0.581256, Valid Dice: 0.623088
-Train Acc: 0.739211, Valid Acc: 0.791897
-Train Prec: 0.592771, Valid Prec: 0.625732
-Train Rec: 0.579117, Valid Rec: 0.625250
-Train F1: 0.581256, Valid F1: 0.623088
+Epoch: 4 (lr: 0.0001, 0.0001)
+Train Loss: 1.011261, Valid Loss: 0.757827
+Train IoU: 0.360520, Valid IoU: 0.434880
+Train Dice: 0.474947, Valid Dice: 0.548038
+Train Acc: 0.650084, Valid Acc: 0.717598
+Train Prec: 0.511712, Valid Prec: 0.574603
+Train Rec: 0.473198, Valid Rec: 0.553837
+Train F1: 0.474946, Valid F1: 0.548038
 
-Epoch: 10 (lr: 0.0001)
-Train Loss: 0.713819, Valid Loss: 0.600801
-Train IoU: 0.478918, Valid IoU: 0.518444
-Train Dice: 0.588588, Valid Dice: 0.618486
-Train Acc: 0.750461, Valid Acc: 0.786917
-Train Prec: 0.610602, Valid Prec: 0.621369
-Train Rec: 0.587328, Valid Rec: 0.635325
-Train F1: 0.588588, Valid F1: 0.618486
+Epoch: 5 (lr: 0.0001, 0.0001)
+Train Loss: 0.933542, Valid Loss: 0.715864
+Train IoU: 0.392207, Valid IoU: 0.458332
+Train Dice: 0.511579, Valid Dice: 0.565526
+Train Acc: 0.676710, Valid Acc: 0.737313
+Train Prec: 0.531789, Valid Prec: 0.602088
+Train Rec: 0.504316, Valid Rec: 0.562563
+Train F1: 0.511579, Valid F1: 0.565526
 
-Epoch: 11 (lr: 0.0001)
-Train Loss: 0.695813, Valid Loss: 0.572285
-Train IoU: 0.485061, Valid IoU: 0.525307
-Train Dice: 0.593225, Valid Dice: 0.623826
-Train Acc: 0.757386, Valid Acc: 0.795429
-Train Prec: 0.608875, Valid Prec: 0.619059
-Train Rec: 0.591356, Valid Rec: 0.632977
-Train F1: 0.593225, Valid F1: 0.623826
+Epoch: 6 (lr: 0.0001, 0.0001)
+Train Loss: 0.885826, Valid Loss: 0.669138
+Train IoU: 0.409722, Valid IoU: 0.501413
+Train Dice: 0.527220, Valid Dice: 0.605836
+Train Acc: 0.691727, Valid Acc: 0.765649
+Train Prec: 0.541057, Valid Prec: 0.600491
+Train Rec: 0.521162, Valid Rec: 0.613845
+Train F1: 0.527219, Valid F1: 0.605836
 
-Epoch: 12 (lr: 0.0001)
-Train Loss: 0.685945, Valid Loss: 0.582777
-Train IoU: 0.491879, Valid IoU: 0.530002
-Train Dice: 0.598511, Valid Dice: 0.627099
-Train Acc: 0.759457, Valid Acc: 0.793662
-Train Prec: 0.620682, Valid Prec: 0.630505
-Train Rec: 0.596363, Valid Rec: 0.636594
-Train F1: 0.598511, Valid F1: 0.627099
+Epoch: 7 (lr: 0.0001, 0.0001)
+Train Loss: 0.855581, Valid Loss: 0.695376
+Train IoU: 0.431785, Valid IoU: 0.497624
+Train Dice: 0.549647, Valid Dice: 0.602134
+Train Acc: 0.706943, Valid Acc: 0.762643
+Train Prec: 0.580957, Valid Prec: 0.590133
+Train Rec: 0.544758, Valid Rec: 0.625443
+Train F1: 0.549647, Valid F1: 0.602134
 
-Epoch: 13 (lr: 0.0001)
-Train Loss: 0.657647, Valid Loss: 0.569503
-Train IoU: 0.497543, Valid IoU: 0.530483
-Train Dice: 0.602803, Valid Dice: 0.627470
-Train Acc: 0.767220, Valid Acc: 0.798580
-Train Prec: 0.612353, Valid Prec: 0.632239
-Train Rec: 0.600894, Valid Rec: 0.638588
-Train F1: 0.602802, Valid F1: 0.627470
+Epoch: 8 (lr: 0.0001, 0.0001)
+Train Loss: 0.828362, Valid Loss: 0.682496
+Train IoU: 0.444313, Valid IoU: 0.499218
+Train Dice: 0.560463, Valid Dice: 0.603930
+Train Acc: 0.719605, Valid Acc: 0.765886
+Train Prec: 0.567076, Valid Prec: 0.588390
+Train Rec: 0.555936, Valid Rec: 0.628178
+Train F1: 0.560463, Valid F1: 0.603930
 
-Epoch: 14 (lr: 0.0001)
-Train Loss: 0.658608, Valid Loss: 0.584382
-Train IoU: 0.499371, Valid IoU: 0.524315
-Train Dice: 0.604143, Valid Dice: 0.622154
-Train Acc: 0.767563, Valid Acc: 0.789704
-Train Prec: 0.617786, Valid Prec: 0.627652
-Train Rec: 0.602246, Valid Rec: 0.641858
-Train F1: 0.604143, Valid F1: 0.622154
+Epoch: 9 (lr: 0.0001, 0.0001)
+Train Loss: 0.796924, Valid Loss: 0.725282
+Train IoU: 0.453876, Valid IoU: 0.492334
+Train Dice: 0.568248, Valid Dice: 0.598607
+Train Acc: 0.730810, Valid Acc: 0.757943
+Train Prec: 0.576445, Valid Prec: 0.596143
+Train Rec: 0.562938, Valid Rec: 0.612976
+Train F1: 0.568248, Valid F1: 0.598607
 
-Epoch: 15 (lr: 0.0001)
-Train Loss: 0.644552, Valid Loss: 0.596214
-Train IoU: 0.506372, Valid IoU: 0.524805
-Train Dice: 0.610138, Valid Dice: 0.622163
-Train Acc: 0.772878, Valid Acc: 0.788733
-Train Prec: 0.647443, Valid Prec: 0.625763
-Train Rec: 0.609155, Valid Rec: 0.642276
-Train F1: 0.610138, Valid F1: 0.622163
+Epoch: 10 (lr: 0.0001, 0.0001)
+Train Loss: 0.781243, Valid Loss: 0.703746
+Train IoU: 0.455252, Valid IoU: 0.501663
+Train Dice: 0.569167, Valid Dice: 0.604452
+Train Acc: 0.729973, Valid Acc: 0.765356
+Train Prec: 0.578519, Valid Prec: 0.595450
+Train Rec: 0.564326, Valid Rec: 0.632119
+Train F1: 0.569167, Valid F1: 0.604452
 
-Epoch: 16 (lr: 0.0001)
-Train Loss: 0.639320, Valid Loss: 0.577744
-Train IoU: 0.506782, Valid IoU: 0.531609
-Train Dice: 0.610660, Valid Dice: 0.627951
-Train Acc: 0.773638, Valid Acc: 0.797889
-Train Prec: 0.625973, Valid Prec: 0.637605
-Train Rec: 0.608190, Valid Rec: 0.641184
-Train F1: 0.610660, Valid F1: 0.627951
+Epoch: 11 (lr: 5e-05, 5e-05)
+Train Loss: 0.739934, Valid Loss: 0.786165
+Train IoU: 0.475680, Valid IoU: 0.509335
+Train Dice: 0.586125, Valid Dice: 0.611319
+Train Acc: 0.747154, Valid Acc: 0.776392
+Train Prec: 0.605383, Valid Prec: 0.599727
+Train Rec: 0.581032, Valid Rec: 0.634302
+Train F1: 0.586125, Valid F1: 0.611319
 
-Epoch: 17 (lr: 5e-05)
-Train Loss: 0.606382, Valid Loss: 0.577206
-Train IoU: 0.516348, Valid IoU: 0.545817
-Train Dice: 0.618766, Valid Dice: 0.650427
-Train Acc: 0.783122, Valid Acc: 0.799442
-Train Prec: 0.645399, Valid Prec: 0.683990
-Train Rec: 0.616788, Valid Rec: 0.662784
-Train F1: 0.618766, Valid F1: 0.650427
+Epoch: 12 (lr: 5e-05, 5e-05)
+Train Loss: 0.724429, Valid Loss: 0.771223
+Train IoU: 0.481839, Valid IoU: 0.504859
+Train Dice: 0.590917, Valid Dice: 0.606976
+Train Acc: 0.753538, Valid Acc: 0.768504
+Train Prec: 0.599283, Valid Prec: 0.595955
+Train Rec: 0.587342, Valid Rec: 0.635989
+Train F1: 0.590917, Valid F1: 0.606976
 
-Epoch: 18 (lr: 5e-05)
-Train Loss: 0.590461, Valid Loss: 0.566289
-Train IoU: 0.521973, Valid IoU: 0.543863
-Train Dice: 0.621793, Valid Dice: 0.639334
-Train Acc: 0.788685, Valid Acc: 0.803433
-Train Prec: 0.639036, Valid Prec: 0.703449
-Train Rec: 0.619836, Valid Rec: 0.651661
-Train F1: 0.621793, Valid F1: 0.639334
+Epoch: 13 (lr: 5e-05, 5e-05)
+Train Loss: 0.714881, Valid Loss: 0.824528
+Train IoU: 0.484626, Valid IoU: 0.516572
+Train Dice: 0.593041, Valid Dice: 0.616373
+Train Acc: 0.756459, Valid Acc: 0.780520
+Train Prec: 0.610256, Valid Prec: 0.606203
+Train Rec: 0.589357, Valid Rec: 0.640635
+Train F1: 0.593041, Valid F1: 0.616373
 
-Epoch: 19 (lr: 5e-05)
-Train Loss: 0.585131, Valid Loss: 0.537965
-Train IoU: 0.524128, Valid IoU: 0.550319
-Train Dice: 0.625422, Valid Dice: 0.653473
-Train Acc: 0.789067, Valid Acc: 0.806844
-Train Prec: 0.657826, Valid Prec: 0.684956
-Train Rec: 0.622547, Valid Rec: 0.658167
-Train F1: 0.625422, Valid F1: 0.653472
+Epoch: 14 (lr: 5e-05, 5e-05)
+Train Loss: 0.707352, Valid Loss: 0.739077
+Train IoU: 0.488678, Valid IoU: 0.521107
+Train Dice: 0.596787, Valid Dice: 0.619425
+Train Acc: 0.760508, Valid Acc: 0.784438
+Train Prec: 0.622188, Valid Prec: 0.611558
+Train Rec: 0.593573, Valid Rec: 0.642789
+Train F1: 0.596787, Valid F1: 0.619425
 
-Epoch: 20 (lr: 5e-05)
-Train Loss: 0.584691, Valid Loss: 0.562606
-Train IoU: 0.532959, Valid IoU: 0.535937
-Train Dice: 0.637967, Valid Dice: 0.636714
-Train Acc: 0.791227, Valid Acc: 0.798350
-Train Prec: 0.692056, Valid Prec: 0.653802
-Train Rec: 0.631502, Valid Rec: 0.650543
-Train F1: 0.637967, Valid F1: 0.636714
+Epoch: 15 (lr: 5e-05, 5e-05)
+Train Loss: 0.680488, Valid Loss: 0.724150
+Train IoU: 0.499711, Valid IoU: 0.516590
+Train Dice: 0.604615, Valid Dice: 0.616417
+Train Acc: 0.769672, Valid Acc: 0.781176
+Train Prec: 0.614070, Valid Prec: 0.604451
+Train Rec: 0.599880, Valid Rec: 0.643836
+Train F1: 0.604615, Valid F1: 0.616417
 
-Epoch: 21 (lr: 5e-05)
-Train Loss: 0.589543, Valid Loss: 0.560758
-Train IoU: 0.525945, Valid IoU: 0.552369
-Train Dice: 0.631052, Valid Dice: 0.652347
-Train Acc: 0.787491, Valid Acc: 0.808711
-Train Prec: 0.656462, Valid Prec: 0.693186
-Train Rec: 0.626335, Valid Rec: 0.655274
-Train F1: 0.631052, Valid F1: 0.652347
+Epoch: 16 (lr: 5e-05, 5e-05)
+Train Loss: 0.683365, Valid Loss: 0.856403
+Train IoU: 0.491795, Valid IoU: 0.504443
+Train Dice: 0.598875, Valid Dice: 0.607162
+Train Acc: 0.765879, Valid Acc: 0.770326
+Train Prec: 0.609555, Valid Prec: 0.599957
+Train Rec: 0.594858, Valid Rec: 0.632601
+Train F1: 0.598875, Valid F1: 0.607162
 
-Epoch: 22 (lr: 5e-05)
-Train Loss: 0.582539, Valid Loss: 0.537923
-Train IoU: 0.523125, Valid IoU: 0.556854
-Train Dice: 0.627912, Valid Dice: 0.659447
-Train Acc: 0.788394, Valid Acc: 0.808350
-Train Prec: 0.665464, Valid Prec: 0.675263
-Train Rec: 0.622947, Valid Rec: 0.664667
-Train F1: 0.627912, Valid F1: 0.659447
+Epoch: 17 (lr: 5e-05, 5e-05)
+Train Loss: 0.689976, Valid Loss: 1.072738
+Train IoU: 0.493374, Valid IoU: 0.495142
+Train Dice: 0.599984, Valid Dice: 0.599946
+Train Acc: 0.763841, Valid Acc: 0.759061
+Train Prec: 0.612622, Valid Prec: 0.602895
+Train Rec: 0.596784, Valid Rec: 0.627715
+Train F1: 0.599984, Valid F1: 0.599946
 
-Epoch: 23 (lr: 5e-05)
-Train Loss: 0.578664, Valid Loss: 0.545314
-Train IoU: 0.532918, Valid IoU: 0.562652
-Train Dice: 0.636449, Valid Dice: 0.666630
-Train Acc: 0.792303, Valid Acc: 0.809277
-Train Prec: 0.667710, Valid Prec: 0.685909
-Train Rec: 0.632536, Valid Rec: 0.668373
-Train F1: 0.636449, Valid F1: 0.666630
+Epoch: 18 (lr: 5e-05, 5e-05)
+Train Loss: 0.679646, Valid Loss: 0.890747
+Train IoU: 0.497249, Valid IoU: 0.505943
+Train Dice: 0.603240, Valid Dice: 0.608550
+Train Acc: 0.768012, Valid Acc: 0.771294
+Train Prec: 0.653858, Valid Prec: 0.593541
+Train Rec: 0.600470, Valid Rec: 0.638464
+Train F1: 0.603240, Valid F1: 0.608550
 
-Epoch: 24 (lr: 5e-05)
-Train Loss: 0.560661, Valid Loss: 0.595051
-Train IoU: 0.544219, Valid IoU: 0.549280
-Train Dice: 0.650613, Valid Dice: 0.649998
-Train Acc: 0.797966, Valid Acc: 0.809476
-Train Prec: 0.691209, Valid Prec: 0.672225
-Train Rec: 0.640409, Valid Rec: 0.653440
-Train F1: 0.650613, Valid F1: 0.649998
+Epoch: 19 (lr: 2.5e-05, 2.5e-05)
+Train Loss: 0.659229, Valid Loss: 1.476778
+Train IoU: 0.502923, Valid IoU: 0.493757
+Train Dice: 0.607201, Valid Dice: 0.597933
+Train Acc: 0.772480, Valid Acc: 0.755415
+Train Prec: 0.630753, Valid Prec: 0.589408
+Train Rec: 0.603611, Valid Rec: 0.631628
+Train F1: 0.607201, Valid F1: 0.597933
 
-Epoch: 25 (lr: 5e-05)
-Train Loss: 0.559413, Valid Loss: 0.532307
-Train IoU: 0.542407, Valid IoU: 0.557759
-Train Dice: 0.645447, Valid Dice: 0.659374
-Train Acc: 0.799867, Valid Acc: 0.814034
-Train Prec: 0.674382, Valid Prec: 0.686954
-Train Rec: 0.638726, Valid Rec: 0.662019
-Train F1: 0.645447, Valid F1: 0.659374
+Epoch: 20 (lr: 2.5e-05, 2.5e-05)
+Train Loss: 0.664180, Valid Loss: 1.368886
+Train IoU: 0.502831, Valid IoU: 0.492035
+Train Dice: 0.607320, Valid Dice: 0.597605
+Train Acc: 0.773554, Valid Acc: 0.756471
+Train Prec: 0.625598, Valid Prec: 0.588304
+Train Rec: 0.604120, Valid Rec: 0.629983
+Train F1: 0.607320, Valid F1: 0.597605
 
-Epoch: 26 (lr: 5e-05)
-Train Loss: 0.563859, Valid Loss: 0.533746
-Train IoU: 0.538486, Valid IoU: 0.562338
-Train Dice: 0.642104, Valid Dice: 0.661480
-Train Acc: 0.797093, Valid Acc: 0.817669
-Train Prec: 0.675119, Valid Prec: 0.680616
-Train Rec: 0.635450, Valid Rec: 0.657364
-Train F1: 0.642104, Valid F1: 0.661480
+Epoch: 21 (lr: 2.5e-05, 2.5e-05)
+Train Loss: 0.632528, Valid Loss: 1.209148
+Train IoU: 0.509554, Valid IoU: 0.508354
+Train Dice: 0.612383, Valid Dice: 0.609779
+Train Acc: 0.779770, Valid Acc: 0.771601
+Train Prec: 0.633426, Valid Prec: 0.599079
+Train Rec: 0.609622, Valid Rec: 0.638834
+Train F1: 0.612383, Valid F1: 0.609778
 
-Epoch: 27 (lr: 5e-05)
-Train Loss: 0.548269, Valid Loss: 0.527738
-Train IoU: 0.550574, Valid IoU: 0.562854
-Train Dice: 0.657809, Valid Dice: 0.664570
-Train Acc: 0.802524, Valid Acc: 0.816517
-Train Prec: 0.696601, Valid Prec: 0.680289
-Train Rec: 0.646707, Valid Rec: 0.667085
-Train F1: 0.657809, Valid F1: 0.664570
+Epoch: 22 (lr: 2.5e-05, 2.5e-05)
+Train Loss: 0.642040, Valid Loss: 1.007385
+Train IoU: 0.508728, Valid IoU: 0.504905
+Train Dice: 0.611476, Valid Dice: 0.607354
+Train Acc: 0.778928, Valid Acc: 0.768699
+Train Prec: 0.633251, Valid Prec: 0.608774
+Train Rec: 0.608782, Valid Rec: 0.636393
+Train F1: 0.611476, Valid F1: 0.607354
 
-Epoch: 28 (lr: 2.5e-05)
-Train Loss: 0.549237, Valid Loss: 0.517570
-Train IoU: 0.551330, Valid IoU: 0.569618
-Train Dice: 0.660005, Valid Dice: 0.674330
-Train Acc: 0.800752, Valid Acc: 0.816190
-Train Prec: 0.701595, Valid Prec: 0.680183
-Train Rec: 0.648890, Valid Rec: 0.677456
-Train F1: 0.660005, Valid F1: 0.674330
+Epoch: 23 (lr: 1.25e-05, 1.25e-05)
+Train Loss: 0.631512, Valid Loss: 1.281126
+Train IoU: 0.511435, Valid IoU: 0.490398
+Train Dice: 0.613904, Valid Dice: 0.595966
+Train Acc: 0.783163, Valid Acc: 0.754190
+Train Prec: 0.644023, Valid Prec: 0.612693
+Train Rec: 0.611104, Valid Rec: 0.630241
+Train F1: 0.613904, Valid F1: 0.595966
 
-Epoch: 29 (lr: 2.5e-05)
-Train Loss: 0.529836, Valid Loss: 0.532634
-Train IoU: 0.562183, Valid IoU: 0.574872
-Train Dice: 0.666702, Valid Dice: 0.681338
-Train Acc: 0.810414, Valid Acc: 0.816562
-Train Prec: 0.701444, Valid Prec: 0.683629
-Train Rec: 0.654983, Valid Rec: 0.687426
-Train F1: 0.666702, Valid F1: 0.681338
+Epoch: 24 (lr: 1.25e-05, 1.25e-05)
+Train Loss: 0.617275, Valid Loss: 1.143202
+Train IoU: 0.517471, Valid IoU: 0.498130
+Train Dice: 0.617921, Valid Dice: 0.602160
+Train Acc: 0.788693, Valid Acc: 0.762054
+Train Prec: 0.648772, Valid Prec: 0.589948
+Train Rec: 0.613449, Valid Rec: 0.637320
+Train F1: 0.617921, Valid F1: 0.602160
 
-Epoch: 30 (lr: 2.5e-05)
-Train Loss: 0.533696, Valid Loss: 0.519929
-Train IoU: 0.556186, Valid IoU: 0.577623
-Train Dice: 0.660467, Valid Dice: 0.681940
-Train Acc: 0.805943, Valid Acc: 0.818980
-Train Prec: 0.692609, Valid Prec: 0.684487
-Train Rec: 0.651721, Valid Rec: 0.683544
-Train F1: 0.660467, Valid F1: 0.681940
+Epoch: 25 (lr: 1.25e-05, 1.25e-05)
+Train Loss: 0.625006, Valid Loss: 1.020582
+Train IoU: 0.518282, Valid IoU: 0.509337
+Train Dice: 0.618685, Valid Dice: 0.610718
+Train Acc: 0.786019, Valid Acc: 0.772228
+Train Prec: 0.630826, Valid Prec: 0.604017
+Train Rec: 0.615015, Valid Rec: 0.635347
+Train F1: 0.618685, Valid F1: 0.610718
 
-Epoch: 31 (lr: 2.5e-05)
-Train Loss: 0.524608, Valid Loss: 0.527686
-Train IoU: 0.564956, Valid IoU: 0.575059
-Train Dice: 0.673351, Valid Dice: 0.680441
-Train Acc: 0.809538, Valid Acc: 0.816812
-Train Prec: 0.700139, Valid Prec: 0.684391
-Train Rec: 0.662365, Valid Rec: 0.682531
-Train F1: 0.673351, Valid F1: 0.680441
+Epoch: 26 (lr: 1.25e-05, 1.25e-05)
+Train Loss: 0.609493, Valid Loss: 0.996618
+Train IoU: 0.520638, Valid IoU: 0.510260
+Train Dice: 0.620484, Valid Dice: 0.611606
+Train Acc: 0.789714, Valid Acc: 0.774076
+Train Prec: 0.648128, Valid Prec: 0.607109
+Train Rec: 0.616332, Valid Rec: 0.637495
+Train F1: 0.620484, Valid F1: 0.611606
 
-Epoch: 32 (lr: 2.5e-05)
-Train Loss: 0.529715, Valid Loss: 0.519393
-Train IoU: 0.567823, Valid IoU: 0.561906
-Train Dice: 0.677302, Valid Dice: 0.663110
-Train Acc: 0.808681, Valid Acc: 0.817013
-Train Prec: 0.703950, Valid Prec: 0.680408
-Train Rec: 0.664001, Valid Rec: 0.665305
-Train F1: 0.677302, Valid F1: 0.663110
+Epoch: 27 (lr: 6.25e-06, 6.25e-06)
+Train Loss: 0.612102, Valid Loss: 0.993908
+Train IoU: 0.519614, Valid IoU: 0.505593
+Train Dice: 0.619716, Valid Dice: 0.608322
+Train Acc: 0.787756, Valid Acc: 0.771115
+Train Prec: 0.633370, Valid Prec: 0.624195
+Train Rec: 0.616653, Valid Rec: 0.637596
+Train F1: 0.619716, Valid F1: 0.608322
 
-Epoch: 33 (lr: 2.5e-05)
-Train Loss: 0.527321, Valid Loss: 0.510148
-Train IoU: 0.571068, Valid IoU: 0.582349
-Train Dice: 0.678577, Valid Dice: 0.689154
-Train Acc: 0.811656, Valid Acc: 0.821087
-Train Prec: 0.706337, Valid Prec: 0.684531
-Train Rec: 0.667051, Valid Rec: 0.695414
-Train F1: 0.678577, Valid F1: 0.689154
+Epoch: 28 (lr: 6.25e-06, 6.25e-06)
+Train Loss: 0.626921, Valid Loss: 0.920582
+Train IoU: 0.516230, Valid IoU: 0.515136
+Train Dice: 0.617705, Valid Dice: 0.615334
+Train Acc: 0.785212, Valid Acc: 0.779734
+Train Prec: 0.639309, Valid Prec: 0.603844
+Train Rec: 0.613117, Valid Rec: 0.642700
+Train F1: 0.617705, Valid F1: 0.615334
 
-Epoch: 34 (lr: 2.5e-05)
-Train Loss: 0.528406, Valid Loss: 0.514030
-Train IoU: 0.562698, Valid IoU: 0.582235
-Train Dice: 0.670247, Valid Dice: 0.688331
-Train Acc: 0.809678, Valid Acc: 0.821468
-Train Prec: 0.697111, Valid Prec: 0.684742
-Train Rec: 0.659035, Valid Rec: 0.694093
-Train F1: 0.670247, Valid F1: 0.688331
+Epoch: 1 (lr: 0.001, 0.001)
+Train Loss: 1.340852, Valid Loss: 1.009348
+Train IoU: 0.235017, Valid IoU: 0.302469
+Train Dice: 0.339094, Valid Dice: 0.396946
+Train Acc: 0.509323, Valid Acc: 0.602360
+Train Prec: 0.362167, Valid Prec: 0.465995
+Train Rec: 0.343550, Valid Rec: 0.424177
+Train F1: 0.339094, Valid F1: 0.396946
 
-Epoch: 35 (lr: 2.5e-05)
-Train Loss: 0.524910, Valid Loss: 0.507320
-Train IoU: 0.568932, Valid IoU: 0.581360
-Train Dice: 0.676978, Valid Dice: 0.686747
-Train Acc: 0.810684, Valid Acc: 0.820887
-Train Prec: 0.701082, Valid Prec: 0.679179
-Train Rec: 0.665308, Valid Rec: 0.696918
-Train F1: 0.676978, Valid F1: 0.686747
+Epoch: 2 (lr: 0.001, 0.001)
+Train Loss: 1.105810, Valid Loss: 1.027021
+Train IoU: 0.310612, Valid IoU: 0.327106
+Train Dice: 0.420867, Valid Dice: 0.432600
+Train Acc: 0.597654, Valid Acc: 0.614621
+Train Prec: 0.456522, Valid Prec: 0.434062
+Train Rec: 0.419782, Valid Rec: 0.448023
+Train F1: 0.420867, Valid F1: 0.432600
 
-Epoch: 36 (lr: 2.5e-05)
-Train Loss: 0.522120, Valid Loss: 0.525929
-Train IoU: 0.566609, Valid IoU: 0.575099
-Train Dice: 0.673506, Valid Dice: 0.681944
-Train Acc: 0.810918, Valid Acc: 0.815976
-Train Prec: 0.691950, Valid Prec: 0.672959
-Train Rec: 0.662675, Valid Rec: 0.694618
-Train F1: 0.673506, Valid F1: 0.681944
+Epoch: 3 (lr: 0.001, 0.001)
+Train Loss: 1.040112, Valid Loss: 0.907167
+Train IoU: 0.336419, Valid IoU: 0.365690
+Train Dice: 0.447963, Valid Dice: 0.471934
+Train Acc: 0.625043, Valid Acc: 0.650428
+Train Prec: 0.473893, Valid Prec: 0.548582
+Train Rec: 0.447144, Valid Rec: 0.485268
+Train F1: 0.447963, Valid F1: 0.471934
 
-Epoch: 37 (lr: 2.5e-05)
-Train Loss: 0.523409, Valid Loss: 0.514329
-Train IoU: 0.565634, Valid IoU: 0.576960
-Train Dice: 0.673695, Valid Dice: 0.682161
-Train Acc: 0.809339, Valid Acc: 0.816878
-Train Prec: 0.694960, Valid Prec: 0.674585
-Train Rec: 0.663203, Valid Rec: 0.696029
-Train F1: 0.673695, Valid F1: 0.682161
+Epoch: 4 (lr: 0.001, 0.001)
+Train Loss: 0.960087, Valid Loss: 0.815391
+Train IoU: 0.359442, Valid IoU: 0.385722
+Train Dice: 0.475022, Valid Dice: 0.494051
+Train Acc: 0.651432, Valid Acc: 0.674544
+Train Prec: 0.512359, Valid Prec: 0.558376
+Train Rec: 0.467948, Valid Rec: 0.495755
+Train F1: 0.475022, Valid F1: 0.494051
 
-Epoch: 38 (lr: 1.25e-05)
-Train Loss: 0.511159, Valid Loss: 0.502370
-Train IoU: 0.575416, Valid IoU: 0.583014
-Train Dice: 0.683429, Valid Dice: 0.687381
-Train Acc: 0.815533, Valid Acc: 0.822160
-Train Prec: 0.702273, Valid Prec: 0.684256
-Train Rec: 0.671457, Valid Rec: 0.692570
-Train F1: 0.683429, Valid F1: 0.687381
+Epoch: 5 (lr: 0.001, 0.001)
+Train Loss: 0.947427, Valid Loss: 0.944671
+Train IoU: 0.379363, Valid IoU: 0.380202
+Train Dice: 0.499781, Valid Dice: 0.498690
+Train Acc: 0.661606, Valid Acc: 0.644800
+Train Prec: 0.521682, Valid Prec: 0.534542
+Train Rec: 0.490153, Valid Rec: 0.503362
+Train F1: 0.499781, Valid F1: 0.498690
 
-Epoch: 39 (lr: 1.25e-05)
-Train Loss: 0.509504, Valid Loss: 0.508109
-Train IoU: 0.579090, Valid IoU: 0.581104
-Train Dice: 0.685827, Valid Dice: 0.686555
-Train Acc: 0.816654, Valid Acc: 0.821551
-Train Prec: 0.705747, Valid Prec: 0.680053
-Train Rec: 0.674087, Valid Rec: 0.694865
-Train F1: 0.685827, Valid F1: 0.686555
+Epoch: 6 (lr: 0.001, 0.001)
+Train Loss: 0.916147, Valid Loss: 0.791738
+Train IoU: 0.388803, Valid IoU: 0.443779
+Train Dice: 0.508822, Valid Dice: 0.559090
+Train Acc: 0.671028, Valid Acc: 0.716816
+Train Prec: 0.530614, Valid Prec: 0.566685
+Train Rec: 0.499615, Valid Rec: 0.558772
+Train F1: 0.508822, Valid F1: 0.559090
 
-Epoch: 40 (lr: 1.25e-05)
-Train Loss: 0.512700, Valid Loss: 0.517180
-Train IoU: 0.579537, Valid IoU: 0.581764
-Train Dice: 0.688006, Valid Dice: 0.688344
-Train Acc: 0.816052, Valid Acc: 0.818956
-Train Prec: 0.715066, Valid Prec: 0.676909
-Train Rec: 0.673389, Valid Rec: 0.704612
-Train F1: 0.688006, Valid F1: 0.688344
+Epoch: 7 (lr: 0.001, 0.001)
+Train Loss: 0.890105, Valid Loss: 0.784580
+Train IoU: 0.406531, Valid IoU: 0.442388
+Train Dice: 0.526953, Valid Dice: 0.558540
+Train Acc: 0.684586, Valid Acc: 0.716338
+Train Prec: 0.541474, Valid Prec: 0.566242
+Train Rec: 0.519384, Valid Rec: 0.566673
+Train F1: 0.526953, Valid F1: 0.558540
 
-Epoch: 41 (lr: 1.25e-05)
-Train Loss: 0.507140, Valid Loss: 0.501877
-Train IoU: 0.580405, Valid IoU: 0.583267
-Train Dice: 0.688895, Valid Dice: 0.688873
-Train Acc: 0.817615, Valid Acc: 0.822301
-Train Prec: 0.714677, Valid Prec: 0.683078
-Train Rec: 0.675565, Valid Rec: 0.696752
-Train F1: 0.688895, Valid F1: 0.688873
+Epoch: 8 (lr: 0.001, 0.001)
+Train Loss: 0.858680, Valid Loss: 0.783240
+Train IoU: 0.415975, Valid IoU: 0.448197
+Train Dice: 0.534879, Valid Dice: 0.564798
+Train Acc: 0.696837, Valid Acc: 0.717439
+Train Prec: 0.554639, Valid Prec: 0.564773
+Train Rec: 0.525282, Valid Rec: 0.571239
+Train F1: 0.534879, Valid F1: 0.564798
 
-Epoch: 42 (lr: 6.25e-06)
-Train Loss: 0.507482, Valid Loss: 0.498739
-Train IoU: 0.578531, Valid IoU: 0.584050
-Train Dice: 0.686663, Valid Dice: 0.689088
-Train Acc: 0.816554, Valid Acc: 0.823277
-Train Prec: 0.709127, Valid Prec: 0.682449
-Train Rec: 0.674950, Valid Rec: 0.697765
-Train F1: 0.686663, Valid F1: 0.689088
+Epoch: 9 (lr: 0.001, 0.001)
+Train Loss: 0.845027, Valid Loss: 0.737211
+Train IoU: 0.426481, Valid IoU: 0.476784
+Train Dice: 0.544244, Valid Dice: 0.586981
+Train Acc: 0.706010, Valid Acc: 0.745508
+Train Prec: 0.563872, Valid Prec: 0.594037
+Train Rec: 0.533889, Valid Rec: 0.585130
+Train F1: 0.544244, Valid F1: 0.586981
 
-Epoch: 43 (lr: 6.25e-06)
-Train Loss: 0.503507, Valid Loss: 0.507866
-Train IoU: 0.581138, Valid IoU: 0.580675
-Train Dice: 0.690062, Valid Dice: 0.686748
-Train Acc: 0.817488, Valid Acc: 0.819816
-Train Prec: 0.713304, Valid Prec: 0.678304
-Train Rec: 0.676320, Valid Rec: 0.699052
-Train F1: 0.690062, Valid F1: 0.686747
+Epoch: 10 (lr: 0.001, 0.001)
+Train Loss: 0.817462, Valid Loss: 0.784786
+Train IoU: 0.433650, Valid IoU: 0.470826
+Train Dice: 0.551013, Valid Dice: 0.580770
+Train Acc: 0.711035, Valid Acc: 0.738905
+Train Prec: 0.565673, Valid Prec: 0.599882
+Train Rec: 0.541309, Valid Rec: 0.578004
+Train F1: 0.551013, Valid F1: 0.580770
 
-Epoch: 44 (lr: 6.25e-06)
-Train Loss: 0.503546, Valid Loss: 0.504265
-Train IoU: 0.582606, Valid IoU: 0.581725
-Train Dice: 0.690892, Valid Dice: 0.687199
-Train Acc: 0.816620, Valid Acc: 0.820350
-Train Prec: 0.711651, Valid Prec: 0.679993
-Train Rec: 0.679025, Valid Rec: 0.698606
-Train F1: 0.690892, Valid F1: 0.687199
+Epoch: 11 (lr: 0.001, 0.001)
+Train Loss: 0.803676, Valid Loss: 0.784092
+Train IoU: 0.441776, Valid IoU: 0.469031
+Train Dice: 0.557033, Valid Dice: 0.581067
+Train Acc: 0.719398, Valid Acc: 0.735884
+Train Prec: 0.615205, Valid Prec: 0.592298
+Train Rec: 0.547732, Valid Rec: 0.584648
+Train F1: 0.557033, Valid F1: 0.581067
 
-Epoch: 45 (lr: 6.25e-06)
-Train Loss: 0.502628, Valid Loss: 0.504505
-Train IoU: 0.584998, Valid IoU: 0.582955
-Train Dice: 0.693885, Valid Dice: 0.688369
-Train Acc: 0.816791, Valid Acc: 0.820999
-Train Prec: 0.710697, Valid Prec: 0.679455
-Train Rec: 0.682398, Valid Rec: 0.700778
-Train F1: 0.693885, Valid F1: 0.688369
+Epoch: 12 (lr: 0.001, 0.001)
+Train Loss: 0.805054, Valid Loss: 0.757453
+Train IoU: 0.437950, Valid IoU: 0.465316
+Train Dice: 0.554696, Valid Dice: 0.577560
+Train Acc: 0.717700, Valid Acc: 0.733311
+Train Prec: 0.569577, Valid Prec: 0.577440
+Train Rec: 0.544964, Valid Rec: 0.583593
+Train F1: 0.554696, Valid F1: 0.577560
 
-Epoch: 46 (lr: 3.125e-06)
-Train Loss: 0.503777, Valid Loss: 0.496638
-Train IoU: 0.580730, Valid IoU: 0.585550
-Train Dice: 0.686354, Valid Dice: 0.690625
-Train Acc: 0.818337, Valid Acc: 0.823537
-Train Prec: 0.704451, Valid Prec: 0.683605
-Train Rec: 0.674910, Valid Rec: 0.699777
-Train F1: 0.686354, Valid F1: 0.690625
+Epoch: 13 (lr: 0.001, 0.001)
+Train Loss: 0.790039, Valid Loss: 0.773719
+Train IoU: 0.443407, Valid IoU: 0.441632
+Train Dice: 0.559386, Valid Dice: 0.561795
+Train Acc: 0.720805, Valid Acc: 0.718674
+Train Prec: 0.572884, Valid Prec: 0.601803
+Train Rec: 0.551460, Valid Rec: 0.549263
+Train F1: 0.559386, Valid F1: 0.561795
 
-Epoch: 47 (lr: 3.125e-06)
-Train Loss: 0.512895, Valid Loss: 0.496884
-Train IoU: 0.575449, Valid IoU: 0.585077
-Train Dice: 0.683713, Valid Dice: 0.690481
-Train Acc: 0.814387, Valid Acc: 0.822213
-Train Prec: 0.707151, Valid Prec: 0.683253
-Train Rec: 0.671215, Valid Rec: 0.700772
-Train F1: 0.683713, Valid F1: 0.690481
+Epoch: 14 (lr: 0.0005, 0.0005)
+Train Loss: 0.725599, Valid Loss: 0.713343
+Train IoU: 0.464654, Valid IoU: 0.468317
+Train Dice: 0.577512, Valid Dice: 0.581645
+Train Acc: 0.740174, Valid Acc: 0.735826
+Train Prec: 0.638425, Valid Prec: 0.586199
+Train Rec: 0.569658, Valid Rec: 0.590149
+Train F1: 0.577512, Valid F1: 0.581644
 
-Epoch: 48 (lr: 3.125e-06)
-Train Loss: 0.505446, Valid Loss: 0.498885
-Train IoU: 0.583693, Valid IoU: 0.585050
-Train Dice: 0.691632, Valid Dice: 0.690775
-Train Acc: 0.818081, Valid Acc: 0.822440
-Train Prec: 0.713148, Valid Prec: 0.682730
-Train Rec: 0.678712, Valid Rec: 0.702187
-Train F1: 0.691632, Valid F1: 0.690775
+Epoch: 15 (lr: 0.0005, 0.0005)
+Train Loss: 0.724506, Valid Loss: 0.921694
+Train IoU: 0.469072, Valid IoU: 0.482252
+Train Dice: 0.583421, Valid Dice: 0.589840
+Train Acc: 0.741632, Valid Acc: 0.747023
+Train Prec: 0.626836, Valid Prec: 0.595359
+Train Rec: 0.573371, Valid Rec: 0.593681
+Train F1: 0.583421, Valid F1: 0.589840
 
+Epoch: 16 (lr: 0.0005, 0.0005)
+Train Loss: 0.717716, Valid Loss: 0.686758
+Train IoU: 0.475571, Valid IoU: 0.487032
+Train Dice: 0.588363, Valid Dice: 0.596707
+Train Acc: 0.744572, Valid Acc: 0.750939
+Train Prec: 0.631427, Valid Prec: 0.632915
+Train Rec: 0.581318, Valid Rec: 0.590940
+Train F1: 0.588363, Valid F1: 0.596707
+
+Epoch: 17 (lr: 0.0005, 0.0005)
+Train Loss: 0.687775, Valid Loss: 0.656358
+Train IoU: 0.481926, Valid IoU: 0.508900
+Train Dice: 0.590921, Valid Dice: 0.612022
+Train Acc: 0.755411, Valid Acc: 0.775139
+Train Prec: 0.606971, Valid Prec: 0.620105
+Train Rec: 0.583649, Valid Rec: 0.621948
+Train F1: 0.590921, Valid F1: 0.612022
+
+Epoch: 18 (lr: 0.0005, 0.0005)
+Train Loss: 0.698152, Valid Loss: 0.632230
+Train IoU: 0.479116, Valid IoU: 0.520401
+Train Dice: 0.589479, Valid Dice: 0.620197
+Train Acc: 0.750998, Valid Acc: 0.780833
+Train Prec: 0.635658, Valid Prec: 0.636218
+Train Rec: 0.581836, Valid Rec: 0.619449
+Train F1: 0.589479, Valid F1: 0.620197
+
+Epoch: 19 (lr: 0.0005, 0.0005)
+Train Loss: 0.685932, Valid Loss: 0.651841
+Train IoU: 0.483911, Valid IoU: 0.500328
+Train Dice: 0.597682, Valid Dice: 0.605751
+Train Acc: 0.755477, Valid Acc: 0.765985
+Train Prec: 0.649994, Valid Prec: 0.634562
+Train Rec: 0.586292, Valid Rec: 0.602530
+Train F1: 0.597682, Valid F1: 0.605751
+
+Epoch: 20 (lr: 0.0005, 0.0005)
+Train Loss: 0.681371, Valid Loss: 0.629245
+Train IoU: 0.480657, Valid IoU: 0.513058
+Train Dice: 0.592494, Valid Dice: 0.615400
+Train Acc: 0.753131, Valid Acc: 0.776426
+Train Prec: 0.625354, Valid Prec: 0.623846
+Train Rec: 0.582632, Valid Rec: 0.618023
+Train F1: 0.592494, Valid F1: 0.615400
+
+Epoch: 21 (lr: 0.0005, 0.0005)
+Train Loss: 0.664284, Valid Loss: 0.612763
+Train IoU: 0.493149, Valid IoU: 0.514137
+Train Dice: 0.604383, Valid Dice: 0.615986
+Train Acc: 0.762456, Valid Acc: 0.774901
+Train Prec: 0.661943, Valid Prec: 0.628787
+Train Rec: 0.594066, Valid Rec: 0.618652
+Train F1: 0.604383, Valid F1: 0.615986
+
+Epoch: 22 (lr: 0.0005, 0.0005)
+Train Loss: 0.672533, Valid Loss: 0.626184
+Train IoU: 0.492200, Valid IoU: 0.511332
+Train Dice: 0.602363, Valid Dice: 0.615159
+Train Acc: 0.762619, Valid Acc: 0.777575
+Train Prec: 0.643922, Valid Prec: 0.616631
+Train Rec: 0.591946, Valid Rec: 0.622194
+Train F1: 0.602363, Valid F1: 0.615158
+
+Epoch: 23 (lr: 0.00025, 0.00025)
+Train Loss: 0.646146, Valid Loss: 0.609647
+Train IoU: 0.499789, Valid IoU: 0.519233
+Train Dice: 0.608607, Valid Dice: 0.619610
+Train Acc: 0.769419, Valid Acc: 0.779652
+Train Prec: 0.653469, Valid Prec: 0.662330
+Train Rec: 0.598996, Valid Rec: 0.622319
+Train F1: 0.608606, Valid F1: 0.619610
+
+Epoch: 24 (lr: 0.00025, 0.00025)
+Train Loss: 0.641299, Valid Loss: 0.600758
+Train IoU: 0.504278, Valid IoU: 0.519117
+Train Dice: 0.613385, Valid Dice: 0.619683
+Train Acc: 0.772051, Valid Acc: 0.781490
+Train Prec: 0.671526, Valid Prec: 0.622936
+Train Rec: 0.603214, Valid Rec: 0.627319
+Train F1: 0.613385, Valid F1: 0.619683
+
+Epoch: 25 (lr: 0.00025, 0.00025)
+Train Loss: 0.639740, Valid Loss: 0.590511
+Train IoU: 0.504347, Valid IoU: 0.520118
+Train Dice: 0.611940, Valid Dice: 0.623481
+Train Acc: 0.772258, Valid Acc: 0.783083
+Train Prec: 0.635717, Valid Prec: 0.631292
+Train Rec: 0.603446, Valid Rec: 0.630547
+Train F1: 0.611940, Valid F1: 0.623481
+
+Epoch: 26 (lr: 0.00025, 0.00025)
+Train Loss: 0.639027, Valid Loss: 0.609384
+Train IoU: 0.505321, Valid IoU: 0.519214
+Train Dice: 0.613817, Valid Dice: 0.622350
+Train Acc: 0.773037, Valid Acc: 0.779526
+Train Prec: 0.647306, Valid Prec: 0.637523
+Train Rec: 0.603964, Valid Rec: 0.626513
+Train F1: 0.613817, Valid F1: 0.622350
+
+Epoch: 27 (lr: 0.000125, 0.000125)
+Train Loss: 0.610716, Valid Loss: 0.589447
+Train IoU: 0.515825, Valid IoU: 0.523258
+Train Dice: 0.623002, Valid Dice: 0.623142
+Train Acc: 0.781377, Valid Acc: 0.787065
+Train Prec: 0.671531, Valid Prec: 0.641479
+Train Rec: 0.611463, Valid Rec: 0.621032
+Train F1: 0.623002, Valid F1: 0.623142
+
+Epoch: 28 (lr: 0.000125, 0.000125)
+Train Loss: 0.620265, Valid Loss: 0.599561
+Train IoU: 0.511109, Valid IoU: 0.521347
+Train Dice: 0.620421, Valid Dice: 0.621547
+Train Acc: 0.774423, Valid Acc: 0.783344
+Train Prec: 0.663389, Valid Prec: 0.627084
+Train Rec: 0.610201, Valid Rec: 0.624360
+Train F1: 0.620421, Valid F1: 0.621547
+
+Epoch: 29 (lr: 0.000125, 0.000125)
+Train Loss: 0.611325, Valid Loss: 0.587942
+Train IoU: 0.514554, Valid IoU: 0.531860
+Train Dice: 0.621166, Valid Dice: 0.632850
+Train Acc: 0.780832, Valid Acc: 0.789629
+Train Prec: 0.649468, Valid Prec: 0.640506
+Train Rec: 0.611624, Valid Rec: 0.637164
+Train F1: 0.621166, Valid F1: 0.632850
+
+Epoch: 30 (lr: 0.000125, 0.000125)
+Train Loss: 0.603048, Valid Loss: 0.619079
+Train IoU: 0.519794, Valid IoU: 0.510283
+Train Dice: 0.625623, Valid Dice: 0.614197
+Train Acc: 0.782799, Valid Acc: 0.777275
+Train Prec: 0.659769, Valid Prec: 0.610534
+Train Rec: 0.616855, Valid Rec: 0.629134
+Train F1: 0.625623, Valid F1: 0.614197
+
+Epoch: 31 (lr: 0.000125, 0.000125)
+Train Loss: 0.606683, Valid Loss: 0.590207
+Train IoU: 0.523923, Valid IoU: 0.524750
+Train Dice: 0.634677, Valid Dice: 0.623837
+Train Acc: 0.783553, Valid Acc: 0.788666
+Train Prec: 0.773248, Valid Prec: 0.639750
+Train Rec: 0.621674, Valid Rec: 0.626267
+Train F1: 0.634677, Valid F1: 0.623837
+
+Epoch: 32 (lr: 0.000125, 0.000125)
+Train Loss: 0.604233, Valid Loss: 0.616172
+Train IoU: 0.517967, Valid IoU: 0.514427
+Train Dice: 0.625360, Valid Dice: 0.616413
+Train Acc: 0.783577, Valid Acc: 0.779774
+Train Prec: 0.774658, Valid Prec: 0.616129
+Train Rec: 0.614895, Valid Rec: 0.635406
+Train F1: 0.625359, Valid F1: 0.616413
+
+Epoch: 33 (lr: 0.000125, 0.000125)
+Train Loss: 0.590221, Valid Loss: 0.610185
+Train IoU: 0.526761, Valid IoU: 0.529751
+Train Dice: 0.631565, Valid Dice: 0.631456
+Train Acc: 0.790009, Valid Acc: 0.788170
+Train Prec: 0.678868, Valid Prec: 0.733110
+Train Rec: 0.621623, Valid Rec: 0.638507
+Train F1: 0.631565, Valid F1: 0.631456
+
+Epoch: 34 (lr: 6.25e-05, 6.25e-05)
+Train Loss: 0.608385, Valid Loss: 0.585223
+Train IoU: 0.516130, Valid IoU: 0.525027
+Train Dice: 0.622275, Valid Dice: 0.627409
+Train Acc: 0.782618, Valid Acc: 0.786402
+Train Prec: 0.664750, Valid Prec: 0.749991
+Train Rec: 0.614091, Valid Rec: 0.623232
+Train F1: 0.622275, Valid F1: 0.627409
+
+Epoch: 35 (lr: 6.25e-05, 6.25e-05)
+Train Loss: 0.592760, Valid Loss: 0.562251
+Train IoU: 0.518420, Valid IoU: 0.533959
+Train Dice: 0.624803, Valid Dice: 0.634631
+Train Acc: 0.784929, Valid Acc: 0.793047
+Train Prec: 0.660366, Valid Prec: 0.773797
+Train Rec: 0.615690, Valid Rec: 0.632008
+Train F1: 0.624803, Valid F1: 0.634631
+
+Epoch: 36 (lr: 6.25e-05, 6.25e-05)
+Train Loss: 0.602593, Valid Loss: 0.593287
+Train IoU: 0.518459, Valid IoU: 0.524325
+Train Dice: 0.626793, Valid Dice: 0.625090
+Train Acc: 0.784080, Valid Acc: 0.786282
+Train Prec: 0.657574, Valid Prec: 0.746546
+Train Rec: 0.615503, Valid Rec: 0.634057
+Train F1: 0.626793, Valid F1: 0.625090
+
+Epoch: 37 (lr: 6.25e-05, 6.25e-05)
+Train Loss: 0.589913, Valid Loss: 0.585840
+Train IoU: 0.526688, Valid IoU: 0.530476
+Train Dice: 0.635458, Valid Dice: 0.629981
+Train Acc: 0.788335, Valid Acc: 0.790420
+Train Prec: 0.679319, Valid Prec: 0.749198
+Train Rec: 0.622465, Valid Rec: 0.635533
+Train F1: 0.635458, Valid F1: 0.629981
+
+Epoch: 38 (lr: 6.25e-05, 6.25e-05)
+Train Loss: 0.596724, Valid Loss: 0.598854
+Train IoU: 0.519364, Valid IoU: 0.523867
+Train Dice: 0.623575, Valid Dice: 0.628768
+Train Acc: 0.784075, Valid Acc: 0.782582
+Train Prec: 0.648049, Valid Prec: 0.773671
+Train Rec: 0.616607, Valid Rec: 0.629890
+Train F1: 0.623575, Valid F1: 0.628768
+
+Epoch: 39 (lr: 6.25e-05, 6.25e-05)
+Train Loss: 0.599336, Valid Loss: 0.586098
+Train IoU: 0.519018, Valid IoU: 0.528409
+Train Dice: 0.627047, Valid Dice: 0.628238
+Train Acc: 0.783592, Valid Acc: 0.788854
+Train Prec: 0.667582, Valid Prec: 0.782439
+Train Rec: 0.615768, Valid Rec: 0.637263
+Train F1: 0.627046, Valid F1: 0.628238
+
+Epoch: 40 (lr: 3.125e-05, 3.125e-05)
+Train Loss: 0.596379, Valid Loss: 0.585677
+Train IoU: 0.519298, Valid IoU: 0.533499
+Train Dice: 0.623694, Valid Dice: 0.636503
+Train Acc: 0.784595, Valid Acc: 0.790662
+Train Prec: 0.651246, Valid Prec: 0.768437
+Train Rec: 0.614579, Valid Rec: 0.638221
+Train F1: 0.623694, Valid F1: 0.636503
+
+Epoch: 41 (lr: 3.125e-05, 3.125e-05)
+Train Loss: 0.584463, Valid Loss: 0.590798
+Train IoU: 0.526836, Valid IoU: 0.529214
+Train Dice: 0.633671, Valid Dice: 0.632746
+Train Acc: 0.789552, Valid Acc: 0.788649
+Train Prec: 0.772822, Valid Prec: 0.800693
+Train Rec: 0.622395, Valid Rec: 0.634524
+Train F1: 0.633671, Valid F1: 0.632746
+
+Epoch: 42 (lr: 3.125e-05, 3.125e-05)
+Train Loss: 0.582638, Valid Loss: 0.564246
+Train IoU: 0.528244, Valid IoU: 0.532928
+Train Dice: 0.630984, Valid Dice: 0.632131
+Train Acc: 0.792773, Valid Acc: 0.791716
+Train Prec: 0.664571, Valid Prec: 0.784487
+Train Rec: 0.622015, Valid Rec: 0.633171
+Train F1: 0.630984, Valid F1: 0.632131
+
+Epoch: 43 (lr: 3.125e-05, 3.125e-05)
+Train Loss: 0.584284, Valid Loss: 0.593032
+Train IoU: 0.523424, Valid IoU: 0.525539
+Train Dice: 0.627838, Valid Dice: 0.625899
+Train Acc: 0.790362, Valid Acc: 0.786722
+Train Prec: 0.659671, Valid Prec: 0.673781
+Train Rec: 0.618232, Valid Rec: 0.636278
+Train F1: 0.627837, Valid F1: 0.625899
+
+Epoch: 44 (lr: 1.5625e-05, 1.5625e-05)
+Train Loss: 0.570503, Valid Loss: 0.600377
+Train IoU: 0.529011, Valid IoU: 0.523563
+Train Dice: 0.632830, Valid Dice: 0.628174
+Train Acc: 0.791506, Valid Acc: 0.785148
+Train Prec: 0.670393, Valid Prec: 0.767245
+Train Rec: 0.623194, Valid Rec: 0.638324
+Train F1: 0.632830, Valid F1: 0.628174
+
+Epoch: 45 (lr: 1.5625e-05, 1.5625e-05)
+Train Loss: 0.572697, Valid Loss: 0.581644
+Train IoU: 0.535072, Valid IoU: 0.533451
+Train Dice: 0.643799, Valid Dice: 0.636297
+Train Acc: 0.792789, Valid Acc: 0.792208
+Train Prec: 0.783472, Valid Prec: 0.783095
+Train Rec: 0.628678, Valid Rec: 0.644958
+Train F1: 0.643799, Valid F1: 0.636297
+
+Epoch: 46 (lr: 1.5625e-05, 1.5625e-05)
+Train Loss: 0.576942, Valid Loss: 0.569894
+Train IoU: 0.531219, Valid IoU: 0.535974
+Train Dice: 0.636788, Valid Dice: 0.633921
+Train Acc: 0.792611, Valid Acc: 0.793943
+Train Prec: 0.785368, Valid Prec: 0.810943
+Train Rec: 0.627552, Valid Rec: 0.637916
+Train F1: 0.636788, Valid F1: 0.633921
+
+Epoch: 47 (lr: 1.5625e-05, 1.5625e-05)
+Train Loss: 0.578565, Valid Loss: 0.580987
+Train IoU: 0.532237, Valid IoU: 0.522457
+Train Dice: 0.638626, Valid Dice: 0.623582
+Train Acc: 0.793205, Valid Acc: 0.784689
+Train Prec: 0.682626, Valid Prec: 0.785306
+Train Rec: 0.627270, Valid Rec: 0.620460
+Train F1: 0.638626, Valid F1: 0.623582
+
+Epoch: 48 (lr: 1.5625e-05, 1.5625e-05)
+Train Loss: 0.588665, Valid Loss: 0.580369
+Train IoU: 0.529223, Valid IoU: 0.533479
+Train Dice: 0.636601, Valid Dice: 0.635946
+Train Acc: 0.788625, Valid Acc: 0.792898
+Train Prec: 0.780728, Valid Prec: 0.781285
+Train Rec: 0.625044, Valid Rec: 0.642686
+Train F1: 0.636601, Valid F1: 0.635946
+
+Epoch: 49 (lr: 1.5625e-05, 1.5625e-05)
+Train Loss: 0.574111, Valid Loss: 0.570739
+Train IoU: 0.531944, Valid IoU: 0.536162
+Train Dice: 0.637842, Valid Dice: 0.637712
+Train Acc: 0.792703, Valid Acc: 0.792067
+Train Prec: 0.775630, Valid Prec: 0.736754
+Train Rec: 0.627753, Valid Rec: 0.642018
+Train F1: 0.637842, Valid F1: 0.637712
 

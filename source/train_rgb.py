@@ -7,6 +7,7 @@ import numpy as np
 import segmentation_models_pytorch as smp
 import torch
 from torch.optim.lr_scheduler import ReduceLROnPlateau
+import wandb
 
 import source
 from source import streaming as S
@@ -17,6 +18,7 @@ from source.utils import log_epoch_results, _get_lr, log_number_of_parameters
 # Filtrujemy ostrzeżenia by log był czytelniejszy.
 (warnings.filterwarnings("ignore"))
 
+
 # =============================================
 #   Main
 # =============================================
@@ -25,6 +27,7 @@ from source.utils import log_epoch_results, _get_lr, log_number_of_parameters
 # - tworzy model (UNet z EfficientNet-B4) i kryterium strat
 # - przenosi model na GPU(y) i opakowuje w DataParallel jeśli jest więcej niż 1 GPU
 # - tworzy optimizer (AdamW z grupowaniem parametrów) oraz scheduler
+# - opcjonalnie inicjalizuje Weights & Biases (wandb)
 # - uruchamia pętlę treningową `train_model`
 
 def main(args):
@@ -45,7 +48,7 @@ def main(args):
     # encoder_weights="imagenet" używa pretrenowanych wag dla enkodera.
     # =============================================
     model = smp.Unet(
-        classes=len(args.classes)+1,
+        classes=len(args.classes) + 1,
         in_channels=3,
         activation=None,
         encoder_weights="imagenet",
@@ -54,7 +57,7 @@ def main(args):
     )
     log_number_of_parameters(model)
     # Przygotowanie wag klas dla funkcji strat (CrossEntropy z wagami)
-    classes_wt = np.ones([len(args.classes)+1], dtype=np.float32)
+    classes_wt = np.ones([len(args.classes) + 1], dtype=np.float32)
     criterion = source.losses.CEWithLogitsLoss(weights=classes_wt)
 
     # =============================================
@@ -117,14 +120,54 @@ def main(args):
             eta_min=float(args.min_lr),
         )
 
+    # =============================================
+    #   Weights & Biases (opcjonalnie)
+    # Inicjalizujemy run w wandb tylko jeśli użytkownik poda --use_wandb.
+    # Do config wrzucamy najważniejsze hiperparametry i opis modelu.
+    # =============================================
+    wandb_run = None
+    if getattr(args, "use_wandb", False):
+        wandb_config = {
+            "seed": args.seed,
+            "n_epochs": args.n_epochs,
+            "batch_size": args.batch_size,
+            "num_workers": args.num_workers,
+            "crop_size": args.crop_size,
+            "learning_rate": float(args.learning_rate),
+            "classes": args.classes,
+            "data_root": args.data_root,
+            "optimizer": "AdamW",
+            "scheduler": args.scheduler,
+            "lr_patience": int(args.lr_patience),
+            "early_patience": int(args.early_patience),
+            "min_delta": float(args.min_delta),
+            "min_lr": float(args.min_lr),
+            "t_max": int(args.t_max),
+            "amp": bool(args.amp),
+            "grad_clip": float(args.grad_clip) if args.grad_clip is not None else None,
+            "model_name": "Unet_efficientnet-b4_rgb",
+            "criterion": criterion.name if hasattr(criterion, "name") else type(criterion).__name__,
+            "model_type": "rgb",
+        }
+        wandb_run = wandb.init(
+            project=getattr(args, "wandb_project", "RGB-train"),
+            entity=getattr(args, "wandb_entity", None),
+            config=wandb_config,
+            name=f"rgb_seed{args.seed}_lr{args.learning_rate}",
+        )
+
     print("Number of epochs   :", args.n_epochs)
-    print("Number of classes  :", len(args.classes)+1)
+    print("Number of classes  :", len(args.classes) + 1)
     print("Batch size         :", args.batch_size)
     print("Device             :", device)
     print("AMP                :", args.amp)
     print("Grad clip          :", args.grad_clip)
     # Uruchamiamy pętlę treningową
-    train_model(args, model, optimizer, criterion, device, scheduler)
+    train_model(args, model, optimizer, criterion, device, scheduler, wandb_run=wandb_run)
+
+    if wandb_run is not None:
+        wandb_run.finish()
+
 
 # =============================================
 #   Główna pętla treningowa z early stopping + scheduler
@@ -133,8 +176,9 @@ def main(args):
 # - dla każdej epoki: trening (streaming), walidacja (streaming), logowanie wyników
 # - aktualizuje scheduler (ReduceLROnPlateau z metryką lub Cosine bez metryki)
 # - realizuje logiczkę checkpointów (zapisywanie najlepszych wag) i early stopping
+# - opcjonalnie loguje metryki do wandb
 # =============================================
-def train_model(args, model, optimizer, criterion, device, scheduler=None):
+def train_model(args, model, optimizer, criterion, device, scheduler=None, wandb_run=None):
     train_data_loader, val_data_loader = build_data_loaders(args, RGBDataset)
     os.makedirs(args.save_model, exist_ok=True)
     os.makedirs(args.save_results, exist_ok=True)
@@ -170,10 +214,26 @@ def train_model(args, model, optimizer, criterion, device, scheduler=None):
         )
 
         # =============================================
-        #   Logowanie wyników epoki
-        # Zapis do pliku i na konsolę: learning rate, metryki train/valid (IoU, loss itd.)
+        #   Logowanie wyników epoki (plik + konsola)
         # =============================================
         log_epoch_results(log_path, epoch + 1, _get_lr(optimizer), logs_train, logs_valid)
+
+        # =============================================
+        #   Logowanie do Weights & Biases (jeśli włączone)
+        # Zapisujemy wszystkie metryki z train/valid oraz aktualny learning rate.
+        # =============================================
+        if wandb_run is not None:
+            log_dict = {"epoch": epoch + 1}
+            # aktualny learning rate (pierwsza grupa parametrów)
+            try:
+                log_dict["lr"] = float(optimizer.param_groups[0]["lr"])
+            except Exception:
+                pass
+            for k, v in logs_train.items():
+                log_dict[f"train/{k}"] = float(v)
+            for k, v in logs_valid.items():
+                log_dict[f"valid/{k}"] = float(v)
+            wandb_run.log(log_dict)
 
         # --- LR scheduler ---
         score = logs_valid["iou"]
@@ -217,25 +277,30 @@ if __name__ == "__main__":
     os.environ["PYTORCH_CUDA_ALLOC_CONF"] = "max_split_size_mb:24"
     os.environ["NO_ALBUMENTATIONS_UPDATE"] = "1"
     parser = argparse.ArgumentParser(description='Model Training RGB')
-    parser.add_argument('--seed', default=0)
-    parser.add_argument('--n_epochs', default=3)
-    parser.add_argument('--batch_size', default=4)
-    parser.add_argument('--num_workers', default=4)
-    parser.add_argument('--crop_size', default=256)
-    parser.add_argument('--learning_rate', default=0.0001)
+    parser.add_argument('--seed', type=int, default=0)
+    parser.add_argument('--n_epochs', type=int, default=100)
+    parser.add_argument('--batch_size', type=int, default=4)
+    parser.add_argument('--num_workers', type=int, default=4)
+    parser.add_argument('--crop_size', type=int, default=256)
+    parser.add_argument('--learning_rate', type=float, default=0.001)
     parser.add_argument('--classes', default=[1, 2, 3, 4, 5, 6, 7, 8])
-    parser.add_argument('--data_root', default="../dataset/train")
-    parser.add_argument('--save_model', default="model")
-    parser.add_argument('--save_results', default="results")
+    parser.add_argument('--data_root', type=str, default="../dataset/train")
+    parser.add_argument('--save_model', type=str, default="model")
+    parser.add_argument('--save_results', type=str, default="results")
     # --- SCHEDULER / EARLY STOPPING PARAMS ---
     parser.add_argument('--scheduler', choices=['plateau', 'cosine', 'none'], default='plateau')
     parser.add_argument('--lr_patience', type=int, default=3)
     parser.add_argument('--early_patience', type=int, default=15)
-    parser.add_argument('--min_delta', type=float, default=0.005)
+    parser.add_argument('--min_delta', type=float, default=0.001)
     parser.add_argument('--min_lr', type=float, default=1e-6)
     parser.add_argument('--t_max', type=int, default=30)
     parser.add_argument('--amp', type=int, default=1, help='Włącz / wyłącz mixed precision (1/0)')
     parser.add_argument('--grad_clip', type=float, default=1.0, help='Maks. norm gradientu; None aby wyłączyć')
+    # --- Weights & Biases ---
+    parser.add_argument('--use_wandb', type=bool, default=True, help='Włącz logowanie do Weights & Biases')
+    parser.add_argument('--wandb_project', type=str, default='RGB-train', help='Nazwa projektu w W&B')
+    parser.add_argument('--wandb_entity', type=str, default='radoslaw-godlewski00-politechnika-warszawska',
+                        help='Nazwa entity w W&B')
     args = parser.parse_args()
     start = time.time()
     main(args)
