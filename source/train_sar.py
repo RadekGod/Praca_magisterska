@@ -40,7 +40,7 @@ def main(args):
         classes=len(args.classes) + 1,
         in_channels=1,
         activation=None,
-        encoder_weights="imagenet",  # zostanie dostosowane do 1 kanału przez SMP
+        encoder_weights=None,  # zostanie dostosowane do 1 kanału przez SMP
         encoder_name="efficientnet-b4",
         decoder_attention_type="scse",
     )
@@ -122,7 +122,7 @@ def main(args):
             project=getattr(args, "wandb_project", "SAR-train"),
             entity=getattr(args, "wandb_entity", None),
             config=wandb_config,
-            name=f"sar_seed{args.seed}_lr{args.learning_rate}",
+            name=f"sar_seed:{args.seed}_lr:{args.learning_rate}_no-weights",
         )
 
         print("Number of epochs   :", args.n_epochs)

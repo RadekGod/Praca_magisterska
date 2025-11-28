@@ -95,7 +95,7 @@ def train_epoch_streaming(model, optimizer, criterion, dataloader, device, num_c
         scaler.update()
         preds = logits.argmax(1).detach().cpu()
         cm = update_confusion_matrix(cm, preds, y_idx.cpu(), num_classes)
-        total_loss += float(loss.detach())
+        total_loss += loss.item()
         n_batches += 1
 
     mets = metrics_from_cm(cm)
@@ -124,7 +124,7 @@ def valid_epoch_streaming(model, criterion, dataloader, device, num_classes: int
             y_idx = to_index_targets(y)
             logits = model(x)
             if criterion is not None:
-                total_loss += float(criterion(logits, y.to(device, non_blocking=True)))
+                total_loss += criterion(logits, y.to(device, non_blocking=True)).item()
             preds = logits.argmax(1).cpu()
             cm = update_confusion_matrix(cm, preds, y_idx.cpu(), num_classes)
             n_batches += 1
