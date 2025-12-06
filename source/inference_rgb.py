@@ -1,0 +1,203 @@
+import argparse
+import os
+
+import numpy as np
+import rasterio
+import torch
+import segmentation_models_pytorch as smp
+
+from source.dataset import load_multiband, load_grayscale, get_crs, save_img
+
+
+# Mapa kolorów: indeks klasy -> (R, G, B)
+# 0 traktujemy jako tło (czarne), kolejne klasy jako widoczne kolory.
+CLASS_COLORS = {
+    0: (0, 0, 0),        # tło
+    1: (255, 0, 0),      # klasa 1 - czerwony
+    2: (0, 255, 0),      # klasa 2 - zielony
+    3: (0, 0, 255),      # klasa 3 - niebieski
+    4: (255, 255, 0),    # klasa 4 - żółty
+    5: (255, 0, 255),    # klasa 5 - magenta
+    6: (0, 255, 255),    # klasa 6 - cyjan
+    7: (255, 128, 0),    # klasa 7 - pomarańczowy
+    8: (128, 0, 255),    # klasa 8 - fioletowy
+}
+
+
+def build_model(model_type: str, num_classes: int, device: str = "cuda"):
+    """Tworzy model U-Net zgodny z tymi z train_*.
+
+    model_type: 'rgb', 'sar' lub 'fusion'.
+    """
+    if model_type == "rgb":
+        in_channels = 3
+        encoder_weights = None  # wagi i tak wczytamy z pliku .pth
+    elif model_type == "sar":
+        in_channels = 1
+        encoder_weights = None
+    elif model_type == "fusion":
+        in_channels = 4
+        encoder_weights = None
+    else:
+        raise ValueError(f"Nieznany model_type: {model_type}")
+
+    model = smp.Unet(
+        classes=num_classes,
+        in_channels=in_channels,
+        activation=None,
+        encoder_weights=encoder_weights,
+        encoder_name="efficientnet-b4",
+        decoder_attention_type="scse",
+    )
+    model.to(device)
+    model.eval()
+    return model
+
+
+def logits_to_mask_rgb(logits: torch.Tensor) -> np.ndarray:
+    """Konwertuje wyjście modelu (B, C, H, W) na kolorową maskę (3, H, W) w uint8.
+
+    Zakładamy batch=1.
+    """
+    # (B, C, H, W) -> (C, H, W)
+    if logits.dim() == 4:
+        logits = logits[0]
+    # predykcja klas pikseli
+    pred = torch.argmax(logits, dim=0).cpu().numpy().astype(np.uint8)  # (H, W)
+
+    h, w = pred.shape
+    rgb_mask = np.zeros((3, h, w), dtype=np.uint8)
+
+    for cls_idx, color in CLASS_COLORS.items():
+        r, g, b = color
+        mask = pred == cls_idx
+        rgb_mask[0][mask] = r
+        rgb_mask[1][mask] = g
+        rgb_mask[2][mask] = b
+
+    return rgb_mask
+
+
+def run_inference(model, model_path: str, image_path: str, output_path: str, device: str = None, model_type: str = "rgb"):
+    """Wykonuje inferencję dla pojedynczego obrazu i zapisuje kolorową maskę."""
+    if device is None:
+        device = "cuda" if torch.cuda.is_available() else "cpu"
+
+    # --- wczytanie obrazu ---
+    if model_type == "rgb":
+        img = load_multiband(image_path)          # (H, W, 3)
+    elif model_type == "sar":
+        sar = load_grayscale(image_path)          # (H, W)
+        img = sar[..., None]                      # (H, W, 1)
+    elif model_type == "fusion":
+        img = load_multiband(image_path)          # (H, W, 4)
+    else:
+        raise ValueError(f"Nieznany model_type: {model_type}")
+
+    # --- tensoryzacja ---
+    x = torch.from_numpy(img.transpose(2, 0, 1)).float() / 255.0  # (C, H, W)
+    x = x.unsqueeze(0).to(device)                                 # (1, C, H, W)
+
+    # --- inferencja ---
+    with torch.no_grad():
+        logits = model(x)  # (1, C, H, W)
+
+    # --- konwersja na kolorową maskę ---
+    rgb_mask = logits_to_mask_rgb(logits)  # (3, H, W)
+
+    # --- zapis GeoTIFF z georeferencją z oryginału, jeśli jest ---
+    try:
+        crs, transform = get_crs(image_path)
+    except Exception:
+        crs, transform = None, None
+
+    os.makedirs(os.path.dirname(output_path), exist_ok=True)
+
+    if crs is not None and transform is not None:
+        save_img(output_path, rgb_mask, crs, transform)
+    else:
+        with rasterio.open(
+            output_path,
+            "w",
+            driver="GTiff",
+            height=rgb_mask.shape[1],
+            width=rgb_mask.shape[2],
+            count=3,
+            dtype=rgb_mask.dtype,
+        ) as dst:
+            dst.write(rgb_mask)
+
+
+def main():
+    parser = argparse.ArgumentParser(description="Inferencja segmentacji i zapis kolorowej maski")
+    parser.add_argument("--model_path", type=str,
+                        help="Ścieżka do wytrenowanego modelu .pth, np. model/RGB_Pesudo_u-efficientnet-b4_s0_CELoss.pth",
+                        default="model/RGB_Pesudo_u-efficientnet-b4_s0_CELoss.pth")
+    parser.add_argument("--image_path", type=str,
+                        help="Ścieżka do obrazu wejściowego (RGB lub SAR, GeoTIFF). Jeśli jest to folder,"
+                             " przetworzone zostaną wszystkie pliki .tif w tym folderze.",
+                        default="results/obrazy/rgb/oryginalne")
+    parser.add_argument("--output_path", type=str,
+                        help="Ścieżka wyjściowa.\n"
+                             "Jeśli --image_path jest plikiem, to jest to dokładna ścieżka do wyjścia.\n"
+                             "Jeśli --image_path jest folderem, to jest to folder wyjściowy,"
+                             " w którym zostaną zapisane maski o tych samych nazwach plików.",
+                        default="results/obrazy/rgb/model")
+    parser.add_argument("--cpu", action="store_true", help="Wymuś użycie CPU zamiast GPU", default=False)
+    parser.add_argument("--model_type", type=str, default="rgb", choices=["rgb", "sar", "fusion"],
+                        help="Typ modelu do użycia: 'rgb' (train_rgb.py), 'sar' (train_sar.py) lub 'fusion'.")
+
+    args = parser.parse_args()
+
+    device = "cpu" if args.cpu else ("cuda" if torch.cuda.is_available() else "cpu")
+    print(f"Używane urządzenie: {device}")
+    print(f"Ładuję wagi modelu z: {args.model_path}")
+
+    # --- zbudowanie modelu i załadowanie wag tylko raz ---
+    num_classes = len(CLASS_COLORS)
+    model = build_model(model_type=args.model_type, num_classes=num_classes, device=device)
+
+    state_dict = torch.load(args.model_path, map_location=device)
+    new_state_dict = {}
+    for k, v in state_dict.items():
+        if k.startswith("module."):
+            new_state_dict[k[len("module."):]] = v
+        else:
+            new_state_dict[k] = v
+    model.load_state_dict(new_state_dict, strict=False)
+
+    # --- rozróżnienie: pojedynczy plik vs folder ---
+    if os.path.isdir(args.image_path):
+        in_dir = args.image_path
+        out_dir = args.output_path
+        os.makedirs(out_dir, exist_ok=True)
+
+        # przetworzenie wszystkich plików .tif w folderze (bez rekurencji)
+        for fn in sorted(os.listdir(in_dir)):
+            if not fn.lower().endswith(".tif"):
+                continue
+            in_path = os.path.join(in_dir, fn)
+            out_path = os.path.join(out_dir, fn)
+            print(f"Przetwarzam: {in_path} -> {out_path}")
+            run_inference(
+                model=model,
+                model_path=args.model_path,
+                image_path=in_path,
+                output_path=out_path,
+                device=device,
+                model_type=args.model_type,
+            )
+    else:
+        # tryb pojedynczego pliku jak wcześniej
+        run_inference(
+            model=model,
+            model_path=args.model_path,
+            image_path=args.image_path,
+            output_path=args.output_path,
+            device=device,
+            model_type=args.model_type,
+        )
+
+
+if __name__ == "__main__":
+    main()

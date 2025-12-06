@@ -10,7 +10,7 @@ from . import transforms as T
 # =============================================
 def build_data_loaders(args, DatasetClass):
     """Zwraca train_loader i valid_loader dla podanej klasy DatasetClass.
-    DatasetClass powinien akceptować (fns, classes=..., size=..., train=..., sar_mean=..., sar_std=..., sar_normalize=...)
+    DatasetClass powinien akceptować (fns, classes=..., size=..., train=..., sar_mean=..., sar_std=..., sar_normalize=..., train_augm=..., valid_augm=...)
     """
 
     # =============================================
@@ -32,38 +32,48 @@ def build_data_loaders(args, DatasetClass):
 
     # =============================================
     #   Obliczanie uśrednionych statystyk SAR
-    # - Jeśli chcemy normalizować pola SAR globalnie, to obliczamy średnią i odchylenie standardowe
-    #   na zbiorze treningowym. UWAGA: dla klasy Dataset używanej do budowy loaderów sprawdzamy,
-    #   czy rzeczywiście potrzebuje kanału SAR (np. `SARDataset` lub `FusionDataset`).
-    #   To zapobiega niepotrzebnemu czytaniu SAR-ów przy trenowaniu czysto RGB.
     # =============================================
 
     sar_mean, sar_std = (None, None)
-    # Tryb normalizacji SAR: domyślnie 'global' (użyj wcześniej policzonych średnich/std). Można to
-    # nadpisać przez args.sar_normalize.
     sar_normalize = getattr(args, 'sar_normalize', 'global')
 
-    # Decyzja: policz statystyki tylko dla datasetów, które używają SAR (SARDataset, FusionDataset)
     needs_sar = DatasetClass.__name__ in ("SARDataset", "FusionDataset")
 
     if needs_sar and sar_normalize == 'global':
-        # load_fn=None pozwala funkcji compute_sar_stats samodzielnie zdecydować jak czytać pliki
         try:
             sar_mean, sar_std = T.compute_sar_stats(train_paths, load_fn=None)
         except Exception as e:
             print("Warning: failed to compute SAR stats in build_data_loaders:", e)
 
+    # Tryby augmentacji przekazywane z args; mogą nie istnieć w starszych skryptach, więc używamy getattr.
+    train_augm = getattr(args, 'train_augm')
+    valid_augm = getattr(args, 'valid_augm')
+
     # =============================================
     #   Tworzenie datasetów i loaderów
     # =============================================
-    # Konstrukcja Datasetów (trainset, validset) z przekazaniem ścieżek oraz wyliczonych statystyk SAR.
-    # - train=True oznacza, że Dataset może używać augmentacji i (opcjonalnie) obliczać swoje statystyki lokalne.
-    # - Rozmiar cropów (jeśli używany) pobierany jest z args.crop_size, jeżeli istnieje.
-    trainset = DatasetClass(train_paths, classes=args.classes, size=getattr(args, 'crop_size', None), train=True, sar_mean=sar_mean, sar_std=sar_std, sar_normalize=sar_normalize)
-    validset = DatasetClass(validate_paths, classes=args.classes, train=False, sar_mean=sar_mean, sar_std=sar_std, sar_normalize=sar_normalize)
+    trainset = DatasetClass(
+        train_paths,
+        classes=args.classes,
+        size=getattr(args, 'crop_size', None),
+        train=True,
+        sar_mean=sar_mean,
+        sar_std=sar_std,
+        sar_normalize=sar_normalize,
+        train_augm=train_augm,
+        valid_augm=valid_augm,
+    )
+    validset = DatasetClass(
+        validate_paths,
+        classes=args.classes,
+        train=False,
+        sar_mean=sar_mean,
+        sar_std=sar_std,
+        sar_normalize=sar_normalize,
+        train_augm=train_augm,
+        valid_augm=valid_augm,
+    )
 
-    # Tworzymy DataLoadery PyTorcha. Ustawienia:
-    # - shuffle=True dla train_loader, shuffle=False dla valid_loader
     train_loader = DataLoader(
         trainset,
         batch_size=args.batch_size,

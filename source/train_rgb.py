@@ -44,15 +44,14 @@ def main(args):
 
     # =============================================
     #   Model i criterion
-    # Tworzymy architekturę UNet z enkoderem EfficientNet-B4. in_channels=3 bo to skrypt dla RGB.
-    # encoder_weights="imagenet" używa pretrenowanych wag dla enkodera.
+    # Tworzymy architekturę UNet z parametryzowanym enkoderem.
     # =============================================
     model = smp.Unet(
         classes=len(args.classes) + 1,
         in_channels=3,
         activation=None,
-        encoder_weights="imagenet",
-        encoder_name="efficientnet-b4",
+        encoder_weights=None if str(args.encoder_weights).lower() == "none" else args.encoder_weights,
+        encoder_name=args.encoder_name,
         decoder_attention_type="scse",
     )
     log_number_of_parameters(model)
@@ -145,15 +144,23 @@ def main(args):
             "t_max": int(args.t_max),
             "amp": bool(args.amp),
             "grad_clip": float(args.grad_clip) if args.grad_clip is not None else None,
-            "model_name": "Unet_efficientnet-b4_rgb",
+            "model_name": f"Unet_{args.encoder_name}_rgb",
             "criterion": criterion.name if hasattr(criterion, "name") else type(criterion).__name__,
             "model_type": "rgb",
+            "encoder_name": args.encoder_name,
+            "encoder_weights": args.encoder_weights,
         }
+        run_name = (
+            f"RGB_Unet_{args.encoder_name}_"
+            f"{criterion.name if hasattr(criterion, 'name') else type(criterion).__name__}"
+            f"_lr:{args.learning_rate}_"
+            f"augmT{getattr(args, 'train_augm', 'NA')}V{getattr(args, 'valid_augm', 'NA')}"
+        )
         wandb_run = wandb.init(
             project=getattr(args, "wandb_project", "RGB-train"),
             entity=getattr(args, "wandb_entity", None),
             config=wandb_config,
-            name=f"rgb_seed{args.seed}_lr{args.learning_rate}",
+            name=run_name,
         )
 
     print("Number of epochs   :", args.n_epochs)
@@ -162,6 +169,8 @@ def main(args):
     print("Device             :", device)
     print("AMP                :", args.amp)
     print("Grad clip          :", args.grad_clip)
+    print("Encoder name       :", args.encoder_name)
+    print("Encoder weights    :", args.encoder_weights)
     # Uruchamiamy pętlę treningową
     train_model(args, model, optimizer, criterion, device, scheduler, wandb_run=wandb_run)
 
@@ -182,7 +191,12 @@ def train_model(args, model, optimizer, criterion, device, scheduler=None, wandb
     train_data_loader, val_data_loader = build_data_loaders(args, RGBDataset)
     os.makedirs(args.save_model, exist_ok=True)
     os.makedirs(args.save_results, exist_ok=True)
-    model_name = f"RGB_Pesudo_{model.name}_s{args.seed}_{criterion.name}"
+    model_name = (
+        f"RGB_Unet_{args.encoder_name}_"
+        f"{criterion.name if hasattr(criterion, 'name') else type(criterion).__name__}"
+        f"_lr:{args.learning_rate}_"
+        f"augmT{getattr(args, 'train_augm', 'NA')}V{getattr(args, 'valid_augm', 'NA')}"
+    )
     max_score = -float("inf")
     bad_epochs = 0
     num_classes = len(args.classes) + 1

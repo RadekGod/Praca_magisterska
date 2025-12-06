@@ -40,8 +40,8 @@ def main(args):
         classes=len(args.classes) + 1,
         in_channels=1,
         activation=None,
-        encoder_weights=None,  # zostanie dostosowane do 1 kanału przez SMP
-        encoder_name="efficientnet-b4",
+        encoder_weights=None if str(args.encoder_weights).lower() == "none" else args.encoder_weights,
+        encoder_name=args.encoder_name,
         decoder_attention_type="scse",
     )
     log_number_of_parameters(model)
@@ -114,15 +114,25 @@ def main(args):
             "t_max": int(args.t_max),
             "amp": bool(args.amp),
             "grad_clip": float(args.grad_clip) if args.grad_clip is not None else None,
-            "model_name": "Unet_efficientnet-b4_sar",
+            "model_name": f"Unet_{args.encoder_name}_sar",
             "criterion": criterion.name if hasattr(criterion, "name") else type(criterion).__name__,
             "model_type": "sar",
+            "encoder_name": args.encoder_name,
+            "encoder_weights": args.encoder_weights,
         }
+
+        run_name = (
+            f"SAR_Unet_{args.encoder_name}_"
+            f"{criterion.name if hasattr(criterion, 'name') else type(criterion).__name__}"
+            f"_lr:{args.learning_rate}_"
+            f"augmT{getattr(args, 'train_augm', 'NA')}V{getattr(args, 'valid_augm', 'NA')}"
+        )
+
         wandb_run = wandb.init(
             project=getattr(args, "wandb_project", "SAR-train"),
             entity=getattr(args, "wandb_entity", None),
             config=wandb_config,
-            name=f"sar_seed:{args.seed}_lr:{args.learning_rate}_no-weights",
+            name=run_name,
         )
 
         print("Number of epochs   :", args.n_epochs)
@@ -131,6 +141,8 @@ def main(args):
         print("Device             :", device)
         print("AMP                :", args.amp)
         print("Grad clip          :", args.grad_clip)
+        print("Encoder name       :", args.encoder_name)
+        print("Encoder weights    :", args.encoder_weights)
 
     train_model(args, model, optimizer, criterion, device, scheduler, wandb_run=wandb_run)
 
@@ -146,7 +158,13 @@ def train_model(args, model, optimizer, criterion, device, scheduler=None, wandb
     train_loader, valid_loader = build_data_loaders(args, SARDataset)
     os.makedirs(args.save_model, exist_ok=True)
     os.makedirs(args.save_results, exist_ok=True)
-    model_name = f"SAR_EfficientNetB4_s{args.seed}_{criterion.name}"
+
+    model_name = (
+        f"SAR_Unet_{args.encoder_name}_"
+        f"{criterion.name if hasattr(criterion, 'name') else type(criterion).__name__}"
+        f"_lr:{args.learning_rate}_"
+        f"augmT{getattr(args, 'train_augm', 'NA')}V{getattr(args, 'valid_augm', 'NA')}"
+    )
     max_score = -float("inf")
     bad_epochs = 0
     num_classes = len(args.classes) + 1
@@ -233,16 +251,26 @@ if __name__ == "__main__":
     parser.add_argument('--batch_size', type=int, default=4)
     parser.add_argument('--num_workers', type=int, default=4)
     parser.add_argument('--crop_size', type=int, default=256)
-    parser.add_argument('--learning_rate', type=float, default=0.0001)
+    parser.add_argument('--learning_rate', type=float, default=0.001)
     parser.add_argument('--classes', default=[1, 2, 3, 4, 5, 6, 7, 8])
     parser.add_argument('--data_root', type=str, default='../dataset/train')
     parser.add_argument('--save_model', type=str, default='model')
     parser.add_argument('--save_results', type=str, default="results")
-
+    # --- AUGMENTACJE ---
+    parser.add_argument('--train_augm', type=int, choices=[1, 2, 3], default=1,
+                        help='Wybór trybu augmentacji dla treningu (train_augm1/2/3)')
+    parser.add_argument('--valid_augm', type=int, choices=[1, 2, 3], default=1,
+                        help='Wybór trybu augmentacji dla walidacji (valid_augm1/2/3)')
+    # --- ENKODER ---
+    parser.add_argument('--encoder_name', type=str, default='resnet34',
+                        help='Nazwa enkodera z segmentation_models_pytorch, np. resnet34, convnext_tiny, swin_tiny_patch4_window7_224')
+    parser.add_argument('--encoder_weights', type=str, default='imagenet',
+                        help='Wagi enkodera, np. imagenet, ssl, swsl lub none (brak wag)')
+    # --- SCHEDULER / EARLY STOPPING PARAMS ---
     parser.add_argument('--scheduler', type=str, choices=['plateau', 'cosine', 'none'], default='plateau')
     parser.add_argument('--lr_patience', type=int, default=3)
     parser.add_argument('--early_patience', type=int, default=15)
-    parser.add_argument('--min_delta', type=float, default=0.005)
+    parser.add_argument('--min_delta', type=float, default=0.001)
     parser.add_argument('--min_lr', type=float, default=1e-6)
     parser.add_argument('--t_max', type=int, default=30)
     parser.add_argument('--amp', type=int, default=1, help='Włącz / wyłącz mixed precision (1/0)')

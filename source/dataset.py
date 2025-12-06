@@ -2,6 +2,7 @@ import numpy as np
 import rasterio
 from torch.utils.data import Dataset as BaseDataset
 import os
+from typing import Optional
 
 from . import transforms as T
 
@@ -37,14 +38,54 @@ def save_img(path, img, crs, transform):
         dst.close()
 
 
+def _pick_augm(train: bool, train_augm: Optional[int], valid_augm: Optional[int]):
+    """Zwraca funkcję augmentacji z modułu transforms na podstawie numeru trybu.
+
+    train_augm/valid_augm: 1,2,3 lub None (None => domyślnie 1).
+    """
+    if train:
+        idx = train_augm or 1
+        if idx == 1:
+            return T.train_augm1
+        if idx == 2:
+            return T.train_augm2
+        if idx == 3:
+            return T.train_augm3
+        # fallback
+        return T.train_augm1
+    else:
+        idx = valid_augm or 1
+        if idx == 1:
+            return T.valid_augm1
+        if idx == 2:
+            return T.valid_augm2
+        if idx == 3:
+            return T.valid_augm3
+        return T.valid_augm1
+
+
 class Dataset(BaseDataset):
-    def __init__(self, label_list, classes=None, size=128, train=False, sar_mean=None, sar_std=None, compute_stats=False, sar_normalize='global'):
+    def __init__(
+        self,
+        label_list,
+        classes=None,
+        size=128,
+        train=False,
+        sar_mean=None,
+        sar_std=None,
+        compute_stats=False,
+        sar_normalize='global',
+        train_augm: Optional[int] = None,
+        valid_augm: Optional[int] = None,
+    ):
         """label_list: list of label file paths (contains 'labels' in path)
         If compute_stats=True and train=True, dataset will compute global SAR mean/std
         using T.compute_sar_stats and the module-level load_grayscale.
+
+        train_augm / valid_augm - numery trybów augmentacji (1..3) dla treningu / walidacji.
         """
         self.fns = label_list
-        self.augm = T.train_augm3 if train else T.valid_augm
+        self.augm = _pick_augm(train=train, train_augm=train_augm, valid_augm=valid_augm)
         self.size = size
         self.train = train
 
@@ -54,7 +95,12 @@ class Dataset(BaseDataset):
         self.sar_normalize = sar_normalize
 
         # create ToTensor with SAR normalization info
-        self.to_tensor = T.ToTensor(classes=classes, sar_mean=sar_mean, sar_std=sar_std, sar_normalize=sar_normalize)
+        self.to_tensor = T.ToTensor(
+            classes=classes,
+            sar_mean=sar_mean,
+            sar_std=sar_std,
+            sar_normalize=sar_normalize,
+        )
         self.load_multiband = load_multiband
         self.load_grayscale = load_grayscale
 

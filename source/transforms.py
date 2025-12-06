@@ -93,7 +93,8 @@ class ToTensor:
         return sample
 
 
-def compute_sar_stats(paths, load_fn=None, replace_from='labels', replace_to='sar_images', max_files=None, verbose=False):
+def compute_sar_stats(paths, load_fn=None, replace_from='labels', replace_to='sar_images', max_files=None,
+                      verbose=False):
     """
     Compute global mean/std for SAR channel across provided list of paths.
     - paths: list of label paths or SAR paths
@@ -138,7 +139,7 @@ def compute_sar_stats(paths, load_fn=None, replace_from='labels', replace_to='sa
         sum_ += float(arrf.sum())
         sumsq += float((arrf ** 2).sum())
         if verbose and (i + 1) % 50 == 0:
-            print(f'compute_sar_stats: processed {i+1}/{n}')
+            print(f'compute_sar_stats: processed {i + 1}/{n}')
 
     if total == 0:
         return None, None
@@ -148,56 +149,98 @@ def compute_sar_stats(paths, load_fn=None, replace_from='labels', replace_to='sa
     return float(mean), float(std)
 
 
-# --- augmentations (kept existing pipelines, updated deprecated names) ---
+# --- augmentations: proste, sensowne dla RGB i SAR ---
 
-def valid_augm(sample, size=512):
-    augms = [A.Resize(height=size, width=size, p=1.0)]
-    return A.Compose(augms)(image=sample['image'], mask=sample['mask'])
-
-
-def test_augm(sample):
-    augms = [A.Flip(p=0.1)]
-    return A.Compose(augms)(image=sample['image'], mask=sample['mask'])
-
-
-def train_augm(sample, size=512):
+# train_augm1: łagodne, uniwersalne augmentacje (geometria + lekka degradacja)
+def train_augm1(sample, size=512):
     augms = [
-        A.ShiftScaleRotate(scale_limit=0.2, rotate_limit=45, border_mode=0, value=0, p=0.7),
+        # prosta geometria
+        A.ShiftScaleRotate(
+            shift_limit=0.05,
+            scale_limit=0.1,
+            rotate_limit=15,
+            border_mode=0,
+            value=0,
+            p=0.7,
+        ),
         A.RandomCrop(size, size, p=1.0),
-        A.Flip(p=0.75),
-        A.Downscale(scale_min=0.5, scale_max=0.75, p=0.05),
-        A.MaskDropout(max_objects=3, image_fill_value=0, mask_fill_value=0, p=0.1),
+        A.HorizontalFlip(p=0.5),
+        A.VerticalFlip(p=0.2),
+        # lekka degradacja jakości (szum / blur)
         A.OneOf([
-            A.RandomBrightnessContrast(brightness_limit=0.3, contrast_limit=0.3, p=1),
-            A.RandomGamma(gamma_limit=(70, 130), p=1),
-            A.ChannelShuffle(p=0.2),
-            A.HueSaturationValue(hue_shift_limit=30, sat_shift_limit=40, val_shift_limit=30, p=1),
-            A.RGBShift(r_shift_limit=30, g_shift_limit=30, b_shift_limit=30, p=1),
-        ], p=0.8),
-        A.OneOf([A.ElasticTransform(p=1), A.OpticalDistortion(p=1), A.GridDistortion(p=1), A.Perspective(p=1)], p=0.2),
-        A.OneOf([A.GaussNoise(p=1), A.MultiplicativeNoise(p=1), A.Sharpen(p=1), A.GaussianBlur(p=1)], p=0.2),
+            A.GaussianBlur(blur_limit=3, p=1.0),
+            A.GaussNoise(var_limit=(5.0, 20.0), p=1.0),
+        ], p=0.3),
     ]
     return A.Compose(augms)(image=sample['image'], mask=sample['mask'])
 
 
-def train_augm3(sample, size=512):
-    augms = [A.PadIfNeeded(size, size, border_mode=0, value=0, p=1.0), A.RandomCrop(size, size, p=1.0)]
+def valid_augm1(sample, size=512):
+    # Walidacja: brak losowych augmentacji, tylko zmiana rozmiaru.
+    augms = [A.Resize(height=size, width=size, p=1.0)]
     return A.Compose(augms)(image=sample['image'], mask=sample['mask'])
+
+
+# train_augm2: trochę mocniejsze augmentacje, nadal bez operacji typowo kolorystycznych
+def train_augm2(sample, size=512):
+    augms = [
+        A.ShiftScaleRotate(
+            shift_limit=0.08,
+            scale_limit=0.15,
+            rotate_limit=25,
+            border_mode=0,
+            value=0,
+            p=0.8,
+        ),
+        A.RandomCrop(size, size, p=1.0),
+        A.HorizontalFlip(p=0.5),
+        A.VerticalFlip(p=0.3),
+        # sporadyczne pogorszenie jakości (downscale)
+        A.Downscale(scale_min=0.6, scale_max=0.9, p=0.2),
+        # okazjonalny dropout obiektów (jeśli maski na to pozwalają)
+        A.MaskDropout(
+            max_objects=2,
+            image_fill_value=0,
+            mask_fill_value=0,
+            p=0.15,
+        ),
+        # trochę szumu / blur / sharpen
+        A.OneOf([
+            A.GaussNoise(var_limit=(5.0, 30.0), p=1.0),
+            A.MultiplicativeNoise(multiplier=(0.9, 1.1), p=1.0),
+            A.GaussianBlur(blur_limit=5, p=1.0),
+            A.Sharpen(alpha=(0.1, 0.3), lightness=(0.9, 1.1), p=1.0),
+        ], p=0.4),
+    ]
+    return A.Compose(augms, additional_targets={'osm': 'image'})(
+        image=sample['image'],
+        mask=sample['mask'],
+        osm=sample.get('osm'),
+    )
 
 
 def valid_augm2(sample, size=512):
     augms = [A.Resize(height=size, width=size, p=1.0)]
-    return A.Compose(augms, additional_targets={'osm': 'image'})(image=sample['image'], mask=sample['mask'], osm=sample.get('osm'))
+    return A.Compose(augms, additional_targets={'osm': 'image'})(
+        image=sample['image'],
+        mask=sample['mask'],
+        osm=sample.get('osm'),
+    )
 
 
-def train_augm2(sample, size=512):
+# train_augm3: minimalne augmentacje – tylko pad + crop (baseline)
+def train_augm3(sample, size=512):
     augms = [
-        A.ShiftScaleRotate(scale_limit=0.2, rotate_limit=45, border_mode=0, value=0, p=0.7),
+        A.PadIfNeeded(size, size, border_mode=0, value=0, p=1.0),
         A.RandomCrop(size, size, p=1.0),
-        A.Flip(p=0.75),
-        A.Downscale(scale_min=0.5, scale_max=0.75, p=0.05),
-        A.MaskDropout(max_objects=3, image_fill_value=0, mask_fill_value=0, p=0.1),
-        A.OneOf([A.ElasticTransform(p=1), A.OpticalDistortion(p=1), A.GridDistortion(p=1), A.Perspective(p=1)], p=0.2),
-        A.OneOf([A.GaussNoise(p=1), A.MultiplicativeNoise(p=1), A.Sharpen(p=1), A.GaussianBlur(p=1)], p=0.2),
     ]
-    return A.Compose(augms, additional_targets={'osm': 'image'})(image=sample['image'], mask=sample['mask'], osm=sample.get('osm'))
+    return A.Compose(augms)(image=sample['image'], mask=sample['mask'])
+
+
+def valid_augm3(sample, size=512):
+    augms = [A.Resize(height=size, width=size, p=1.0)]
+    return A.Compose(augms, additional_targets={'osm': 'image'})(
+        image=sample['image'],
+        mask=sample['mask'],
+        osm=sample.get('osm'),
+    )

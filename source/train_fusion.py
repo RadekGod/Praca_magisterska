@@ -58,7 +58,7 @@ def data_loader(args):
 def train_model(args, model, optimizer, criterion, device, scheduler=None):
     train_loader, valid_loader = data_loader(args)
     os.makedirs(args.save_model, exist_ok=True)
-    model_name = f"FUSION_EfficientNetB4_s{args.seed}_{criterion.name}"
+    model_name = f"FUSION_EfficientNetB4_s{args.seed}_{criterion.name}_augmT{getattr(args, 'train_augm', 'NA')}V{getattr(args, 'valid_augm', 'NA')}"
     max_score = -float("inf")
     bad_epochs = 0
     num_classes = len(args.classes) + 1
@@ -274,6 +274,11 @@ if __name__ == "__main__":
     parser.add_argument('--classes', default=[1,2,3,4,5,6,7,8])
     parser.add_argument('--data_root', default='dataset/train')
     parser.add_argument('--save_model', default='model')
+    # --- AUGMENTACJE ---
+    parser.add_argument('--train_augm', type=int, choices=[1, 2, 3], default=1,
+                        help='Wybór trybu augmentacji dla treningu (train_augm1/2/3)')
+    parser.add_argument('--valid_augm', type=int, choices=[1, 2, 3], default=1,
+                        help='Wybór trybu augmentacji dla walidacji (valid_augm1/2/3)')
     parser.add_argument('--scheduler', choices=['plateau','cosine','none'], default='plateau')
     parser.add_argument('--lr_patience', type=int, default=4)
     parser.add_argument('--early_patience', type=int, default=15)

@@ -1,0 +1,103 @@
+efficientnet-b4
+resnet34
+tu-convnext_tiny
+tu-swin_tiny_patch4_window7_224
+
+cd D:\Magisterka\Projekt
+
+python source\train_rgb.py ^
+  --seed=0 ^
+  --n_epochs=100 ^
+  --batch_size=4 ^
+  --num_workers=4 ^
+  --crop_size=256 ^
+  --learning_rate=0.001 ^
+  --classes "[1,2,3,4,5,6,7,8]" ^
+  --data_root="../dataset/train" ^
+  --save_model="model" ^
+  --save_results="results" ^
+  --train_augm=1 ^
+  --valid_augm=1 ^
+  --encoder_name=efficientnet-b4 ^
+  --encoder_weights=imagenet ^
+  --scheduler="plateau" ^
+  --lr_patience=3 ^
+  --early_patience=15 ^
+  --min_delta=0.001 ^
+  --min_lr=1e-6 ^
+  --t_max=30 ^
+  --amp=1 ^
+  --grad_clip=1.0 ^
+  --use_wandb=True ^
+  --wandb_project="RGB-train" ^
+  --wandb_entity="radoslaw-godlewski00-politechnika-warszawska"
+
+
+
+
+
+
+
+  cd D:\Magisterka\Projekt
+
+python source\train_rgb.py ^
+  --seed=0 ^
+  --n_epochs=100 ^
+  --batch_size=4 ^
+  --num_workers=4 ^
+  --crop_size=256 ^
+  --learning_rate=0.001 ^
+  --classes "[1,2,3,4,5,6,7,8]" ^
+  --data_root="../dataset/train" ^
+  --save_model="model" ^
+  --save_results="results" ^
+  --train_augm=2 ^
+  --valid_augm=1 ^
+  --encoder_name=efficientnet-b4 ^
+  --encoder_weights=imagenet ^
+  --scheduler="plateau" ^
+  --lr_patience=3 ^
+  --early_patience=15 ^
+  --min_delta=0.001 ^
+  --min_lr=1e-6 ^
+  --t_max=30 ^
+  --amp=1 ^
+  --grad_clip=1.0 ^
+  --use_wandb=True ^
+  --wandb_project="RGB-train" ^
+  --wandb_entity="radoslaw-godlewski00-politechnika-warszawska"
+
+
+
+
+
+
+
+cd D:\Magisterka\Projekt
+
+python source\train_rgb.py ^
+  --seed=0 ^
+  --n_epochs=100 ^
+  --batch_size=4 ^
+  --num_workers=4 ^
+  --crop_size=256 ^
+  --learning_rate=0.001 ^
+  --classes "[1,2,3,4,5,6,7,8]" ^
+  --data_root="../dataset/train" ^
+  --save_model="model" ^
+  --save_results="results" ^
+  --train_augm=3 ^
+  --valid_augm=1 ^
+  --encoder_name=efficientnet-b4 ^
+  --encoder_weights=imagenet ^
+  --scheduler="plateau" ^
+  --lr_patience=3 ^
+  --early_patience=15 ^
+  --min_delta=0.001 ^
+  --min_lr=1e-6 ^
+  --t_max=30 ^
+  --amp=1 ^
+  --grad_clip=1.0 ^
+  --use_wandb=True ^
+  --wandb_project="RGB-train" ^
+  --wandb_entity="radoslaw-godlewski00-politechnika-warszawska"
