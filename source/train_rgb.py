@@ -301,6 +301,16 @@ if __name__ == "__main__":
     parser.add_argument('--data_root', type=str, default="../dataset/train")
     parser.add_argument('--save_model', type=str, default="model")
     parser.add_argument('--save_results', type=str, default="results")
+    # --- AUGMENTACJE ---
+    parser.add_argument('--train_augm', type=int, choices=[1, 2, 3], default=2,
+                        help='Wybór trybu augmentacji dla treningu (train_augm1/2/3)')
+    parser.add_argument('--valid_augm', type=int, choices=[1, 2, 3], default=1,
+                        help='Wybór trybu augmentacji dla walidacji (valid_augm1/2/3)')
+    # --- ENKODER ---
+    parser.add_argument('--encoder_name', type=str, default='resnet34',
+                        help='Nazwa enkodera z segmentation_models_pytorch, np. resnet34, convnext_tiny, swin_tiny_patch4_window7_224')
+    parser.add_argument('--encoder_weights', type=str, default='imagenet',
+                        help='Wagi enkodera, np. imagenet, ssl, swsl lub none (brak wag)')
     # --- SCHEDULER / EARLY STOPPING PARAMS ---
     parser.add_argument('--scheduler', choices=['plateau', 'cosine', 'none'], default='plateau')
     parser.add_argument('--lr_patience', type=int, default=3)

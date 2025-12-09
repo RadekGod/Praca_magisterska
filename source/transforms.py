@@ -212,20 +212,12 @@ def train_augm2(sample, size=512):
             A.Sharpen(alpha=(0.1, 0.3), lightness=(0.9, 1.1), p=1.0),
         ], p=0.4),
     ]
-    return A.Compose(augms, additional_targets={'osm': 'image'})(
-        image=sample['image'],
-        mask=sample['mask'],
-        osm=sample.get('osm'),
-    )
+    return A.Compose(augms)(image=sample['image'], mask=sample['mask'])
 
 
 def valid_augm2(sample, size=512):
     augms = [A.Resize(height=size, width=size, p=1.0)]
-    return A.Compose(augms, additional_targets={'osm': 'image'})(
-        image=sample['image'],
-        mask=sample['mask'],
-        osm=sample.get('osm'),
-    )
+    return A.Compose(augms)(image=sample['image'], mask=sample['mask'])
 
 
 # train_augm3: minimalne augmentacje – tylko pad + crop (baseline)
@@ -239,8 +231,4 @@ def train_augm3(sample, size=512):
 
 def valid_augm3(sample, size=512):
     augms = [A.Resize(height=size, width=size, p=1.0)]
-    return A.Compose(augms, additional_targets={'osm': 'image'})(
-        image=sample['image'],
-        mask=sample['mask'],
-        osm=sample.get('osm'),
-    )
+    return A.Compose(augms)(image=sample['image'], mask=sample['mask'])

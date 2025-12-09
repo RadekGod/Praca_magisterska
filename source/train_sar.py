@@ -124,7 +124,7 @@ def main(args):
         run_name = (
             f"SAR_Unet_{args.encoder_name}_"
             f"{criterion.name if hasattr(criterion, 'name') else type(criterion).__name__}"
-            f"_lr:{args.learning_rate}_"
+            f"_lr-{args.learning_rate}_"
             f"augmT{getattr(args, 'train_augm', 'NA')}V{getattr(args, 'valid_augm', 'NA')}"
         )
 
@@ -162,14 +162,14 @@ def train_model(args, model, optimizer, criterion, device, scheduler=None, wandb
     model_name = (
         f"SAR_Unet_{args.encoder_name}_"
         f"{criterion.name if hasattr(criterion, 'name') else type(criterion).__name__}"
-        f"_lr:{args.learning_rate}_"
+        f"_lr-{args.learning_rate}_"
         f"augmT{getattr(args, 'train_augm', 'NA')}V{getattr(args, 'valid_augm', 'NA')}"
     )
     max_score = -float("inf")
     bad_epochs = 0
     num_classes = len(args.classes) + 1
 
-    log_path = os.path.join(args.save_results, "train_sar.txt")
+    log_path = os.path.join(args.save_results, "train_" + model_name)
 
     for epoch in range(args.n_epochs):
         logs_train = S.train_epoch_streaming(
@@ -262,8 +262,8 @@ if __name__ == "__main__":
     parser.add_argument('--valid_augm', type=int, choices=[1, 2, 3], default=1,
                         help='Wybór trybu augmentacji dla walidacji (valid_augm1/2/3)')
     # --- ENKODER ---
-    parser.add_argument('--encoder_name', type=str, default='resnet34',
-                        help='Nazwa enkodera z segmentation_models_pytorch, np. resnet34, convnext_tiny, swin_tiny_patch4_window7_224')
+    parser.add_argument('--encoder_name', type=str, default='tu-convnext_tiny',
+                        help='Nazwa enkodera z segmentation_models_pytorch, np. resnet34, tu-convnext_tiny, swin_tiny_patch4_window7_224')
     parser.add_argument('--encoder_weights', type=str, default='imagenet',
                         help='Wagi enkodera, np. imagenet, ssl, swsl lub none (brak wag)')
     # --- SCHEDULER / EARLY STOPPING PARAMS ---
