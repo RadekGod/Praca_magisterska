@@ -59,6 +59,8 @@ def metrics_from_cm(cm: torch.Tensor):
         "prec": prec_c.mean().item(),
         "rec": rec_c.mean().item(),
         "f1": f1_c.mean().item(),
+        "iou_per_class": iou_c.tolist(),
+        "f1_per_class": f1_c.tolist(),
     }
 
 

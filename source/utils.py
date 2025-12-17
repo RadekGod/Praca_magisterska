@@ -62,8 +62,10 @@ def progress(train_logs, valid_logs, loss_nm, metric_nm, nepochs, outdir, fn_out
 
 def log_epoch_results(log_path: str, epoch_idx: int, lr_str: str, train_logs: dict, valid_logs: dict):
     os.makedirs(os.path.dirname(log_path), exist_ok=True)
+
     def _g(d: dict, k: str):
         return float(d.get(k, float('nan')))
+
     with open(log_path, "a", encoding="utf-8") as f:
         f.write(f"Epoch: {epoch_idx} (lr: {lr_str})\n")
         f.write("Train Loss: {:.6f}, Valid Loss: {:.6f}\n".format(_g(train_logs, "loss"), _g(valid_logs, "loss")))
@@ -72,7 +74,44 @@ def log_epoch_results(log_path: str, epoch_idx: int, lr_str: str, train_logs: di
         f.write("Train Acc: {:.6f}, Valid Acc: {:.6f}\n".format(_g(train_logs, "acc"), _g(valid_logs, "acc")))
         f.write("Train Prec: {:.6f}, Valid Prec: {:.6f}\n".format(_g(train_logs, "prec"), _g(valid_logs, "prec")))
         f.write("Train Rec: {:.6f}, Valid Rec: {:.6f}\n".format(_g(train_logs, "rec"), _g(valid_logs, "rec")))
-        f.write("Train F1: {:.6f}, Valid F1: {:.6f}\n\n".format(_g(train_logs, "f1"), _g(valid_logs, "f1")))
+        f.write("Train F1: {:.6f}, Valid F1: {:.6f}\n".format(_g(train_logs, "f1"), _g(valid_logs, "f1")))
+
+        # Opcjonalne: per-class IoU i F1 jeśli są dostępne
+        def _get_per_class(d: dict, key: str):
+            v = d.get(key, None)
+            if v is None:
+                return None
+            # oczekujemy listy/ndarray/tensora 1D
+            try:
+                arr = np.asarray(v, dtype=float).ravel()
+            except Exception:
+                return None
+            if arr.size == 0:
+                return None
+            return arr
+
+        iou_t = _get_per_class(train_logs, "iou_per_class")
+        iou_v = _get_per_class(valid_logs, "iou_per_class")
+        f1_t = _get_per_class(train_logs, "f1_per_class")
+        f1_v = _get_per_class(valid_logs, "f1_per_class")
+
+        if iou_t is not None and iou_v is not None:
+            f.write("Per-class IoU (Train):\n")
+            for cid, val in enumerate(iou_t):
+                f.write(f"  class_{cid}: {val:.6f}\n")
+            f.write("Per-class IoU (Valid):\n")
+            for cid, val in enumerate(iou_v):
+                f.write(f"  class_{cid}: {val:.6f}\n")
+
+        if f1_t is not None and f1_v is not None:
+            f.write("Per-class F1 (Train):\n")
+            for cid, val in enumerate(f1_t):
+                f.write(f"  class_{cid}: {val:.6f}\n")
+            f.write("Per-class F1 (Valid):\n")
+            for cid, val in enumerate(f1_v):
+                f.write(f"  class_{cid}: {val:.6f}\n")
+
+        f.write("\n")
 
         print(f"\nEpoch: {epoch_idx} (lr: {lr_str})")
         print(f"Train Loss: {train_logs.get('loss'):.6f}, Valid Loss: {valid_logs.get('loss'):.6f}")
@@ -82,9 +121,15 @@ def log_epoch_results(log_path: str, epoch_idx: int, lr_str: str, train_logs: di
         print(f"Train Prec: {train_logs.get('prec'):.6f}, Valid Prec: {valid_logs.get('prec'):.6f}")
         print(f"Train Rec: {train_logs.get('rec'):.6f}, Valid Rec: {valid_logs.get('rec'):.6f}")
         print(f"Train F1: {train_logs.get('f1'):.6f}, Valid F1: {valid_logs.get('f1'):.6f}")
+        print("Per-class IoU (Train):", ", ".join(f"c{cid}={val:.3f}" for cid, val in enumerate(iou_t)))
+        print("Per-class IoU (Valid):", ", ".join(f"c{cid}={val:.3f}" for cid, val in enumerate(iou_v)))
+        print("Per-class F1 (Train):", ", ".join(f"c{cid}={val:.3f}" for cid, val in enumerate(f1_t)))
+        print("Per-class F1 (Valid):", ", ".join(f"c{cid}={val:.3f}" for cid, val in enumerate(f1_v)))
+
 
 def _get_lr(optimizer):
     return ", ".join(f"{g['lr']:.6g}" for g in optimizer.param_groups)
+
 
 def log_number_of_parameters(model):
     params = 0

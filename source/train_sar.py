@@ -46,7 +46,23 @@ def main(args):
     )
     log_number_of_parameters(model)
 
-    classes_wt = np.ones([len(args.classes) + 1], dtype=np.float32)
+    # Te same wagi klas jak w treningu RGB (założenie: identyczny rozkład klas masek)
+    classes_wt = np.array(
+        [
+            3.244,  # klasa 0 (tło)
+            2.123,  # klasa 1
+            0.539,  # klasa 2
+            0.565,  # klasa 3
+            1.157,  # klasa 4
+            0.768,  # klasa 5
+            0.927,  # klasa 6
+            1.217,  # klasa 7
+            0.903,  # klasa 8
+        ],
+        dtype=np.float32,
+    )
+    if classes_wt.shape[0] != len(args.classes) + 1:
+        raise ValueError(f"classes_wt length {classes_wt.shape[0]} != num_classes {len(args.classes) + 1}")
     criterion = source.losses.CEWithLogitsLoss(weights=classes_wt)
 
     model = model.to(device)
@@ -119,6 +135,7 @@ def main(args):
             "model_type": "sar",
             "encoder_name": args.encoder_name,
             "encoder_weights": args.encoder_weights,
+            "class_weights": classes_wt.tolist(),
         }
 
         run_name = (
@@ -143,6 +160,7 @@ def main(args):
         print("Grad clip          :", args.grad_clip)
         print("Encoder name       :", args.encoder_name)
         print("Encoder weights    :", args.encoder_weights)
+        print("Class weights      :", classes_wt)
 
     train_model(args, model, optimizer, criterion, device, scheduler, wandb_run=wandb_run)
 
@@ -207,10 +225,24 @@ def train_model(args, model, optimizer, criterion, device, scheduler=None, wandb
                 log_dict["lr"] = float(optimizer.param_groups[0]["lr"])
             except Exception:
                 pass
-            for k, v in logs_train.items():
-                log_dict[f"train/{k}"] = float(v)
-            for k, v in logs_valid.items():
-                log_dict[f"valid/{k}"] = float(v)
+
+            def _log_metrics(prefix: str, logs: dict):
+                for k, v in logs.items():
+                    if k in ("iou_per_class", "f1_per_class"):
+                        arr = np.asarray(v, dtype=float).ravel()
+                        for cid, val in enumerate(arr):
+                            if k == "iou_per_class":
+                                log_dict[f"{prefix}/iou_class_{cid}"] = float(val)
+                            elif k == "f1_per_class":
+                                log_dict[f"{prefix}/f1_class_{cid}"] = float(val)
+                    else:
+                        try:
+                            log_dict[f"{prefix}/{k}"] = float(v)
+                        except Exception:
+                            continue
+
+            _log_metrics("train", logs_train)
+            _log_metrics("valid", logs_valid)
             wandb_run.log(log_dict)
 
         score = logs_valid["iou"]

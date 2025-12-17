@@ -151,8 +151,21 @@ def compute_sar_stats(paths, load_fn=None, replace_from='labels', replace_to='sa
 
 # --- augmentations: proste, sensowne dla RGB i SAR ---
 
-# train_augm1: łagodne, uniwersalne augmentacje (geometria + lekka degradacja)
+# train_augm1: minimalne augmentacje – tylko pad + crop (baseline)
 def train_augm1(sample, size=512):
+    augms = [
+        A.PadIfNeeded(size, size, border_mode=0, value=0, p=1.0),
+        A.RandomCrop(size, size, p=1.0),
+    ]
+    return A.Compose(augms)(image=sample['image'], mask=sample['mask'])
+
+
+def valid_augm1(sample, size=512):
+    augms = [A.Resize(height=size, width=size, p=1.0)]
+    return A.Compose(augms)(image=sample['image'], mask=sample['mask'])
+
+# train_augm2: łagodne, uniwersalne augmentacje (geometria + lekka degradacja)
+def train_augm2(sample, size=512):
     augms = [
         # prosta geometria
         A.ShiftScaleRotate(
@@ -175,14 +188,14 @@ def train_augm1(sample, size=512):
     return A.Compose(augms)(image=sample['image'], mask=sample['mask'])
 
 
-def valid_augm1(sample, size=512):
+def valid_augm2(sample, size=512):
     # Walidacja: brak losowych augmentacji, tylko zmiana rozmiaru.
     augms = [A.Resize(height=size, width=size, p=1.0)]
     return A.Compose(augms)(image=sample['image'], mask=sample['mask'])
 
 
-# train_augm2: trochę mocniejsze augmentacje, nadal bez operacji typowo kolorystycznych
-def train_augm2(sample, size=512):
+# train_augm3: mocniejsze augmentacje, nadal bez operacji typowo kolorystycznych
+def train_augm3(sample, size=512):
     augms = [
         A.ShiftScaleRotate(
             shift_limit=0.08,
@@ -211,20 +224,6 @@ def train_augm2(sample, size=512):
             A.GaussianBlur(blur_limit=5, p=1.0),
             A.Sharpen(alpha=(0.1, 0.3), lightness=(0.9, 1.1), p=1.0),
         ], p=0.4),
-    ]
-    return A.Compose(augms)(image=sample['image'], mask=sample['mask'])
-
-
-def valid_augm2(sample, size=512):
-    augms = [A.Resize(height=size, width=size, p=1.0)]
-    return A.Compose(augms)(image=sample['image'], mask=sample['mask'])
-
-
-# train_augm3: minimalne augmentacje – tylko pad + crop (baseline)
-def train_augm3(sample, size=512):
-    augms = [
-        A.PadIfNeeded(size, size, border_mode=0, value=0, p=1.0),
-        A.RandomCrop(size, size, p=1.0),
     ]
     return A.Compose(augms)(image=sample['image'], mask=sample['mask'])
 

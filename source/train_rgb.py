@@ -55,8 +55,36 @@ def main(args):
         decoder_attention_type="scse",
     )
     log_number_of_parameters(model)
-    # Przygotowanie wag klas dla funkcji strat (CrossEntropy z wagami)
-    classes_wt = np.ones([len(args.classes) + 1], dtype=np.float32)
+
+    # Wagi klas policzone na podstawie rozkładu pikseli w zbiorze treningowym
+    # Liczebności pikseli (z analyze_label_classes.py):
+    # 0:  6_034_416  (0.1476 %)
+    # 1: 71_911_578  (1.7585 %)
+    # 2: 994_713_749 (24.3239 %)
+    # 3: 948_679_056 (23.1982 %)
+    # 4: 300_376_797 (7.3452 %)
+    # 5: 582_552_537 (14.2453 %)
+    # 6: 451_856_526 (11.0493 %)
+    # 7: 271_955_592 (6.6502 %)
+    # 8: 461_366_149 (11.2819 %)
+    # Wagi wyznaczone metodą odwrotnej częstości, znormalizowane tak, aby średnia waga ≈ 1
+    # (największy nacisk na rzadkie klasy 0 i 1, mniejszy na dominujące 2 i 3).
+    classes_wt = np.array(
+        [
+            3.244,  # klasa 0 (tło)
+            2.123,  # klasa 1
+            0.539,  # klasa 2
+            0.565,  # klasa 3
+            1.157,  # klasa 4
+            0.768,  # klasa 5
+            0.927,  # klasa 6
+            1.217,  # klasa 7
+            0.903,  # klasa 8
+        ],
+        dtype=np.float32,
+    )
+    if classes_wt.shape[0] != len(args.classes) + 1:
+        raise ValueError(f"classes_wt length {classes_wt.shape[0]} != num_classes {len(args.classes) + 1}")
     criterion = source.losses.CEWithLogitsLoss(weights=classes_wt)
 
     # =============================================
@@ -149,6 +177,7 @@ def main(args):
             "model_type": "rgb",
             "encoder_name": args.encoder_name,
             "encoder_weights": args.encoder_weights,
+            "class_weights": classes_wt.tolist(),
         }
         run_name = (
             f"RGB_Unet_{args.encoder_name}_"
@@ -171,6 +200,7 @@ def main(args):
     print("Grad clip          :", args.grad_clip)
     print("Encoder name       :", args.encoder_name)
     print("Encoder weights    :", args.encoder_weights)
+    print("Class weights      :", classes_wt)
     # Uruchamiamy pętlę treningową
     train_model(args, model, optimizer, criterion, device, scheduler, wandb_run=wandb_run)
 
@@ -243,10 +273,24 @@ def train_model(args, model, optimizer, criterion, device, scheduler=None, wandb
                 log_dict["lr"] = float(optimizer.param_groups[0]["lr"])
             except Exception:
                 pass
-            for k, v in logs_train.items():
-                log_dict[f"train/{k}"] = float(v)
-            for k, v in logs_valid.items():
-                log_dict[f"valid/{k}"] = float(v)
+
+            def _log_metrics(prefix: str, logs: dict):
+                for k, v in logs.items():
+                    if k in ("iou_per_class", "f1_per_class"):
+                        arr = np.asarray(v, dtype=float).ravel()
+                        for cid, val in enumerate(arr):
+                            if k == "iou_per_class":
+                                log_dict[f"{prefix}/iou_class_{cid}"] = float(val)
+                            elif k == "f1_per_class":
+                                log_dict[f"{prefix}/f1_class_{cid}"] = float(val)
+                    else:
+                        try:
+                            log_dict[f"{prefix}/{k}"] = float(v)
+                        except Exception:
+                            continue
+
+            _log_metrics("train", logs_train)
+            _log_metrics("valid", logs_valid)
             wandb_run.log(log_dict)
 
         # --- LR scheduler ---
@@ -302,13 +346,13 @@ if __name__ == "__main__":
     parser.add_argument('--save_model', type=str, default="model")
     parser.add_argument('--save_results', type=str, default="results")
     # --- AUGMENTACJE ---
-    parser.add_argument('--train_augm', type=int, choices=[1, 2, 3], default=2,
+    parser.add_argument('--train_augm', type=int, choices=[1, 2, 3], default=1,
                         help='Wybór trybu augmentacji dla treningu (train_augm1/2/3)')
     parser.add_argument('--valid_augm', type=int, choices=[1, 2, 3], default=1,
                         help='Wybór trybu augmentacji dla walidacji (valid_augm1/2/3)')
     # --- ENKODER ---
-    parser.add_argument('--encoder_name', type=str, default='resnet34',
-                        help='Nazwa enkodera z segmentation_models_pytorch, np. resnet34, convnext_tiny, swin_tiny_patch4_window7_224')
+    parser.add_argument('--encoder_name', type=str, default='tu-convnext_tiny',
+                        help='Nazwa enkodera z segmentation_models_pytorch, np. efficientnet-b4, resnet34, tu-convnext_tiny')
     parser.add_argument('--encoder_weights', type=str, default='imagenet',
                         help='Wagi enkodera, np. imagenet, ssl, swsl lub none (brak wag)')
     # --- SCHEDULER / EARLY STOPPING PARAMS ---

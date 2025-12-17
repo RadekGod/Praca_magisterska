@@ -1,5 +1,6 @@
 import argparse
 from pathlib import Path
+from typing import List, Dict
 
 import numpy as np
 from PIL import Image
@@ -31,7 +32,7 @@ def parse_args() -> argparse.Namespace:
     return parser.parse_args()
 
 
-def find_label_files(labels_dir: Path, ext: str) -> list[Path]:
+def find_label_files(labels_dir: Path, ext: str) -> List[Path]:
     """Zwraca posortowaną listę plików etykiet o zadanym rozszerzeniu.
 
     Nie przeszukujemy rekurencyjnie ani nie filtrujemy po plikach ukrytych,
@@ -71,7 +72,7 @@ def load_mask_pil(path: Path) -> np.ndarray:
     return mask
 
 
-def update_class_counts(counts: dict[int, int], mask: np.ndarray) -> None:
+def update_class_counts(counts: Dict[int, int], mask: np.ndarray) -> None:
     """Aktualizuje słownik `counts` o zliczenia wartości pikseli w `mask`.
 
     Używa np.unique, więc jest bardzo szybkie i pamięciooszczędne
@@ -97,7 +98,7 @@ def main() -> None:
 
     print(f"Liczba znalezionych plików: {len(files)}")
 
-    class_counts: dict[int, int] = {}
+    class_counts: Dict[int, int] = {}
     num_errors = 0
 
     for idx, path in enumerate(files, start=1):
@@ -142,4 +143,3 @@ def main() -> None:
 
 if __name__ == "__main__":
     main()
-
