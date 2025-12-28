@@ -49,6 +49,13 @@ def build_data_loaders(args, DatasetClass):
     train_augm = getattr(args, 'train_augm')
     valid_augm = getattr(args, 'valid_augm')
 
+    # --- class-aware crop / oversampling (tylko train) ---
+    class_aware_crop = bool(getattr(args, 'class_aware_crop', 0))
+    oversample_class = int(getattr(args, 'oversample_class', 1))
+    oversample_p = float(getattr(args, 'oversample_p', 0.0))
+    oversample_min_pixels = int(getattr(args, 'oversample_min_pixels', 20))
+    oversample_max_tries = int(getattr(args, 'oversample_max_tries', 30))
+
     # =============================================
     #   Tworzenie datasetów i loaderów
     # =============================================
@@ -62,6 +69,11 @@ def build_data_loaders(args, DatasetClass):
         sar_normalize=sar_normalize,
         train_augm=train_augm,
         valid_augm=valid_augm,
+        class_aware_crop=class_aware_crop,
+        oversample_class=oversample_class,
+        oversample_p=oversample_p,
+        oversample_min_pixels=oversample_min_pixels,
+        oversample_max_tries=oversample_max_tries,
     )
     validset = DatasetClass(
         validate_paths,
@@ -72,6 +84,11 @@ def build_data_loaders(args, DatasetClass):
         sar_normalize=sar_normalize,
         train_augm=train_augm,
         valid_augm=valid_augm,
+        class_aware_crop=False,
+        oversample_class=oversample_class,
+        oversample_p=0.0,
+        oversample_min_pixels=oversample_min_pixels,
+        oversample_max_tries=oversample_max_tries,
     )
 
     train_loader = DataLoader(

@@ -79,6 +79,7 @@ def train_epoch_streaming(model, optimizer, criterion, dataloader, device, num_c
     cm = torch.zeros((num_classes, num_classes), dtype=torch.int64)
     total_loss = 0.0
     n_batches = 0
+    n_loss_batches = 0
     scaler = torch.cuda.amp.GradScaler(enabled=use_amp)
 
     for batch in tqdm(dataloader, desc="Train", leave=False):
@@ -86,22 +87,34 @@ def train_epoch_streaming(model, optimizer, criterion, dataloader, device, num_c
         y = batch["y"]
         y_idx = to_index_targets(y)
         optimizer.zero_grad(set_to_none=True)
+
+        # Forward w AMP OK, ale loss liczmy w fp32 (stabilniej, szczególnie CE i Dice)
         with torch.cuda.amp.autocast(enabled=use_amp):
             logits = model(x)
-            loss = criterion(logits, y.to(device, non_blocking=True))
+        with torch.cuda.amp.autocast(enabled=False):
+            loss = criterion(logits.float(), y.to(device, non_blocking=True).float())
+
+        loss_val = _safe_loss_value(loss)
+        if loss_val is None:
+            _debug_invalid_loss("train", logits, y, y_idx)
+            # pomijamy backward dla zepsutego batcha
+            continue
+
         scaler.scale(loss).backward()
         if grad_clip is not None:
             scaler.unscale_(optimizer)
             torch.nn.utils.clip_grad_norm_(model.parameters(), grad_clip)
         scaler.step(optimizer)
         scaler.update()
+
         preds = logits.argmax(1).detach().cpu()
         cm = update_confusion_matrix(cm, preds, y_idx.cpu(), num_classes)
-        total_loss += loss.item()
+        total_loss += loss_val
         n_batches += 1
+        n_loss_batches += 1
 
     mets = metrics_from_cm(cm)
-    mets["loss"] = total_loss / max(n_batches, 1)
+    mets["loss"] = total_loss / max(n_loss_batches, 1)
     return mets
 
 
@@ -119,18 +132,69 @@ def valid_epoch_streaming(model, criterion, dataloader, device, num_classes: int
     cm = torch.zeros((num_classes, num_classes), dtype=torch.int64)
     total_loss = 0.0
     n_batches = 0
-    with torch.inference_mode(), torch.cuda.amp.autocast(enabled=use_amp):
+    n_loss_batches = 0
+
+    with torch.inference_mode():
         for batch in tqdm(dataloader, desc="Valid", leave=False):
             x = batch["x"].to(device, non_blocking=True)
             y = batch["y"]
             y_idx = to_index_targets(y)
-            logits = model(x)
+
+            # logits mogą być w AMP
+            with torch.cuda.amp.autocast(enabled=use_amp):
+                logits = model(x)
+
             if criterion is not None:
-                total_loss += criterion(logits, y.to(device, non_blocking=True)).item()
+                # loss zawsze w fp32 (stabilnie)
+                with torch.cuda.amp.autocast(enabled=False):
+                    loss = criterion(logits.float(), y.to(device, non_blocking=True).float())
+                loss_val = _safe_loss_value(loss)
+                if loss_val is None:
+                    _debug_invalid_loss("valid", logits, y, y_idx)
+                else:
+                    total_loss += loss_val
+                    n_loss_batches += 1
+
             preds = logits.argmax(1).cpu()
             cm = update_confusion_matrix(cm, preds, y_idx.cpu(), num_classes)
             n_batches += 1
+
     mets = metrics_from_cm(cm)
-    if criterion is not None and n_batches > 0:
-        mets["loss"] = total_loss / n_batches
+    if criterion is not None and n_loss_batches > 0:
+        mets["loss"] = total_loss / n_loss_batches
     return mets
+
+def _safe_loss_value(loss: torch.Tensor) -> Optional[float]:
+    """Zwraca bezpieczną wartość loss jako float lub None jeśli loss jest NaN/Inf."""
+    if loss is None:
+        return None
+    if not torch.is_tensor(loss):
+        try:
+            loss = torch.as_tensor(loss)
+        except Exception:
+            return None
+    if not torch.isfinite(loss).all():
+        return None
+    v = float(loss.detach().item())
+    # dodatkowe zabezpieczenie przed ekstremami (u Ciebie valid loss potrafił iść w dziesiątki)
+    if v > 1000.0:
+        return None
+    return v
+
+
+def _debug_invalid_loss(prefix: str, logits: torch.Tensor, y: torch.Tensor, y_idx: torch.Tensor):
+    try:
+        lg_min = float(logits.detach().min().item())
+        lg_max = float(logits.detach().max().item())
+    except Exception:
+        lg_min, lg_max = None, None
+    try:
+        yi_min = int(y_idx.detach().min().item())
+        yi_max = int(y_idx.detach().max().item())
+    except Exception:
+        yi_min, yi_max = None, None
+    print(
+        f"[{prefix}] Invalid loss detected. "
+        f"logits[min,max]=({lg_min},{lg_max}) target_idx[min,max]=({yi_min},{yi_max}) "
+        f"target_shape={tuple(y.shape)} logits_shape={tuple(logits.shape)}"
+    )

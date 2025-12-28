@@ -6,6 +6,8 @@ import rasterio
 import torch
 import segmentation_models_pytorch as smp
 
+from collections import OrderedDict
+
 from source.dataset import load_multiband, load_grayscale, get_crs, save_img
 
 
@@ -22,6 +24,11 @@ CLASS_COLORS = {
     7: (255, 128, 0),    # klasa 7 - pomarańczowy
     8: (128, 0, 255),    # klasa 8 - fioletowy
 }
+
+
+# ImageNet stats (muszą być identyczne jak w source/transforms.py)
+IMAGENET_MEAN = np.array([0.485, 0.456, 0.406], dtype=np.float32)
+IMAGENET_STD = np.array([0.229, 0.224, 0.225], dtype=np.float32)
 
 
 def build_model(model_type: str, num_classes: int, device: str = "cuda"):
@@ -78,6 +85,30 @@ def logits_to_mask_rgb(logits: torch.Tensor) -> np.ndarray:
     return rgb_mask
 
 
+def _preprocess_image(img: np.ndarray, model_type: str) -> torch.Tensor:
+    """Preprocessing zgodny z treningiem.
+
+    - RGB: /255 + normalizacja ImageNet mean/std
+    - SAR/fusion: tylko /255 (tu brak globalnych statystyk w check_model_rgb.py)
+
+    Zwraca tensor (1, C, H, W) float32.
+    """
+    if img.ndim == 2:
+        img = img[..., None]
+
+    x = img.astype(np.float32) / 255.0  # H,W,C
+
+    if model_type in ("rgb", "fusion") and x.shape[-1] >= 3:
+        # normalizujemy pierwsze 3 kanały jako RGB
+        x[..., 0] = (x[..., 0] - IMAGENET_MEAN[0]) / IMAGENET_STD[0]
+        x[..., 1] = (x[..., 1] - IMAGENET_MEAN[1]) / IMAGENET_STD[1]
+        x[..., 2] = (x[..., 2] - IMAGENET_MEAN[2]) / IMAGENET_STD[2]
+
+    # (H,W,C) -> (1,C,H,W)
+    x = torch.from_numpy(x.transpose(2, 0, 1)).unsqueeze(0).float()
+    return x
+
+
 def run_inference(model, model_path: str, image_path: str, output_path: str, device: str = None, model_type: str = "rgb"):
     """Wykonuje inferencję dla pojedynczego obrazu i zapisuje kolorową maskę."""
     if device is None:
@@ -94,9 +125,8 @@ def run_inference(model, model_path: str, image_path: str, output_path: str, dev
     else:
         raise ValueError(f"Nieznany model_type: {model_type}")
 
-    # --- tensoryzacja ---
-    x = torch.from_numpy(img.transpose(2, 0, 1)).float() / 255.0  # (C, H, W)
-    x = x.unsqueeze(0).to(device)                                 # (1, C, H, W)
+    # --- preprocessing identyczny jak w treningu ---
+    x = _preprocess_image(img, model_type=model_type).to(device)  # (1, C, H, W)
 
     # --- inferencja ---
     with torch.no_grad():
@@ -130,23 +160,22 @@ def run_inference(model, model_path: str, image_path: str, output_path: str, dev
 
 def main():
     parser = argparse.ArgumentParser(description="Inferencja segmentacji i zapis kolorowej maski")
-    parser.add_argument("--model_path", type=str,
-                        help="Ścieżka do wytrenowanego modelu .pth, np. model/RGB_Pesudo_u-efficientnet-b4_s0_CELoss.pth",
-                        default="model/RGB_Pesudo_u-efficientnet-b4_s0_CELoss.pth")
     parser.add_argument("--image_path", type=str,
                         help="Ścieżka do obrazu wejściowego (RGB lub SAR, GeoTIFF). Jeśli jest to folder,"
                              " przetworzone zostaną wszystkie pliki .tif w tym folderze.",
                         default="results/obrazy/rgb/oryginalne")
+    parser.add_argument("--cpu", action="store_true", help="Wymuś użycie CPU zamiast GPU", default=False)
+    parser.add_argument("--model_type", type=str, default="rgb", choices=["rgb", "sar", "fusion"],
+                        help="Typ modelu do użycia: 'rgb' (train_rgb.py), 'sar' (train_sar.py) lub 'fusion'.")
+    parser.add_argument("--model_path", type=str,
+                        help="Ścieżka do wytrenowanego modelu .pth, np. model/RGB_Unet_resnet34_WCEPlusDice_ce1.0_dice1.0_lr_0.001_augmT1V2.pth",
+                        default="model/RGB_Unet_efficientnet-b4_WCEPlusDice_ce1.0_dice1.0_lr_0.001_augmT1V2.pth")
     parser.add_argument("--output_path", type=str,
                         help="Ścieżka wyjściowa.\n"
                              "Jeśli --image_path jest plikiem, to jest to dokładna ścieżka do wyjścia.\n"
                              "Jeśli --image_path jest folderem, to jest to folder wyjściowy,"
                              " w którym zostaną zapisane maski o tych samych nazwach plików.",
-                        default="results/obrazy/rgb/model")
-    parser.add_argument("--cpu", action="store_true", help="Wymuś użycie CPU zamiast GPU", default=False)
-    parser.add_argument("--model_type", type=str, default="rgb", choices=["rgb", "sar", "fusion"],
-                        help="Typ modelu do użycia: 'rgb' (train_rgb.py), 'sar' (train_sar.py) lub 'fusion'.")
-
+                        default="results/obrazy/rgb/model/efficientnet")
     args = parser.parse_args()
 
     device = "cpu" if args.cpu else ("cuda" if torch.cuda.is_available() else "cpu")
@@ -158,13 +187,29 @@ def main():
     model = build_model(model_type=args.model_type, num_classes=num_classes, device=device)
 
     state_dict = torch.load(args.model_path, map_location=device)
-    new_state_dict = {}
+    new_state_dict = OrderedDict()
     for k, v in state_dict.items():
         if k.startswith("module."):
             new_state_dict[k[len("module."):]] = v
         else:
             new_state_dict[k] = v
-    model.load_state_dict(new_state_dict, strict=False)
+
+    # Nie ładujmy wag "po cichu" – wypiszemy co nie pasuje.
+    incompatible = model.load_state_dict(new_state_dict, strict=False)
+    missing = list(getattr(incompatible, "missing_keys", []))
+    unexpected = list(getattr(incompatible, "unexpected_keys", []))
+    if missing:
+        print("[WARN] Missing keys when loading state_dict (model weights not found in checkpoint):")
+        for k in missing[:50]:
+            print("  -", k)
+        if len(missing) > 50:
+            print(f"  ... and {len(missing) - 50} more")
+    if unexpected:
+        print("[WARN] Unexpected keys when loading state_dict (checkpoint contains weights not used by model):")
+        for k in unexpected[:50]:
+            print("  -", k)
+        if len(unexpected) > 50:
+            print(f"  ... and {len(unexpected) - 50} more")
 
     # --- rozróżnienie: pojedynczy plik vs folder ---
     if os.path.isdir(args.image_path):

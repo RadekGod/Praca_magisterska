@@ -5,7 +5,7 @@ from pathlib import Path
 import numpy as np
 import rasterio
 
-from source.inference_rgb import CLASS_COLORS
+from source.check_model_rgb import CLASS_COLORS
 from source.dataset import get_crs, save_img
 
 
@@ -103,7 +103,7 @@ def process_directory(input_dir: str, output_dir: str, suffix: str = "_color") -
 
 def main():
     parser = argparse.ArgumentParser(
-        description="Konwersja masek etykiet .tif na kolorowe maski wg CLASS_COLORS z inference_rgb.py"
+        description="Konwersja masek etykiet .tif na kolorowe maski wg CLASS_COLORS z check_model_rgb.py"
     )
     parser.add_argument(
         "--input_dir",

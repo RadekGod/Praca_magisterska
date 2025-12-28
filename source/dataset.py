@@ -77,6 +77,12 @@ class Dataset(BaseDataset):
         sar_normalize='global',
         train_augm: Optional[int] = None,
         valid_augm: Optional[int] = None,
+        # --- class-aware crop / oversampling ---
+        class_aware_crop: bool = False,
+        oversample_class: int = 1,
+        oversample_p: float = 0.0,
+        oversample_min_pixels: int = 20,
+        oversample_max_tries: int = 30,
     ):
         """label_list: list of label file paths (contains 'labels' in path)
         If compute_stats=True and train=True, dataset will compute global SAR mean/std
@@ -88,6 +94,15 @@ class Dataset(BaseDataset):
         self.augm = _pick_augm(train=train, train_augm=train_augm, valid_augm=valid_augm)
         self.size = size
         self.train = train
+
+        # konfiguracja cropów (działa na masce int, przed one-hot)
+        self.crop_cfg = {
+            "enabled": bool(class_aware_crop) and bool(train) and float(oversample_p) > 0.0,
+            "target_class": int(oversample_class),
+            "p": float(oversample_p),
+            "min_pixels": int(oversample_min_pixels),
+            "max_tries": int(oversample_max_tries),
+        }
 
         # store stats for diagnostics
         self.sar_mean = sar_mean
@@ -109,7 +124,7 @@ class Dataset(BaseDataset):
         msk = self.load_grayscale(self.fns[idx])
 
         if self.train:
-            data = self.augm({"image": img, "mask": msk}, self.size)
+            data = self.augm({"image": img, "mask": msk}, self.size, self.crop_cfg)
         else:
             data = self.augm({"image": img, "mask": msk}, 1024)
         data = self.to_tensor(data)
@@ -128,7 +143,7 @@ class SARDataset(Dataset):
         msk = self.load_grayscale(self.fns[idx])
 
         if self.train:
-            data = self.augm({"image": img, "mask": msk}, self.size)
+            data = self.augm({"image": img, "mask": msk}, self.size, self.crop_cfg)
         else:
             data = self.augm({"image": img, "mask": msk}, 1024)
         data = self.to_tensor(data)
@@ -143,7 +158,7 @@ class RGBDataset(Dataset):
         img = self.load_multiband(self.fns[idx].replace("labels", "rgb_images"))
         msk = self.load_grayscale(self.fns[idx])
         if self.train:
-            data = self.augm({"image": img, "mask": msk}, self.size)
+            data = self.augm({"image": img, "mask": msk}, self.size, self.crop_cfg)
         else:
             data = self.augm({"image": img, "mask": msk}, 1024)
         data = self.to_tensor(data)
@@ -165,7 +180,7 @@ class FusionDataset(Dataset):
         msk = self.load_grayscale(self.fns[idx])
         # Augmentacje zgodne z SAR/RGB (bez kolorowych specyficznych operacji)
         if self.train:
-            data = self.augm({"image": img, "mask": msk}, self.size)
+            data = self.augm({"image": img, "mask": msk}, self.size, self.crop_cfg)
         else:
             data = self.augm({"image": img, "mask": msk}, 1024)
         data = self.to_tensor(data)  # image -> [4,H,W]

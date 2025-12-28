@@ -55,37 +55,34 @@ def main(args):
         decoder_attention_type="scse",
     )
     log_number_of_parameters(model)
-
-    # Wagi klas policzone na podstawie rozkładu pikseli w zbiorze treningowym
-    # Liczebności pikseli (z analyze_label_classes.py):
-    # 0:  6_034_416  (0.1476 %)
-    # 1: 71_911_578  (1.7585 %)
-    # 2: 994_713_749 (24.3239 %)
-    # 3: 948_679_056 (23.1982 %)
-    # 4: 300_376_797 (7.3452 %)
-    # 5: 582_552_537 (14.2453 %)
-    # 6: 451_856_526 (11.0493 %)
-    # 7: 271_955_592 (6.6502 %)
-    # 8: 461_366_149 (11.2819 %)
-    # Wagi wyznaczone metodą odwrotnej częstości, znormalizowane tak, aby średnia waga ≈ 1
-    # (największy nacisk na rzadkie klasy 0 i 1, mniejszy na dominujące 2 i 3).
-    classes_wt = np.array(
-        [
-            3.244,  # klasa 0 (tło)
-            2.123,  # klasa 1
-            0.539,  # klasa 2
-            0.565,  # klasa 3
-            1.157,  # klasa 4
-            0.768,  # klasa 5
-            0.927,  # klasa 6
-            1.217,  # klasa 7
-            0.903,  # klasa 8
-        ],
+    classes_wt = np.array([
+        3.0,
+        5.0,
+        1.0,
+        1.0,
+        1.5,
+        1.0,
+        1.0,
+        1.5,
+        1.0
+    ],
         dtype=np.float32,
     )
     if classes_wt.shape[0] != len(args.classes) + 1:
         raise ValueError(f"classes_wt length {classes_wt.shape[0]} != num_classes {len(args.classes) + 1}")
-    criterion = source.losses.CEWithLogitsLoss(weights=classes_wt)
+
+    loss_name = str(getattr(args, 'loss', 'ce')).lower()
+    if loss_name in ("wce_dice", "wce+dice", "ce_dice"):
+        criterion = source.losses.WeightedCEPlusDice(
+            class_weights=classes_wt,
+            ce_weight=float(getattr(args, 'ce_weight', 1.0)),
+            dice_weight=float(getattr(args, 'dice_weight', 1.0)),
+            dice_smooth=float(getattr(args, 'dice_smooth', 1.0)),
+            dice_include_background=bool(int(getattr(args, 'dice_include_background', 0))),
+            device=device,
+        )
+    else:
+        criterion = source.losses.CEWithLogitsLoss(weights=classes_wt, device=device)
 
     # =============================================
     #   Device i DataParallel
@@ -224,7 +221,7 @@ def train_model(args, model, optimizer, criterion, device, scheduler=None, wandb
     model_name = (
         f"RGB_Unet_{args.encoder_name}_"
         f"{criterion.name if hasattr(criterion, 'name') else type(criterion).__name__}"
-        f"_lr:{args.learning_rate}_"
+        f"_lr_{args.learning_rate}_"
         f"augmT{getattr(args, 'train_augm', 'NA')}V{getattr(args, 'valid_augm', 'NA')}"
     )
     max_score = -float("inf")
@@ -304,14 +301,28 @@ def train_model(args, model, optimizer, criterion, device, scheduler=None, wandb
         # --- EARLY STOPPING + checkpoint ---
         # Jeśli nastąpi poprawa (większe IoU) zapisujemy checkpoint i resetujemy licznik "złych" epok.
         improvement = score - (max_score if max_score != -float("inf") else score)
+
+        # zawsze zapisujemy poprawny state_dict (bez względu na DataParallel)
+        state_dict = (model.module.state_dict() if hasattr(model, "module") else model.state_dict())
+
+        best_path = os.path.join(args.save_model, f"{model_name}.pth")
+        last_path = os.path.join(args.save_model, f"{model_name}_last.pth")
+
         if max_score == -float("inf") or improvement > float(args.min_delta):
             max_score = score
             bad_epochs = 0
-            torch.save(model.state_dict(), os.path.join(args.save_model, f"{model_name}.pth"))
-            print("Model saved in the folder : ", args.save_model)
-            print("Model name is : ", model_name)
+            os.makedirs(args.save_model, exist_ok=True)
+            torch.save(state_dict, best_path)
+            print("Model saved:", os.path.abspath(best_path))
         else:
             bad_epochs += 1
+
+        # Zapis awaryjny: zawsze zapisuj ostatni checkpoint (łatwiej debugować i nic nie ginie)
+        try:
+            os.makedirs(args.save_model, exist_ok=True)
+            torch.save(state_dict, last_path)
+        except Exception as e:
+            print("Warning: failed to save last checkpoint:", e)
 
         # Early stopping: jeśli przez `early_patience` epok nie ma poprawy, przerywamy trening
         if bad_epochs >= int(args.early_patience):
@@ -348,10 +359,10 @@ if __name__ == "__main__":
     # --- AUGMENTACJE ---
     parser.add_argument('--train_augm', type=int, choices=[1, 2, 3], default=1,
                         help='Wybór trybu augmentacji dla treningu (train_augm1/2/3)')
-    parser.add_argument('--valid_augm', type=int, choices=[1, 2, 3], default=1,
+    parser.add_argument('--valid_augm', type=int, choices=[1, 2, 3], default=2,
                         help='Wybór trybu augmentacji dla walidacji (valid_augm1/2/3)')
     # --- ENKODER ---
-    parser.add_argument('--encoder_name', type=str, default='tu-convnext_tiny',
+    parser.add_argument('--encoder_name', type=str, default='efficientnet-b4',
                         help='Nazwa enkodera z segmentation_models_pytorch, np. efficientnet-b4, resnet34, tu-convnext_tiny')
     parser.add_argument('--encoder_weights', type=str, default='imagenet',
                         help='Wagi enkodera, np. imagenet, ssl, swsl lub none (brak wag)')
@@ -364,6 +375,24 @@ if __name__ == "__main__":
     parser.add_argument('--t_max', type=int, default=30)
     parser.add_argument('--amp', type=int, default=1, help='Włącz / wyłącz mixed precision (1/0)')
     parser.add_argument('--grad_clip', type=float, default=1.0, help='Maks. norm gradientu; None aby wyłączyć')
+
+    # --- Loss ---
+    parser.add_argument('--loss', type=str, default='wce_dice', choices=['ce', 'wce_dice'],
+                        help='Funkcja straty: ce (weighted CE) lub wce_dice (weighted CE + Dice)')
+    parser.add_argument('--ce_weight', type=float, default=1.0, help='Waga składnika CE w loss wce_dice')
+    parser.add_argument('--dice_weight', type=float, default=1.0, help='Waga składnika Dice w loss wce_dice')
+    parser.add_argument('--dice_smooth', type=float, default=1.0, help='Smooth dla DiceLoss')
+    parser.add_argument('--dice_include_background', type=int, default=0, choices=[0, 1],
+                        help='Czy uwzględniać tło (klasa 0) w Dice (0/1)')
+
+    # --- Class-aware crop / oversampling (pod rzadkie klasy, np. c1) ---
+    parser.add_argument('--class_aware_crop', type=int, default=1, choices=[0, 1],
+                        help='Włącz class-aware cropping na treningu (0/1)')
+    parser.add_argument('--oversample_class', type=int, default=1, help='Wartość klasy w masce, którą preferujemy w crop (np. 1 dla c1)')
+    parser.add_argument('--oversample_p', type=float, default=0.5, help='Prawdopodobieństwo użycia class-aware crop dla próbki (np. 0.5)')
+    parser.add_argument('--oversample_min_pixels', type=int, default=200, help='Minimalna liczba pikseli target_class w crop')
+    parser.add_argument('--oversample_max_tries', type=int, default=50, help='Ile losowych cropów próbować zanim fallback')
+
     # --- Weights & Biases ---
     parser.add_argument('--use_wandb', type=bool, default=True, help='Włącz logowanie do Weights & Biases')
     parser.add_argument('--wandb_project', type=str, default='RGB-train', help='Nazwa projektu w W&B')

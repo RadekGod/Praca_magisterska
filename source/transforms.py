@@ -149,23 +149,99 @@ def compute_sar_stats(paths, load_fn=None, replace_from='labels', replace_to='sa
     return float(mean), float(std)
 
 
+def _random_crop_np(image: np.ndarray, mask: np.ndarray, size: int, rng: np.random.RandomState):
+    """Prosty crop (H,W[,C]) i (H,W) zwracany jako dict dla zgodności z resztą pipeline."""
+    h, w = mask.shape[:2]
+    if h == size and w == size:
+        return {"image": image, "mask": mask}
+    if h < size or w < size:
+        # zakładamy, że A.PadIfNeeded wcześniej dopasował rozmiar; tu tylko asekuracja
+        pad_h = max(0, size - h)
+        pad_w = max(0, size - w)
+        image = np.pad(image, ((0, pad_h), (0, pad_w)) + (() if image.ndim == 2 else ((0, 0),)), mode="constant")
+        mask = np.pad(mask, ((0, pad_h), (0, pad_w)), mode="constant")
+        h, w = mask.shape[:2]
+    y0 = int(rng.randint(0, h - size + 1))
+    x0 = int(rng.randint(0, w - size + 1))
+    if image.ndim == 2:
+        img_c = image[y0:y0 + size, x0:x0 + size]
+    else:
+        img_c = image[y0:y0 + size, x0:x0 + size, ...]
+    msk_c = mask[y0:y0 + size, x0:x0 + size]
+    return {"image": img_c, "mask": msk_c}
+
+
+def class_aware_random_crop(sample, size: int, target_class: int = 1, p: float = 0.5,
+                           max_tries: int = 30, min_pixels: int = 20, seed: int = None):
+    """Class-aware crop: z prawdopodobieństwem p próbuje wylosować crop zawierający >= min_pixels pikseli target_class.
+
+    Działa na masce w formacie integer (przed one-hot). Jeśli klasa nie występuje / nie uda się w max_tries,
+    robi zwykły losowy crop.
+
+    Parametry:
+    - target_class: wartość w masce (np. 1 dla c1)
+    - p: prawdopodobieństwo użycia trybu class-aware dla danej próbki
+    - max_tries: ile losowych cropów maksymalnie sprawdzić
+    - min_pixels: minimalna liczba pikseli target_class w cropie
+    """
+    img = sample["image"]
+    msk = sample["mask"]
+    rng = np.random.RandomState(seed) if seed is not None else np.random
+
+    # jeśli nie włączamy, szybko wyjdź
+    if p <= 0 or rng.rand() > p:
+        return _random_crop_np(img, msk, size, rng)
+
+    # jeśli klasa w ogóle nie występuje, fallback
+    if not np.any(msk == target_class):
+        return _random_crop_np(img, msk, size, rng)
+
+    best = None
+    best_cnt = -1
+    for _ in range(max(1, int(max_tries))):
+        out = _random_crop_np(img, msk, size, rng)
+        cnt = int(np.sum(out["mask"] == target_class))
+        if cnt > best_cnt:
+            best_cnt = cnt
+            best = out
+        if cnt >= int(min_pixels):
+            return out
+
+    return best if best is not None else _random_crop_np(img, msk, size, rng)
+
+
 # --- augmentations: proste, sensowne dla RGB i SAR ---
 
 # train_augm1: minimalne augmentacje – tylko pad + crop (baseline)
-def train_augm1(sample, size=512):
+def train_augm1(sample, size=512, crop_cfg=None):
+    crop_cfg = crop_cfg or {}
     augms = [
         A.PadIfNeeded(size, size, border_mode=0, value=0, p=1.0),
-        A.RandomCrop(size, size, p=1.0),
     ]
-    return A.Compose(augms)(image=sample['image'], mask=sample['mask'])
+    out = A.Compose(augms)(image=sample['image'], mask=sample['mask'])
+
+    if crop_cfg.get("enabled", False):
+        out = class_aware_random_crop(
+            out,
+            size=size,
+            target_class=int(crop_cfg.get("target_class", 1)),
+            p=float(crop_cfg.get("p", 0.5)),
+            max_tries=int(crop_cfg.get("max_tries", 30)),
+            min_pixels=int(crop_cfg.get("min_pixels", 20)),
+        )
+    else:
+        out = A.RandomCrop(size, size, p=1.0)(image=out["image"], mask=out["mask"])
+    return out
 
 
 def valid_augm1(sample, size=512):
     augms = [A.Resize(height=size, width=size, p=1.0)]
     return A.Compose(augms)(image=sample['image'], mask=sample['mask'])
 
+
 # train_augm2: łagodne, uniwersalne augmentacje (geometria + lekka degradacja)
-def train_augm2(sample, size=512):
+def train_augm2(sample, size=512, crop_cfg=None):
+    crop_cfg = crop_cfg or {}
     augms = [
         # prosta geometria
         A.ShiftScaleRotate(
@@ -176,7 +252,7 @@ def train_augm2(sample, size=512):
             value=0,
             p=0.7,
         ),
-        A.RandomCrop(size, size, p=1.0),
+        A.PadIfNeeded(size, size, border_mode=0, value=0, p=1.0),
         A.HorizontalFlip(p=0.5),
         A.VerticalFlip(p=0.2),
         # lekka degradacja jakości (szum / blur)
@@ -185,7 +261,20 @@ def train_augm2(sample, size=512):
             A.GaussNoise(var_limit=(5.0, 20.0), p=1.0),
         ], p=0.3),
     ]
-    return A.Compose(augms)(image=sample['image'], mask=sample['mask'])
+    out = A.Compose(augms)(image=sample['image'], mask=sample['mask'])
+
+    if crop_cfg.get("enabled", False):
+        out = class_aware_random_crop(
+            out,
+            size=size,
+            target_class=int(crop_cfg.get("target_class", 1)),
+            p=float(crop_cfg.get("p", 0.5)),
+            max_tries=int(crop_cfg.get("max_tries", 30)),
+            min_pixels=int(crop_cfg.get("min_pixels", 20)),
+        )
+    else:
+        out = A.RandomCrop(size, size, p=1.0)(image=out["image"], mask=out["mask"])
+    return out
 
 
 def valid_augm2(sample, size=512):
@@ -195,7 +284,8 @@ def valid_augm2(sample, size=512):
 
 
 # train_augm3: mocniejsze augmentacje, nadal bez operacji typowo kolorystycznych
-def train_augm3(sample, size=512):
+def train_augm3(sample, size=512, crop_cfg=None):
+    crop_cfg = crop_cfg or {}
     augms = [
         A.ShiftScaleRotate(
             shift_limit=0.08,
@@ -205,7 +295,7 @@ def train_augm3(sample, size=512):
             value=0,
             p=0.8,
         ),
-        A.RandomCrop(size, size, p=1.0),
+        A.PadIfNeeded(size, size, border_mode=0, value=0, p=1.0),
         A.HorizontalFlip(p=0.5),
         A.VerticalFlip(p=0.3),
         # sporadyczne pogorszenie jakości (downscale)
@@ -225,7 +315,20 @@ def train_augm3(sample, size=512):
             A.Sharpen(alpha=(0.1, 0.3), lightness=(0.9, 1.1), p=1.0),
         ], p=0.4),
     ]
-    return A.Compose(augms)(image=sample['image'], mask=sample['mask'])
+    out = A.Compose(augms)(image=sample['image'], mask=sample['mask'])
+
+    if crop_cfg.get("enabled", False):
+        out = class_aware_random_crop(
+            out,
+            size=size,
+            target_class=int(crop_cfg.get("target_class", 1)),
+            p=float(crop_cfg.get("p", 0.5)),
+            max_tries=int(crop_cfg.get("max_tries", 30)),
+            min_pixels=int(crop_cfg.get("min_pixels", 20)),
+        )
+    else:
+        out = A.RandomCrop(size, size, p=1.0)(image=out["image"], mask=out["mask"])
+    return out
 
 
 def valid_augm3(sample, size=512):
