@@ -169,7 +169,7 @@ def main():
                         help="Typ modelu do użycia: 'rgb' (train_rgb.py), 'sar' (train_sar.py) lub 'fusion'.")
     parser.add_argument("--model_path", type=str,
                         help="Ścieżka do wytrenowanego modelu .pth, np. model/RGB_Unet_resnet34_WCEPlusDice_ce1.0_dice1.0_lr_0.001_augmT1V1.pth",
-                        default="model/" + main_model_name + model_name_variant + ".pth")
+                        default="model/rgb/" + main_model_name + model_name_variant + ".pth")
     parser.add_argument("--output_path", type=str,
                         help="Ścieżka wyjściowa.\n"
                              "Jeśli --image_path jest plikiem, to jest to dokładna ścieżka do wyjścia.\n"
@@ -245,7 +245,7 @@ def main():
 
 
 if __name__ == "__main__":
-    model_name_variant = "T3V1"
-    encoder_name = "resnet34"
+    model_name_variant = "T1V1"
+    encoder_name = "efficientnet-b4"
     main_model_name = "RGB_Unet_" + encoder_name +"_WCEPlusDice_ce1.0_dice1.0_lr_0.001_augm"
     main()

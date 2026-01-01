@@ -354,7 +354,7 @@ if __name__ == "__main__":
     parser.add_argument('--learning_rate', type=float, default=0.001)
     parser.add_argument('--classes', default=[1, 2, 3, 4, 5, 6, 7, 8])
     parser.add_argument('--data_root', type=str, default="../dataset/train")
-    parser.add_argument('--save_model', type=str, default="model")
+    parser.add_argument('--save_model', type=str, default="model/rgb")
     parser.add_argument('--save_results', type=str, default="results")
     # --- AUGMENTACJE ---
     parser.add_argument('--train_augm', type=int, choices=[1, 2, 3], default=3,

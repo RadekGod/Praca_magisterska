@@ -54,7 +54,7 @@ def build_model(model_type: str, num_classes: int, device: str = "cuda"):
         in_channels=in_channels,
         activation=None,
         encoder_weights=encoder_weights,
-        encoder_name="efficientnet-b4",
+        encoder_name=encoder_name,
         decoder_attention_type="scse",
     )
     model.to(device)
@@ -224,13 +224,13 @@ def main():
                         help="Typ modelu do użycia: 'rgb' (train_rgb.py), 'sar' (train_sar.py) lub 'fusion'.")
     parser.add_argument("--model_path", type=str,
                         help="Ścieżka do wytrenowanego modelu .pth, np. model/RGB_Unet_resnet34_WCEPlusDice_ce1.0_dice1.0_lr_0.001_augmT2V1.pth",
-                        default="model/SAR_Unet_efficientnet-b4_WCEPlusDice_ce1.0_dice1.0_lr_0.001_augmT3V1_last.pth")
+                        default="model/sar/" + main_model_name + model_name_variant + ".pth")
     parser.add_argument("--output_path", type=str,
                         help="Ścieżka wyjściowa.\n"
                              "Jeśli --image_path jest plikiem, to jest to dokładna ścieżka do wyjścia.\n"
                              "Jeśli --image_path jest folderem, to jest to folder wyjściowy,"
                              " w którym zostaną zapisane maski o tych samych nazwach plików.",
-                        default="results/obrazy/sar/model/efficientnet")
+                        default = "results/obrazy/sar/model/" + encoder_name + "/" + model_name_variant)
     parser.add_argument("--sar_normalize", type=str, default="global", choices=["global", "per_sample", "none"],
                         help="Normalizacja SAR jak w treningu: global (mean/std z datasetu), per_sample, none")
     parser.add_argument("--sar_mean", type=float, default=None, help="Mean SAR na skali [0,1] (opcjonalnie).")
@@ -325,4 +325,7 @@ def main():
 
 
 if __name__ == "__main__":
+    model_name_variant = "T2V1"
+    encoder_name = "efficientnet-b4"
+    main_model_name = "SAR_Unet_" + encoder_name +"_WCEPlusDice_ce1.0_dice1.0_lr_0.001_augm"
     main()
