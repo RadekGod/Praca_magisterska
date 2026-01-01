@@ -9,6 +9,7 @@ import segmentation_models_pytorch as smp
 from collections import OrderedDict
 
 from source.dataset import load_multiband, load_grayscale, get_crs, save_img
+from source import transforms as T
 
 
 # Mapa kolorów: indeks klasy -> (R, G, B)
@@ -85,11 +86,17 @@ def logits_to_mask_rgb(logits: torch.Tensor) -> np.ndarray:
     return rgb_mask
 
 
-def _preprocess_image(img: np.ndarray, model_type: str) -> torch.Tensor:
+def _preprocess_image(
+    img: np.ndarray,
+    model_type: str,
+    sar_normalize: str = "global",
+    sar_mean: float | None = None,
+    sar_std: float | None = None,
+) -> torch.Tensor:
     """Preprocessing zgodny z treningiem.
 
     - RGB: /255 + normalizacja ImageNet mean/std
-    - SAR/fusion: tylko /255 (tu brak globalnych statystyk w check_model_rgb.py)
+    - SAR: /255 + (opcjonalnie) normalizacja SAR jak w `source.transforms.ToTensor`
 
     Zwraca tensor (1, C, H, W) float32.
     """
@@ -104,12 +111,50 @@ def _preprocess_image(img: np.ndarray, model_type: str) -> torch.Tensor:
         x[..., 1] = (x[..., 1] - IMAGENET_MEAN[1]) / IMAGENET_STD[1]
         x[..., 2] = (x[..., 2] - IMAGENET_MEAN[2]) / IMAGENET_STD[2]
 
+    # Normalizacja SAR (dla modelu SAR i dla kanału SAR w fusion)
+    if model_type in ("sar", "fusion"):
+        # zakładamy: SAR jest jedynym kanałem (sar) albo ostatnim kanałem (fusion)
+        sar_ch = -1 if x.shape[-1] > 1 else 0
+        if sar_normalize == "global" and sar_mean is not None and sar_std is not None:
+            std = sar_std if sar_std > 0 else 1.0
+            x[..., sar_ch] = (x[..., sar_ch] - float(sar_mean)) / float(std)
+        elif sar_normalize == "per_sample":
+            m = float(x[..., sar_ch].mean())
+            s = float(x[..., sar_ch].std())
+            s = s if s > 0 else 1.0
+            x[..., sar_ch] = (x[..., sar_ch] - m) / s
+        # 'none' -> bez zmian
+
     # (H,W,C) -> (1,C,H,W)
     x = torch.from_numpy(x.transpose(2, 0, 1)).unsqueeze(0).float()
     return x
 
 
-def run_inference(model, model_path: str, image_path: str, output_path: str, device: str = None, model_type: str = "rgb"):
+def _print_pred_distribution(pred: np.ndarray, num_classes: int):
+    """Wypisuje procent pikseli każdej klasy w predykcji (diagnostyka szybkiego 'collapse')."""
+    if pred.size == 0:
+        return
+    counts = np.bincount(pred.reshape(-1), minlength=num_classes).astype(np.int64)
+    total = int(counts.sum())
+    parts = []
+    for i in range(num_classes):
+        pct = 100.0 * float(counts[i]) / float(total)
+        if pct >= 0.1:  # nie spamuj bardzo małymi
+            parts.append(f"c{i}:{pct:.1f}%")
+    print("Pred class distribution:", ", ".join(parts) if parts else "(all <0.1%)")
+
+
+def run_inference(
+    model,
+    model_path: str,
+    image_path: str,
+    output_path: str,
+    device: str = None,
+    model_type: str = "rgb",
+    sar_normalize: str = "global",
+    sar_mean: float | None = None,
+    sar_std: float | None = None,
+):
     """Wykonuje inferencję dla pojedynczego obrazu i zapisuje kolorową maskę."""
     if device is None:
         device = "cuda" if torch.cuda.is_available() else "cpu"
@@ -126,11 +171,21 @@ def run_inference(model, model_path: str, image_path: str, output_path: str, dev
         raise ValueError(f"Nieznany model_type: {model_type}")
 
     # --- preprocessing identyczny jak w treningu ---
-    x = _preprocess_image(img, model_type=model_type).to(device)  # (1, C, H, W)
+    x = _preprocess_image(
+        img,
+        model_type=model_type,
+        sar_normalize=sar_normalize,
+        sar_mean=sar_mean,
+        sar_std=sar_std,
+    ).to(device)  # (1, C, H, W)
 
     # --- inferencja ---
     with torch.no_grad():
         logits = model(x)  # (1, C, H, W)
+
+    # --- diagnostyka: rozkład klas ---
+    pred = torch.argmax(logits[0], dim=0).cpu().numpy().astype(np.uint8)
+    _print_pred_distribution(pred, num_classes=len(CLASS_COLORS))
 
     # --- konwersja na kolorową maskę ---
     rgb_mask = logits_to_mask_rgb(logits)  # (3, H, W)
@@ -168,7 +223,7 @@ def main():
     parser.add_argument("--model_type", type=str, default="sar", choices=["rgb", "sar", "fusion"],
                         help="Typ modelu do użycia: 'rgb' (train_rgb.py), 'sar' (train_sar.py) lub 'fusion'.")
     parser.add_argument("--model_path", type=str,
-                        help="Ścieżka do wytrenowanego modelu .pth, np. model/RGB_Unet_resnet34_WCEPlusDice_ce1.0_dice1.0_lr_0.001_augmT2V2.pth",
+                        help="Ścieżka do wytrenowanego modelu .pth, np. model/RGB_Unet_resnet34_WCEPlusDice_ce1.0_dice1.0_lr_0.001_augmT2V1.pth",
                         default="model/SAR_Unet_efficientnet-b4_WCEPlusDice_ce1.0_dice1.0_lr_0.001_augmT3V1_last.pth")
     parser.add_argument("--output_path", type=str,
                         help="Ścieżka wyjściowa.\n"
@@ -176,11 +231,31 @@ def main():
                              "Jeśli --image_path jest folderem, to jest to folder wyjściowy,"
                              " w którym zostaną zapisane maski o tych samych nazwach plików.",
                         default="results/obrazy/sar/model/efficientnet")
+    parser.add_argument("--sar_normalize", type=str, default="global", choices=["global", "per_sample", "none"],
+                        help="Normalizacja SAR jak w treningu: global (mean/std z datasetu), per_sample, none")
+    parser.add_argument("--sar_mean", type=float, default=None, help="Mean SAR na skali [0,1] (opcjonalnie).")
+    parser.add_argument("--sar_std", type=float, default=None, help="Std SAR na skali [0,1] (opcjonalnie).")
+    parser.add_argument("--sar_stats_root", type=str, default="../dataset/train",
+                        help="Jeśli podasz folder treningowy (np. ../dataset/train), to mean/std SAR zostaną policzone automatycznie z labeli.")
     args = parser.parse_args()
 
     device = "cpu" if args.cpu else ("cuda" if torch.cuda.is_available() else "cpu")
     print(f"Używane urządzenie: {device}")
     print(f"Ładuję wagi modelu z: {args.model_path}")
+
+    # --- wylicz mean/std SAR jeśli trzeba ---
+    sar_mean = args.sar_mean
+    sar_std = args.sar_std
+    if args.model_type in ("sar", "fusion") and args.sar_normalize == "global" and (sar_mean is None or sar_std is None):
+        if args.sar_stats_root is not None:
+            from pathlib import Path
+            label_paths = [str(f) for f in Path(args.sar_stats_root).rglob("*.tif") if "labels" in f.parts]
+            m, s = T.compute_sar_stats(label_paths, load_fn=None)
+            sar_mean = m if sar_mean is None else sar_mean
+            sar_std = s if sar_std is None else sar_std
+            print(f"SAR stats (computed): mean={sar_mean} std={sar_std} (scale [0,1])")
+        else:
+            print("[WARN] SAR global normalization wybrana, ale nie podano --sar_mean/--sar_std ani --sar_stats_root. Inferencja będzie bez normalizacji SAR.")
 
     # --- zbudowanie modelu i załadowanie wag tylko raz ---
     num_classes = len(CLASS_COLORS)
@@ -231,9 +306,11 @@ def main():
                 output_path=out_path,
                 device=device,
                 model_type=args.model_type,
+                sar_normalize=args.sar_normalize,
+                sar_mean=sar_mean,
+                sar_std=sar_std,
             )
     else:
-        # tryb pojedynczego pliku jak wcześniej
         run_inference(
             model=model,
             model_path=args.model_path,
@@ -241,6 +318,9 @@ def main():
             output_path=args.output_path,
             device=device,
             model_type=args.model_type,
+            sar_normalize=args.sar_normalize,
+            sar_mean=sar_mean,
+            sar_std=sar_std,
         )
 
 

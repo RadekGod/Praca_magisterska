@@ -357,9 +357,9 @@ if __name__ == "__main__":
     parser.add_argument('--save_model', type=str, default="model")
     parser.add_argument('--save_results', type=str, default="results")
     # --- AUGMENTACJE ---
-    parser.add_argument('--train_augm', type=int, choices=[1, 2, 3], default=1,
+    parser.add_argument('--train_augm', type=int, choices=[1, 2, 3], default=3,
                         help='Wybór trybu augmentacji dla treningu (train_augm1/2/3)')
-    parser.add_argument('--valid_augm', type=int, choices=[1, 2, 3], default=2,
+    parser.add_argument('--valid_augm', type=int, choices=[1, 2, 3], default=1,
                         help='Wybór trybu augmentacji dla walidacji (valid_augm1/2/3)')
     # --- ENKODER ---
     parser.add_argument('--encoder_name', type=str, default='efficientnet-b4',

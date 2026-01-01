@@ -53,7 +53,7 @@ def build_model(model_type: str, num_classes: int, device: str = "cuda"):
         in_channels=in_channels,
         activation=None,
         encoder_weights=encoder_weights,
-        encoder_name="efficientnet-b4",
+        encoder_name=encoder_name,
         decoder_attention_type="scse",
     )
     model.to(device)
@@ -168,14 +168,14 @@ def main():
     parser.add_argument("--model_type", type=str, default="rgb", choices=["rgb", "sar", "fusion"],
                         help="Typ modelu do użycia: 'rgb' (train_rgb.py), 'sar' (train_sar.py) lub 'fusion'.")
     parser.add_argument("--model_path", type=str,
-                        help="Ścieżka do wytrenowanego modelu .pth, np. model/RGB_Unet_resnet34_WCEPlusDice_ce1.0_dice1.0_lr_0.001_augmT1V2.pth",
-                        default="model/RGB_Unet_efficientnet-b4_WCEPlusDice_ce1.0_dice1.0_lr_0.001_augmT1V2.pth")
+                        help="Ścieżka do wytrenowanego modelu .pth, np. model/RGB_Unet_resnet34_WCEPlusDice_ce1.0_dice1.0_lr_0.001_augmT1V1.pth",
+                        default="model/" + main_model_name + model_name_variant + ".pth")
     parser.add_argument("--output_path", type=str,
                         help="Ścieżka wyjściowa.\n"
                              "Jeśli --image_path jest plikiem, to jest to dokładna ścieżka do wyjścia.\n"
                              "Jeśli --image_path jest folderem, to jest to folder wyjściowy,"
                              " w którym zostaną zapisane maski o tych samych nazwach plików.",
-                        default="results/obrazy/rgb/model/efficientnet")
+                        default="results/obrazy/rgb/model/" + encoder_name + "/" + model_name_variant)
     args = parser.parse_args()
 
     device = "cpu" if args.cpu else ("cuda" if torch.cuda.is_available() else "cpu")
@@ -245,4 +245,7 @@ def main():
 
 
 if __name__ == "__main__":
+    model_name_variant = "T3V1"
+    encoder_name = "resnet34"
+    main_model_name = "RGB_Unet_" + encoder_name +"_WCEPlusDice_ce1.0_dice1.0_lr_0.001_augm"
     main()

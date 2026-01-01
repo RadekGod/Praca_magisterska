@@ -320,7 +320,7 @@ if __name__ == "__main__":
     parser.add_argument('--valid_augm', type=int, choices=[1, 2, 3], default=1,
                         help='Wybór trybu augmentacji dla walidacji (valid_augm1/2/3)')
     # --- ENKODER ---
-    parser.add_argument('--encoder_name', type=str, default='efficientnet-b4',
+    parser.add_argument('--encoder_name', type=str, default='resnet34',
                         help='Nazwa enkodera z segmentation_models_pytorch, np. efficientnet-b4, resnet34, tu-convnext_tiny, swin_tiny_patch4_window7_224')
     parser.add_argument('--encoder_weights', type=str, default='imagenet',
                         help='Wagi enkodera, np. imagenet, ssl, swsl lub none (brak wag)')
