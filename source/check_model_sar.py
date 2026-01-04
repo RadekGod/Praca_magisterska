@@ -325,7 +325,7 @@ def main():
 
 
 if __name__ == "__main__":
-    model_name_variant = "T2V1"
-    encoder_name = "efficientnet-b4"
+    model_name_variant = "T3V1"
+    encoder_name = "tu-convnext_tiny"
     main_model_name = "SAR_Unet_" + encoder_name +"_WCEPlusDice_ce1.0_dice1.0_lr_0.001_augm"
     main()

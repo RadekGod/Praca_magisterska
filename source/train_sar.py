@@ -320,7 +320,7 @@ if __name__ == "__main__":
     parser.add_argument('--valid_augm', type=int, choices=[1, 2, 3], default=1,
                         help='Wybór trybu augmentacji dla walidacji (valid_augm1/2/3)')
     # --- ENKODER ---
-    parser.add_argument('--encoder_name', type=str, default='resnet34',
+    parser.add_argument('--encoder_name', type=str, default='tu-convnext_tiny',
                         help='Nazwa enkodera z segmentation_models_pytorch, np. efficientnet-b4, resnet34, tu-convnext_tiny, swin_tiny_patch4_window7_224')
     parser.add_argument('--encoder_weights', type=str, default='imagenet',
                         help='Wagi enkodera, np. imagenet, ssl, swsl lub none (brak wag)')
@@ -331,7 +331,7 @@ if __name__ == "__main__":
     parser.add_argument('--min_delta', type=float, default=0.001)
     parser.add_argument('--min_lr', type=float, default=1e-6)
     parser.add_argument('--t_max', type=int, default=30)
-    parser.add_argument('--amp', type=int, default=1, help='Włącz / wyłącz mixed precision (1/0)')
+    parser.add_argument('--amp', type=int, default=0, help='Włącz / wyłącz mixed precision (1/0)')
     parser.add_argument('--grad_clip', type=float, default=1.0, help='Maks. norm gradientu; None aby wyłączyć')
 
     # --- Loss ---

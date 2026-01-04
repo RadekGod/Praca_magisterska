@@ -1,0 +1,2646 @@
+Epoch: 1 (lr: 0.001, 0.001)
+Train Loss: 2.776538, Valid Loss: 2.686838
+Train IoU: 0.079352, Valid IoU: 0.084820
+Train Dice: 0.132440, Valid Dice: 0.137595
+Train Acc: 0.302448, Valid Acc: 0.326978
+Train Prec: 0.175240, Valid Prec: 0.267923
+Train Rec: 0.157849, Valid Rec: 0.176156
+Train F1: 0.132440, Valid F1: 0.137595
+Per-class IoU (Train):
+  class_0: 0.000000
+  class_1: 0.000771
+  class_2: 0.257844
+  class_3: 0.236678
+  class_4: 0.004745
+  class_5: 0.031971
+  class_6: 0.038773
+  class_7: 0.001748
+  class_8: 0.141639
+Per-class IoU (Valid):
+  class_0: 0.000000
+  class_1: 0.000000
+  class_2: 0.258958
+  class_3: 0.292720
+  class_4: 0.000011
+  class_5: 0.019294
+  class_6: 0.026476
+  class_7: 0.000026
+  class_8: 0.165895
+Per-class F1 (Train):
+  class_0: 0.000000
+  class_1: 0.001542
+  class_2: 0.409978
+  class_3: 0.382764
+  class_4: 0.009444
+  class_5: 0.061962
+  class_6: 0.074651
+  class_7: 0.003489
+  class_8: 0.248133
+Per-class F1 (Valid):
+  class_0: 0.000000
+  class_1: 0.000000
+  class_2: 0.411385
+  class_3: 0.452874
+  class_4: 0.000023
+  class_5: 0.037858
+  class_6: 0.051587
+  class_7: 0.000051
+  class_8: 0.284579
+
+Epoch: 2 (lr: 0.001, 0.001)
+Train Loss: 2.668956, Valid Loss: 2.646441
+Train IoU: 0.117191, Valid IoU: 0.147806
+Train Dice: 0.193071, Valid Dice: 0.224158
+Train Acc: 0.340366, Valid Acc: 0.339679
+Train Prec: 0.225259, Valid Prec: 0.259995
+Train Rec: 0.203745, Valid Rec: 0.251007
+Train F1: 0.193071, Valid F1: 0.224158
+Per-class IoU (Train):
+  class_0: 0.000000
+  class_1: 0.000001
+  class_2: 0.249817
+  class_3: 0.271265
+  class_4: 0.000973
+  class_5: 0.142559
+  class_6: 0.229013
+  class_7: 0.021122
+  class_8: 0.139973
+Per-class IoU (Valid):
+  class_0: 0.000000
+  class_1: 0.000000
+  class_2: 0.142389
+  class_3: 0.204490
+  class_4: 0.000010
+  class_5: 0.228430
+  class_6: 0.536954
+  class_7: 0.000000
+  class_8: 0.217983
+Per-class F1 (Train):
+  class_0: 0.000000
+  class_1: 0.000001
+  class_2: 0.399765
+  class_3: 0.426763
+  class_4: 0.001945
+  class_5: 0.249543
+  class_6: 0.372677
+  class_7: 0.041370
+  class_8: 0.245572
+Per-class F1 (Valid):
+  class_0: 0.000000
+  class_1: 0.000000
+  class_2: 0.249283
+  class_3: 0.339547
+  class_4: 0.000021
+  class_5: 0.371905
+  class_6: 0.698725
+  class_7: 0.000000
+  class_8: 0.357941
+
+Epoch: 3 (lr: 0.001, 0.001)
+Train Loss: 2.597742, Valid Loss: 2.621607
+Train IoU: 0.142788, Valid IoU: 0.137687
+Train Dice: 0.231452, Valid Dice: 0.219678
+Train Acc: 0.366579, Valid Acc: 0.347095
+Train Prec: 0.260665, Valid Prec: 0.263909
+Train Rec: 0.235287, Valid Rec: 0.257155
+Train F1: 0.231452, Valid F1: 0.219678
+Per-class IoU (Train):
+  class_0: 0.000000
+  class_1: 0.000000
+  class_2: 0.239103
+  class_3: 0.279415
+  class_4: 0.006833
+  class_5: 0.233479
+  class_6: 0.289110
+  class_7: 0.079559
+  class_8: 0.157591
+Per-class IoU (Valid):
+  class_0: 0.000000
+  class_1: 0.000000
+  class_2: 0.178698
+  class_3: 0.218262
+  class_4: 0.001696
+  class_5: 0.282510
+  class_6: 0.301363
+  class_7: 0.000018
+  class_8: 0.256634
+Per-class F1 (Train):
+  class_0: 0.000000
+  class_1: 0.000000
+  class_2: 0.385930
+  class_3: 0.436785
+  class_4: 0.013573
+  class_5: 0.378569
+  class_6: 0.448542
+  class_7: 0.147392
+  class_8: 0.272274
+Per-class F1 (Valid):
+  class_0: 0.000000
+  class_1: 0.000000
+  class_2: 0.303212
+  class_3: 0.358317
+  class_4: 0.003387
+  class_5: 0.440558
+  class_6: 0.463149
+  class_7: 0.000036
+  class_8: 0.408447
+
+Epoch: 4 (lr: 0.001, 0.001)
+Train Loss: 2.533409, Valid Loss: 2.656290
+Train IoU: 0.166745, Valid IoU: 0.177322
+Train Dice: 0.264524, Valid Dice: 0.268730
+Train Acc: 0.389580, Valid Acc: 0.360151
+Train Prec: 0.291792, Valid Prec: 0.330866
+Train Rec: 0.264502, Valid Rec: 0.302719
+Train F1: 0.264524, Valid F1: 0.268730
+Per-class IoU (Train):
+  class_0: 0.000000
+  class_1: 0.000004
+  class_2: 0.241984
+  class_3: 0.284466
+  class_4: 0.011271
+  class_5: 0.265582
+  class_6: 0.351531
+  class_7: 0.133651
+  class_8: 0.212215
+Per-class IoU (Valid):
+  class_0: 0.000000
+  class_1: 0.000000
+  class_2: 0.154550
+  class_3: 0.138205
+  class_4: 0.003228
+  class_5: 0.233869
+  class_6: 0.550590
+  class_7: 0.318110
+  class_8: 0.197348
+Per-class F1 (Train):
+  class_0: 0.000000
+  class_1: 0.000009
+  class_2: 0.389674
+  class_3: 0.442933
+  class_4: 0.022291
+  class_5: 0.419699
+  class_6: 0.520197
+  class_7: 0.235788
+  class_8: 0.350128
+Per-class F1 (Valid):
+  class_0: 0.000000
+  class_1: 0.000000
+  class_2: 0.267724
+  class_3: 0.242847
+  class_4: 0.006435
+  class_5: 0.379082
+  class_6: 0.710168
+  class_7: 0.482676
+  class_8: 0.329642
+
+Epoch: 5 (lr: 0.001, 0.001)
+Train Loss: 2.495341, Valid Loss: 2.402376
+Train IoU: 0.171399, Valid IoU: 0.214085
+Train Dice: 0.270303, Valid Dice: 0.313576
+Train Acc: 0.395023, Valid Acc: 0.471186
+Train Prec: 0.294926, Valid Prec: 0.376023
+Train Rec: 0.271384, Valid Rec: 0.322939
+Train F1: 0.270303, Valid F1: 0.313576
+Per-class IoU (Train):
+  class_0: 0.000000
+  class_1: 0.000958
+  class_2: 0.238270
+  class_3: 0.292775
+  class_4: 0.009840
+  class_5: 0.268062
+  class_6: 0.374230
+  class_7: 0.151797
+  class_8: 0.206656
+Per-class IoU (Valid):
+  class_0: 0.000000
+  class_1: 0.000000
+  class_2: 0.307568
+  class_3: 0.325757
+  class_4: 0.003564
+  class_5: 0.370646
+  class_6: 0.566817
+  class_7: 0.111308
+  class_8: 0.241106
+Per-class F1 (Train):
+  class_0: 0.000000
+  class_1: 0.001913
+  class_2: 0.384844
+  class_3: 0.452941
+  class_4: 0.019488
+  class_5: 0.422790
+  class_6: 0.544639
+  class_7: 0.263582
+  class_8: 0.342526
+Per-class F1 (Valid):
+  class_0: 0.000000
+  class_1: 0.000000
+  class_2: 0.470443
+  class_3: 0.491428
+  class_4: 0.007102
+  class_5: 0.540834
+  class_6: 0.723526
+  class_7: 0.200320
+  class_8: 0.388534
+
+Epoch: 6 (lr: 0.001, 0.001)
+Train Loss: 2.461141, Valid Loss: 2.396713
+Train IoU: 0.183383, Valid IoU: 0.221937
+Train Dice: 0.285895, Valid Dice: 0.324301
+Train Acc: 0.407486, Valid Acc: 0.471624
+Train Prec: 0.311187, Valid Prec: 0.372781
+Train Rec: 0.285812, Valid Rec: 0.326798
+Train F1: 0.285895, Valid F1: 0.324301
+Per-class IoU (Train):
+  class_0: 0.000000
+  class_1: 0.005603
+  class_2: 0.246056
+  class_3: 0.291818
+  class_4: 0.011268
+  class_5: 0.287591
+  class_6: 0.404094
+  class_7: 0.175257
+  class_8: 0.228763
+Per-class IoU (Valid):
+  class_0: 0.000000
+  class_1: 0.000000
+  class_2: 0.307852
+  class_3: 0.301807
+  class_4: 0.004564
+  class_5: 0.348490
+  class_6: 0.597698
+  class_7: 0.161563
+  class_8: 0.275458
+Per-class F1 (Train):
+  class_0: 0.000000
+  class_1: 0.011143
+  class_2: 0.394935
+  class_3: 0.451794
+  class_4: 0.022285
+  class_5: 0.446712
+  class_6: 0.575594
+  class_7: 0.298244
+  class_8: 0.372346
+Per-class F1 (Valid):
+  class_0: 0.000000
+  class_1: 0.000000
+  class_2: 0.470775
+  class_3: 0.463674
+  class_4: 0.009086
+  class_5: 0.516860
+  class_6: 0.748199
+  class_7: 0.278181
+  class_8: 0.431936
+
+Epoch: 7 (lr: 0.001, 0.001)
+Train Loss: 2.448321, Valid Loss: 2.520591
+Train IoU: 0.187993, Valid IoU: 0.164509
+Train Dice: 0.291779, Valid Dice: 0.260563
+Train Acc: 0.415302, Valid Acc: 0.398694
+Train Prec: 0.312833, Valid Prec: 0.324907
+Train Rec: 0.292294, Valid Rec: 0.285439
+Train F1: 0.291779, Valid F1: 0.260563
+Per-class IoU (Train):
+  class_0: 0.000000
+  class_1: 0.000405
+  class_2: 0.263379
+  class_3: 0.286684
+  class_4: 0.010156
+  class_5: 0.283845
+  class_6: 0.405808
+  class_7: 0.205523
+  class_8: 0.236136
+Per-class IoU (Valid):
+  class_0: 0.000000
+  class_1: 0.000000
+  class_2: 0.261436
+  class_3: 0.290550
+  class_4: 0.000001
+  class_5: 0.334732
+  class_6: 0.125930
+  class_7: 0.194013
+  class_8: 0.273924
+Per-class F1 (Train):
+  class_0: 0.000000
+  class_1: 0.000809
+  class_2: 0.416944
+  class_3: 0.445616
+  class_4: 0.020107
+  class_5: 0.442180
+  class_6: 0.577330
+  class_7: 0.340969
+  class_8: 0.382055
+Per-class F1 (Valid):
+  class_0: 0.000000
+  class_1: 0.000000
+  class_2: 0.414505
+  class_3: 0.450273
+  class_4: 0.000002
+  class_5: 0.501571
+  class_6: 0.223690
+  class_7: 0.324976
+  class_8: 0.430047
+
+Epoch: 8 (lr: 0.001, 0.001)
+Train Loss: 2.432030, Valid Loss: 2.335710
+Train IoU: 0.197382, Valid IoU: 0.252878
+Train Dice: 0.303587, Valid Dice: 0.360849
+Train Acc: 0.427946, Valid Acc: 0.486791
+Train Prec: 0.326200, Valid Prec: 0.401053
+Train Rec: 0.302184, Valid Rec: 0.362268
+Train F1: 0.303587, Valid F1: 0.360849
+Per-class IoU (Train):
+  class_0: 0.000000
+  class_1: 0.000000
+  class_2: 0.280365
+  class_3: 0.288300
+  class_4: 0.013129
+  class_5: 0.301174
+  class_6: 0.417756
+  class_7: 0.239526
+  class_8: 0.236191
+Per-class IoU (Valid):
+  class_0: 0.000000
+  class_1: 0.000000
+  class_2: 0.281278
+  class_3: 0.311922
+  class_4: 0.002610
+  class_5: 0.361013
+  class_6: 0.598406
+  class_7: 0.443244
+  class_8: 0.277432
+Per-class F1 (Train):
+  class_0: 0.000000
+  class_1: 0.000000
+  class_2: 0.437946
+  class_3: 0.447566
+  class_4: 0.025918
+  class_5: 0.462926
+  class_6: 0.589320
+  class_7: 0.386479
+  class_8: 0.382127
+Per-class F1 (Valid):
+  class_0: 0.000000
+  class_1: 0.000000
+  class_2: 0.439059
+  class_3: 0.475519
+  class_4: 0.005207
+  class_5: 0.530507
+  class_6: 0.748753
+  class_7: 0.614233
+  class_8: 0.434359
+
+Epoch: 9 (lr: 0.001, 0.001)
+Train Loss: 2.405379, Valid Loss: 2.414336
+Train IoU: 0.206007, Valid IoU: 0.222885
+Train Dice: 0.313660, Valid Dice: 0.327153
+Train Acc: 0.435302, Valid Acc: 0.457329
+Train Prec: 0.345061, Valid Prec: 0.342748
+Train Rec: 0.312190, Valid Rec: 0.342246
+Train F1: 0.313660, Valid F1: 0.327153
+Per-class IoU (Train):
+  class_0: 0.000000
+  class_1: 0.000012
+  class_2: 0.284736
+  class_3: 0.289058
+  class_4: 0.013147
+  class_5: 0.300709
+  class_6: 0.443386
+  class_7: 0.280400
+  class_8: 0.242614
+Per-class IoU (Valid):
+  class_0: 0.000000
+  class_1: 0.000000
+  class_2: 0.210960
+  class_3: 0.327155
+  class_4: 0.000000
+  class_5: 0.364129
+  class_6: 0.568371
+  class_7: 0.280588
+  class_8: 0.254763
+Per-class F1 (Train):
+  class_0: 0.000000
+  class_1: 0.000024
+  class_2: 0.443260
+  class_3: 0.448479
+  class_4: 0.025953
+  class_5: 0.462377
+  class_6: 0.614369
+  class_7: 0.437988
+  class_8: 0.390489
+Per-class F1 (Valid):
+  class_0: 0.000000
+  class_1: 0.000000
+  class_2: 0.348417
+  class_3: 0.493017
+  class_4: 0.000000
+  class_5: 0.533863
+  class_6: 0.724791
+  class_7: 0.438218
+  class_8: 0.406073
+
+Epoch: 10 (lr: 0.001, 0.001)
+Train Loss: 2.395170, Valid Loss: 2.441358
+Train IoU: 0.211115, Valid IoU: 0.230844
+Train Dice: 0.319411, Valid Dice: 0.336789
+Train Acc: 0.442344, Valid Acc: 0.451021
+Train Prec: 0.370780, Valid Prec: 0.381635
+Train Rec: 0.319204, Valid Rec: 0.337557
+Train F1: 0.319411, Valid F1: 0.336789
+Per-class IoU (Train):
+  class_0: 0.000000
+  class_1: 0.008057
+  class_2: 0.281110
+  class_3: 0.296658
+  class_4: 0.006005
+  class_5: 0.316508
+  class_6: 0.458462
+  class_7: 0.290884
+  class_8: 0.242353
+Per-class IoU (Valid):
+  class_0: 0.000000
+  class_1: 0.000000
+  class_2: 0.238814
+  class_3: 0.283648
+  class_4: 0.002280
+  class_5: 0.322143
+  class_6: 0.580149
+  class_7: 0.375326
+  class_8: 0.275235
+Per-class F1 (Train):
+  class_0: 0.000000
+  class_1: 0.015986
+  class_2: 0.438853
+  class_3: 0.457574
+  class_4: 0.011938
+  class_5: 0.480829
+  class_6: 0.628692
+  class_7: 0.450673
+  class_8: 0.390152
+Per-class F1 (Valid):
+  class_0: 0.000000
+  class_1: 0.000000
+  class_2: 0.385553
+  class_3: 0.441941
+  class_4: 0.004549
+  class_5: 0.487305
+  class_6: 0.734296
+  class_7: 0.545799
+  class_8: 0.431662
+
+Epoch: 11 (lr: 0.001, 0.001)
+Train Loss: 2.384316, Valid Loss: 2.415510
+Train IoU: 0.217462, Valid IoU: 0.230969
+Train Dice: 0.330380, Valid Dice: 0.338462
+Train Acc: 0.439847, Valid Acc: 0.471094
+Train Prec: 0.366499, Valid Prec: 0.400393
+Train Rec: 0.325368, Valid Rec: 0.334183
+Train F1: 0.330380, Valid F1: 0.338462
+Per-class IoU (Train):
+  class_0: 0.000000
+  class_1: 0.049176
+  class_2: 0.274767
+  class_3: 0.304308
+  class_4: 0.010796
+  class_5: 0.302641
+  class_6: 0.464998
+  class_7: 0.308825
+  class_8: 0.241644
+Per-class IoU (Valid):
+  class_0: 0.000000
+  class_1: 0.000000
+  class_2: 0.304799
+  class_3: 0.299169
+  class_4: 0.019847
+  class_5: 0.366197
+  class_6: 0.582526
+  class_7: 0.271553
+  class_8: 0.234633
+Per-class F1 (Train):
+  class_0: 0.000000
+  class_1: 0.093742
+  class_2: 0.431086
+  class_3: 0.466619
+  class_4: 0.021361
+  class_5: 0.464657
+  class_6: 0.634810
+  class_7: 0.471911
+  class_8: 0.389232
+Per-class F1 (Valid):
+  class_0: 0.000000
+  class_1: 0.000000
+  class_2: 0.467197
+  class_3: 0.460555
+  class_4: 0.038921
+  class_5: 0.536083
+  class_6: 0.736198
+  class_7: 0.427120
+  class_8: 0.380086
+
+Epoch: 12 (lr: 0.001, 0.001)
+Train Loss: 2.382635, Valid Loss: 2.373563
+Train IoU: 0.213540, Valid IoU: 0.235098
+Train Dice: 0.322970, Valid Dice: 0.338189
+Train Acc: 0.439267, Valid Acc: 0.486001
+Train Prec: 0.360053, Valid Prec: 0.389158
+Train Rec: 0.321379, Valid Rec: 0.343315
+Train F1: 0.322970, Valid F1: 0.338189
+Per-class IoU (Train):
+  class_0: 0.000000
+  class_1: 0.014993
+  class_2: 0.269101
+  class_3: 0.301006
+  class_4: 0.004646
+  class_5: 0.304853
+  class_6: 0.455989
+  class_7: 0.310790
+  class_8: 0.260480
+Per-class IoU (Valid):
+  class_0: 0.000000
+  class_1: 0.000000
+  class_2: 0.323755
+  class_3: 0.338067
+  class_4: 0.000040
+  class_5: 0.210878
+  class_6: 0.611144
+  class_7: 0.417713
+  class_8: 0.214281
+Per-class F1 (Train):
+  class_0: 0.000000
+  class_1: 0.029543
+  class_2: 0.424082
+  class_3: 0.462728
+  class_4: 0.009249
+  class_5: 0.467260
+  class_6: 0.626363
+  class_7: 0.474202
+  class_8: 0.413303
+Per-class F1 (Valid):
+  class_0: 0.000000
+  class_1: 0.000000
+  class_2: 0.489146
+  class_3: 0.505307
+  class_4: 0.000080
+  class_5: 0.348306
+  class_6: 0.758646
+  class_7: 0.589278
+  class_8: 0.352935
+
+Epoch: 13 (lr: 0.0005, 0.0005)
+Train Loss: 2.313572, Valid Loss: 2.378520
+Train IoU: 0.238179, Valid IoU: 0.255700
+Train Dice: 0.352442, Valid Dice: 0.371788
+Train Acc: 0.468865, Valid Acc: 0.478694
+Train Prec: 0.393873, Valid Prec: 0.414477
+Train Rec: 0.346350, Valid Rec: 0.388183
+Train F1: 0.352442, Valid F1: 0.371788
+Per-class IoU (Train):
+  class_0: 0.000000
+  class_1: 0.045808
+  class_2: 0.306426
+  class_3: 0.311903
+  class_4: 0.006135
+  class_5: 0.337904
+  class_6: 0.508459
+  class_7: 0.373509
+  class_8: 0.253470
+Per-class IoU (Valid):
+  class_0: 0.000000
+  class_1: 0.089011
+  class_2: 0.272402
+  class_3: 0.320211
+  class_4: 0.000803
+  class_5: 0.353286
+  class_6: 0.603820
+  class_7: 0.363603
+  class_8: 0.298166
+Per-class F1 (Train):
+  class_0: 0.000000
+  class_1: 0.087603
+  class_2: 0.469106
+  class_3: 0.475498
+  class_4: 0.012195
+  class_5: 0.505125
+  class_6: 0.674144
+  class_7: 0.543875
+  class_8: 0.404429
+Per-class F1 (Valid):
+  class_0: 0.000000
+  class_1: 0.163472
+  class_2: 0.428169
+  class_3: 0.485090
+  class_4: 0.001604
+  class_5: 0.522115
+  class_6: 0.752977
+  class_7: 0.533297
+  class_8: 0.459365
+
+Epoch: 14 (lr: 0.0005, 0.0005)
+Train Loss: 2.313404, Valid Loss: 2.307305
+Train IoU: 0.241994, Valid IoU: 0.269268
+Train Dice: 0.359615, Valid Dice: 0.377892
+Train Acc: 0.461315, Valid Acc: 0.518534
+Train Prec: 0.389510, Valid Prec: 0.412597
+Train Rec: 0.355935, Valid Rec: 0.379500
+Train F1: 0.359615, Valid F1: 0.377892
+Per-class IoU (Train):
+  class_0: 0.000000
+  class_1: 0.084801
+  class_2: 0.281549
+  class_3: 0.311180
+  class_4: 0.009661
+  class_5: 0.323454
+  class_6: 0.513387
+  class_7: 0.385270
+  class_8: 0.268642
+Per-class IoU (Valid):
+  class_0: 0.000000
+  class_1: 0.000000
+  class_2: 0.321147
+  class_3: 0.352633
+  class_4: 0.020212
+  class_5: 0.391859
+  class_6: 0.661505
+  class_7: 0.435771
+  class_8: 0.240290
+Per-class F1 (Train):
+  class_0: 0.000000
+  class_1: 0.156345
+  class_2: 0.439388
+  class_3: 0.474656
+  class_4: 0.019136
+  class_5: 0.488802
+  class_6: 0.678461
+  class_7: 0.556238
+  class_8: 0.423511
+Per-class F1 (Valid):
+  class_0: 0.000000
+  class_1: 0.000000
+  class_2: 0.486163
+  class_3: 0.521402
+  class_4: 0.039622
+  class_5: 0.563073
+  class_6: 0.796272
+  class_7: 0.607020
+  class_8: 0.387474
+
+Epoch: 15 (lr: 0.0005, 0.0005)
+Train Loss: 2.313351, Valid Loss: 2.317524
+Train IoU: 0.240302, Valid IoU: 0.264708
+Train Dice: 0.356811, Valid Dice: 0.379152
+Train Acc: 0.466387, Valid Acc: 0.500769
+Train Prec: 0.395299, Valid Prec: 0.415901
+Train Rec: 0.348151, Valid Rec: 0.373506
+Train F1: 0.356811, Valid F1: 0.379152
+Per-class IoU (Train):
+  class_0: 0.000000
+  class_1: 0.055709
+  class_2: 0.307593
+  class_3: 0.301795
+  class_4: 0.020021
+  class_5: 0.330112
+  class_6: 0.505755
+  class_7: 0.386290
+  class_8: 0.255445
+Per-class IoU (Valid):
+  class_0: 0.000000
+  class_1: 0.047584
+  class_2: 0.303621
+  class_3: 0.351729
+  class_4: 0.042398
+  class_5: 0.371302
+  class_6: 0.646529
+  class_7: 0.411328
+  class_8: 0.207876
+Per-class F1 (Train):
+  class_0: 0.000000
+  class_1: 0.105539
+  class_2: 0.470472
+  class_3: 0.463660
+  class_4: 0.039256
+  class_5: 0.496367
+  class_6: 0.671763
+  class_7: 0.557301
+  class_8: 0.406940
+Per-class F1 (Valid):
+  class_0: 0.000000
+  class_1: 0.090844
+  class_2: 0.465812
+  class_3: 0.520414
+  class_4: 0.081347
+  class_5: 0.541532
+  class_6: 0.785324
+  class_7: 0.582895
+  class_8: 0.344201
+
+Epoch: 16 (lr: 0.0005, 0.0005)
+Train Loss: 2.301280, Valid Loss: 2.335219
+Train IoU: 0.244313, Valid IoU: 0.272970
+Train Dice: 0.361780, Valid Dice: 0.395956
+Train Acc: 0.469200, Valid Acc: 0.490427
+Train Prec: 0.392725, Valid Prec: 0.407474
+Train Rec: 0.355052, Valid Rec: 0.393563
+Train F1: 0.361780, Valid F1: 0.395956
+Per-class IoU (Train):
+  class_0: 0.000000
+  class_1: 0.076181
+  class_2: 0.300793
+  class_3: 0.315031
+  class_4: 0.013275
+  class_5: 0.337165
+  class_6: 0.528076
+  class_7: 0.367485
+  class_8: 0.260811
+Per-class IoU (Valid):
+  class_0: 0.000000
+  class_1: 0.088792
+  class_2: 0.310626
+  class_3: 0.320648
+  class_4: 0.082099
+  class_5: 0.346957
+  class_6: 0.637965
+  class_7: 0.405103
+  class_8: 0.264542
+Per-class F1 (Train):
+  class_0: 0.000000
+  class_1: 0.141577
+  class_2: 0.462477
+  class_3: 0.479123
+  class_4: 0.026202
+  class_5: 0.504298
+  class_6: 0.691165
+  class_7: 0.537461
+  class_8: 0.413719
+Per-class F1 (Valid):
+  class_0: 0.000000
+  class_1: 0.163102
+  class_2: 0.474012
+  class_3: 0.485592
+  class_4: 0.151740
+  class_5: 0.515171
+  class_6: 0.778973
+  class_7: 0.576617
+  class_8: 0.418399
+
+Epoch: 17 (lr: 0.0005, 0.0005)
+Train Loss: 2.302585, Valid Loss: 2.288916
+Train IoU: 0.242221, Valid IoU: 0.284673
+Train Dice: 0.357883, Valid Dice: 0.403428
+Train Acc: 0.470355, Valid Acc: 0.507791
+Train Prec: 0.391729, Valid Prec: 0.419292
+Train Rec: 0.350717, Valid Rec: 0.408245
+Train F1: 0.357883, Valid F1: 0.403428
+Per-class IoU (Train):
+  class_0: 0.000000
+  class_1: 0.042604
+  class_2: 0.313541
+  class_3: 0.306276
+  class_4: 0.020282
+  class_5: 0.333246
+  class_6: 0.522134
+  class_7: 0.373015
+  class_8: 0.268895
+Per-class IoU (Valid):
+  class_0: 0.000000
+  class_1: 0.085865
+  class_2: 0.297922
+  class_3: 0.337115
+  class_4: 0.058211
+  class_5: 0.377350
+  class_6: 0.693744
+  class_7: 0.460738
+  class_8: 0.251109
+Per-class F1 (Train):
+  class_0: 0.000000
+  class_1: 0.081726
+  class_2: 0.477398
+  class_3: 0.468930
+  class_4: 0.039757
+  class_5: 0.499901
+  class_6: 0.686055
+  class_7: 0.543352
+  class_8: 0.423825
+Per-class F1 (Valid):
+  class_0: 0.000000
+  class_1: 0.158150
+  class_2: 0.459075
+  class_3: 0.504242
+  class_4: 0.110018
+  class_5: 0.547936
+  class_6: 0.819184
+  class_7: 0.630829
+  class_8: 0.401418
+
+Epoch: 18 (lr: 0.0005, 0.0005)
+Train Loss: 2.261196, Valid Loss: 2.277748
+Train IoU: 0.252315, Valid IoU: 0.279137
+Train Dice: 0.371690, Valid Dice: 0.396625
+Train Acc: 0.475005, Valid Acc: 0.508958
+Train Prec: 0.397739, Valid Prec: 0.419217
+Train Rec: 0.365463, Valid Rec: 0.398420
+Train F1: 0.371690, Valid F1: 0.396625
+Per-class IoU (Train):
+  class_0: 0.000000
+  class_1: 0.077152
+  class_2: 0.304243
+  class_3: 0.308946
+  class_4: 0.026719
+  class_5: 0.356432
+  class_6: 0.540108
+  class_7: 0.382541
+  class_8: 0.274690
+Per-class IoU (Valid):
+  class_0: 0.000000
+  class_1: 0.094532
+  class_2: 0.298402
+  class_3: 0.346687
+  class_4: 0.029368
+  class_5: 0.375128
+  class_6: 0.692116
+  class_7: 0.410449
+  class_8: 0.265552
+Per-class F1 (Train):
+  class_0: 0.000000
+  class_1: 0.143252
+  class_2: 0.466543
+  class_3: 0.472053
+  class_4: 0.052048
+  class_5: 0.525544
+  class_6: 0.701389
+  class_7: 0.553388
+  class_8: 0.430992
+Per-class F1 (Valid):
+  class_0: 0.000000
+  class_1: 0.172735
+  class_2: 0.459644
+  class_3: 0.514874
+  class_4: 0.057060
+  class_5: 0.545590
+  class_6: 0.818048
+  class_7: 0.582012
+  class_8: 0.419662
+
+Epoch: 19 (lr: 0.0005, 0.0005)
+Train Loss: 2.293041, Valid Loss: 2.253101
+Train IoU: 0.251483, Valid IoU: 0.292929
+Train Dice: 0.367606, Valid Dice: 0.412501
+Train Acc: 0.479709, Valid Acc: 0.521354
+Train Prec: 0.398286, Valid Prec: 0.443613
+Train Rec: 0.360048, Valid Rec: 0.414737
+Train F1: 0.367606, Valid F1: 0.412501
+Per-class IoU (Train):
+  class_0: 0.000000
+  class_1: 0.036361
+  class_2: 0.324096
+  class_3: 0.305950
+  class_4: 0.022524
+  class_5: 0.343152
+  class_6: 0.514901
+  class_7: 0.435153
+  class_8: 0.281210
+Per-class IoU (Valid):
+  class_0: 0.000000
+  class_1: 0.127117
+  class_2: 0.329504
+  class_3: 0.357276
+  class_4: 0.041276
+  class_5: 0.394538
+  class_6: 0.693278
+  class_7: 0.478913
+  class_8: 0.214462
+Per-class F1 (Train):
+  class_0: 0.000000
+  class_1: 0.070171
+  class_2: 0.489535
+  class_3: 0.468548
+  class_4: 0.044055
+  class_5: 0.510965
+  class_6: 0.679782
+  class_7: 0.606421
+  class_8: 0.438976
+Per-class F1 (Valid):
+  class_0: 0.000000
+  class_1: 0.225561
+  class_2: 0.495680
+  class_3: 0.526460
+  class_4: 0.079279
+  class_5: 0.565833
+  class_6: 0.818859
+  class_7: 0.647656
+  class_8: 0.353181
+
+Epoch: 20 (lr: 0.0005, 0.0005)
+Train Loss: 2.284909, Valid Loss: 2.267019
+Train IoU: 0.247203, Valid IoU: 0.285969
+Train Dice: 0.361264, Valid Dice: 0.404036
+Train Acc: 0.476582, Valid Acc: 0.518692
+Train Prec: 0.388580, Valid Prec: 0.432424
+Train Rec: 0.355453, Valid Rec: 0.402872
+Train F1: 0.361264, Valid F1: 0.404036
+Per-class IoU (Train):
+  class_0: 0.000000
+  class_1: 0.012650
+  class_2: 0.316026
+  class_3: 0.303826
+  class_4: 0.026272
+  class_5: 0.344074
+  class_6: 0.518610
+  class_7: 0.416693
+  class_8: 0.286678
+Per-class IoU (Valid):
+  class_0: 0.000000
+  class_1: 0.093301
+  class_2: 0.326061
+  class_3: 0.365960
+  class_4: 0.042514
+  class_5: 0.360437
+  class_6: 0.700065
+  class_7: 0.446405
+  class_8: 0.238975
+Per-class F1 (Train):
+  class_0: 0.000000
+  class_1: 0.024985
+  class_2: 0.480273
+  class_3: 0.466052
+  class_4: 0.051200
+  class_5: 0.511986
+  class_6: 0.683006
+  class_7: 0.588262
+  class_8: 0.445609
+Per-class F1 (Valid):
+  class_0: 0.000000
+  class_1: 0.170678
+  class_2: 0.491774
+  class_3: 0.535828
+  class_4: 0.081560
+  class_5: 0.529884
+  class_6: 0.823574
+  class_7: 0.617261
+  class_8: 0.385762
+
+Epoch: 21 (lr: 0.0005, 0.0005)
+Train Loss: 2.267690, Valid Loss: 2.250957
+Train IoU: 0.258374, Valid IoU: 0.293322
+Train Dice: 0.378412, Valid Dice: 0.413334
+Train Acc: 0.480319, Valid Acc: 0.517826
+Train Prec: 0.406703, Valid Prec: 0.447038
+Train Rec: 0.369552, Valid Rec: 0.421374
+Train F1: 0.378412, Valid F1: 0.413334
+Per-class IoU (Train):
+  class_0: 0.000000
+  class_1: 0.074197
+  class_2: 0.309350
+  class_3: 0.311160
+  class_4: 0.031064
+  class_5: 0.363172
+  class_6: 0.540716
+  class_7: 0.412805
+  class_8: 0.282904
+Per-class IoU (Valid):
+  class_0: 0.000000
+  class_1: 0.131860
+  class_2: 0.295558
+  class_3: 0.354398
+  class_4: 0.035650
+  class_5: 0.403642
+  class_6: 0.687244
+  class_7: 0.484915
+  class_8: 0.246632
+Per-class F1 (Train):
+  class_0: 0.000000
+  class_1: 0.138144
+  class_2: 0.472525
+  class_3: 0.474634
+  class_4: 0.060255
+  class_5: 0.532834
+  class_6: 0.701902
+  class_7: 0.584377
+  class_8: 0.441037
+Per-class F1 (Valid):
+  class_0: 0.000000
+  class_1: 0.232997
+  class_2: 0.456264
+  class_3: 0.523329
+  class_4: 0.068845
+  class_5: 0.575135
+  class_6: 0.814635
+  class_7: 0.653121
+  class_8: 0.395678
+
+Epoch: 22 (lr: 0.0005, 0.0005)
+Train Loss: 2.252619, Valid Loss: 2.227700
+Train IoU: 0.261297, Valid IoU: 0.298334
+Train Dice: 0.382147, Valid Dice: 0.421153
+Train Acc: 0.483979, Valid Acc: 0.525144
+Train Prec: 0.404462, Valid Prec: 0.436087
+Train Rec: 0.376471, Valid Rec: 0.423003
+Train F1: 0.382147, Valid F1: 0.421153
+Per-class IoU (Train):
+  class_0: 0.000000
+  class_1: 0.083023
+  class_2: 0.317260
+  class_3: 0.313188
+  class_4: 0.029410
+  class_5: 0.357341
+  class_6: 0.539074
+  class_7: 0.424157
+  class_8: 0.288224
+Per-class IoU (Valid):
+  class_0: 0.000000
+  class_1: 0.109281
+  class_2: 0.326375
+  class_3: 0.356672
+  class_4: 0.077372
+  class_5: 0.394175
+  class_6: 0.698150
+  class_7: 0.467651
+  class_8: 0.255332
+Per-class F1 (Train):
+  class_0: 0.000000
+  class_1: 0.153317
+  class_2: 0.481697
+  class_3: 0.476989
+  class_4: 0.057139
+  class_5: 0.526531
+  class_6: 0.700518
+  class_7: 0.595661
+  class_8: 0.447475
+Per-class F1 (Valid):
+  class_0: 0.000000
+  class_1: 0.197030
+  class_2: 0.492131
+  class_3: 0.525804
+  class_4: 0.143630
+  class_5: 0.565460
+  class_6: 0.822248
+  class_7: 0.637278
+  class_8: 0.406796
+
+Epoch: 23 (lr: 0.0005, 0.0005)
+Train Loss: 2.255606, Valid Loss: 2.229751
+Train IoU: 0.258305, Valid IoU: 0.287919
+Train Dice: 0.377021, Valid Dice: 0.400402
+Train Acc: 0.483952, Valid Acc: 0.534326
+Train Prec: 0.403867, Valid Prec: 0.446713
+Train Rec: 0.369704, Valid Rec: 0.393609
+Train F1: 0.377021, Valid F1: 0.400402
+Per-class IoU (Train):
+  class_0: 0.000000
+  class_1: 0.057261
+  class_2: 0.311322
+  class_3: 0.314981
+  class_4: 0.031815
+  class_5: 0.363615
+  class_6: 0.544111
+  class_7: 0.419110
+  class_8: 0.282530
+Per-class IoU (Valid):
+  class_0: 0.000000
+  class_1: 0.054087
+  class_2: 0.351518
+  class_3: 0.362979
+  class_4: 0.031246
+  class_5: 0.386813
+  class_6: 0.722610
+  class_7: 0.466629
+  class_8: 0.215392
+Per-class F1 (Train):
+  class_0: 0.000000
+  class_1: 0.108320
+  class_2: 0.474822
+  class_3: 0.479066
+  class_4: 0.061669
+  class_5: 0.533310
+  class_6: 0.704756
+  class_7: 0.590666
+  class_8: 0.440582
+Per-class F1 (Valid):
+  class_0: 0.000000
+  class_1: 0.102623
+  class_2: 0.520183
+  class_3: 0.532626
+  class_4: 0.060598
+  class_5: 0.557844
+  class_6: 0.838971
+  class_7: 0.636329
+  class_8: 0.354440
+
+Epoch: 24 (lr: 0.0005, 0.0005)
+Train Loss: 2.251423, Valid Loss: 2.265905
+Train IoU: 0.260822, Valid IoU: 0.269868
+Train Dice: 0.379650, Valid Dice: 0.375111
+Train Acc: 0.484590, Valid Acc: 0.519244
+Train Prec: 0.401836, Valid Prec: 0.414377
+Train Rec: 0.373324, Valid Rec: 0.382810
+Train F1: 0.379650, Valid F1: 0.375111
+Per-class IoU (Train):
+  class_0: 0.000000
+  class_1: 0.048878
+  class_2: 0.307218
+  class_3: 0.306328
+  class_4: 0.040892
+  class_5: 0.380288
+  class_6: 0.549775
+  class_7: 0.422135
+  class_8: 0.291881
+Per-class IoU (Valid):
+  class_0: 0.000000
+  class_1: 0.000046
+  class_2: 0.312017
+  class_3: 0.360785
+  class_4: 0.010701
+  class_5: 0.359727
+  class_6: 0.731467
+  class_7: 0.406850
+  class_8: 0.247217
+Per-class F1 (Train):
+  class_0: 0.000000
+  class_1: 0.093200
+  class_2: 0.470033
+  class_3: 0.468991
+  class_4: 0.078571
+  class_5: 0.551027
+  class_6: 0.709490
+  class_7: 0.593664
+  class_8: 0.451870
+Per-class F1 (Valid):
+  class_0: 0.000000
+  class_1: 0.000092
+  class_2: 0.475629
+  class_3: 0.530260
+  class_4: 0.021176
+  class_5: 0.529117
+  class_6: 0.844910
+  class_7: 0.578384
+  class_8: 0.396430
+
+Epoch: 25 (lr: 0.0005, 0.0005)
+Train Loss: 2.242554, Valid Loss: 2.221266
+Train IoU: 0.262654, Valid IoU: 0.291927
+Train Dice: 0.382058, Valid Dice: 0.409872
+Train Acc: 0.488076, Valid Acc: 0.531910
+Train Prec: 0.414479, Valid Prec: 0.442093
+Train Rec: 0.373698, Valid Rec: 0.407372
+Train F1: 0.382058, Valid F1: 0.409872
+Per-class IoU (Train):
+  class_0: 0.000000
+  class_1: 0.072192
+  class_2: 0.319844
+  class_3: 0.309274
+  class_4: 0.026980
+  class_5: 0.361828
+  class_6: 0.558990
+  class_7: 0.425584
+  class_8: 0.289191
+Per-class IoU (Valid):
+  class_0: 0.000000
+  class_1: 0.106496
+  class_2: 0.329378
+  class_3: 0.362467
+  class_4: 0.016477
+  class_5: 0.410263
+  class_6: 0.681800
+  class_7: 0.459086
+  class_8: 0.261372
+Per-class F1 (Train):
+  class_0: 0.000000
+  class_1: 0.134662
+  class_2: 0.484669
+  class_3: 0.472435
+  class_4: 0.052542
+  class_5: 0.531386
+  class_6: 0.717118
+  class_7: 0.597066
+  class_8: 0.448640
+Per-class F1 (Valid):
+  class_0: 0.000000
+  class_1: 0.192492
+  class_2: 0.495537
+  class_3: 0.532075
+  class_4: 0.032420
+  class_5: 0.581824
+  class_6: 0.810798
+  class_7: 0.629279
+  class_8: 0.414425
+
+Epoch: 26 (lr: 0.0005, 0.0005)
+Train Loss: 2.258783, Valid Loss: 2.296032
+Train IoU: 0.261840, Valid IoU: 0.282634
+Train Dice: 0.380458, Valid Dice: 0.405034
+Train Acc: 0.488225, Valid Acc: 0.510822
+Train Prec: 0.410943, Valid Prec: 0.429004
+Train Rec: 0.373580, Valid Rec: 0.423102
+Train F1: 0.380458, Valid F1: 0.405034
+Per-class IoU (Train):
+  class_0: 0.000000
+  class_1: 0.056483
+  class_2: 0.324717
+  class_3: 0.305954
+  class_4: 0.025882
+  class_5: 0.357414
+  class_6: 0.528675
+  class_7: 0.455784
+  class_8: 0.301649
+Per-class IoU (Valid):
+  class_0: 0.000000
+  class_1: 0.177920
+  class_2: 0.284300
+  class_3: 0.364968
+  class_4: 0.018520
+  class_5: 0.383009
+  class_6: 0.666095
+  class_7: 0.372504
+  class_8: 0.276389
+Per-class F1 (Train):
+  class_0: 0.000000
+  class_1: 0.106926
+  class_2: 0.490243
+  class_3: 0.468552
+  class_4: 0.050459
+  class_5: 0.526610
+  class_6: 0.691677
+  class_7: 0.626170
+  class_8: 0.463487
+Per-class F1 (Valid):
+  class_0: 0.000000
+  class_1: 0.302092
+  class_2: 0.442731
+  class_3: 0.534764
+  class_4: 0.036366
+  class_5: 0.553877
+  class_6: 0.799588
+  class_7: 0.542809
+  class_8: 0.433080
+
+Epoch: 27 (lr: 0.00025, 0.00025)
+Train Loss: 2.228657, Valid Loss: 2.216780
+Train IoU: 0.265797, Valid IoU: 0.309060
+Train Dice: 0.384380, Valid Dice: 0.431137
+Train Acc: 0.493895, Valid Acc: 0.536689
+Train Prec: 0.415993, Valid Prec: 0.448580
+Train Rec: 0.373981, Valid Rec: 0.427669
+Train F1: 0.384379, Valid F1: 0.431137
+Per-class IoU (Train):
+  class_0: 0.000000
+  class_1: 0.039307
+  class_2: 0.327365
+  class_3: 0.311575
+  class_4: 0.049383
+  class_5: 0.378586
+  class_6: 0.567726
+  class_7: 0.434680
+  class_8: 0.283548
+Per-class IoU (Valid):
+  class_0: 0.000000
+  class_1: 0.107360
+  class_2: 0.343731
+  class_3: 0.358535
+  class_4: 0.071388
+  class_5: 0.396238
+  class_6: 0.723714
+  class_7: 0.495455
+  class_8: 0.285123
+Per-class F1 (Train):
+  class_0: 0.000000
+  class_1: 0.075640
+  class_2: 0.493256
+  class_3: 0.475116
+  class_4: 0.094118
+  class_5: 0.549239
+  class_6: 0.724267
+  class_7: 0.605961
+  class_8: 0.441819
+Per-class F1 (Valid):
+  class_0: 0.000000
+  class_1: 0.193902
+  class_2: 0.511607
+  class_3: 0.527826
+  class_4: 0.133262
+  class_5: 0.567580
+  class_6: 0.839715
+  class_7: 0.662615
+  class_8: 0.443728
+
+Epoch: 28 (lr: 0.00025, 0.00025)
+Train Loss: 2.223412, Valid Loss: 2.207522
+Train IoU: 0.272117, Valid IoU: 0.315225
+Train Dice: 0.394573, Valid Dice: 0.442116
+Train Acc: 0.489755, Valid Acc: 0.532838
+Train Prec: 0.416363, Valid Prec: 0.450420
+Train Rec: 0.387384, Valid Rec: 0.449432
+Train F1: 0.394573, Valid F1: 0.442116
+Per-class IoU (Train):
+  class_0: 0.000000
+  class_1: 0.074806
+  class_2: 0.321223
+  class_3: 0.302680
+  class_4: 0.055149
+  class_5: 0.363282
+  class_6: 0.564489
+  class_7: 0.453332
+  class_8: 0.314094
+Per-class IoU (Valid):
+  class_0: 0.000000
+  class_1: 0.134960
+  class_2: 0.328603
+  class_3: 0.331360
+  class_4: 0.111401
+  class_5: 0.412766
+  class_6: 0.720887
+  class_7: 0.494955
+  class_8: 0.302088
+Per-class F1 (Train):
+  class_0: 0.000000
+  class_1: 0.139198
+  class_2: 0.486251
+  class_3: 0.464704
+  class_4: 0.104534
+  class_5: 0.532952
+  class_6: 0.721627
+  class_7: 0.623852
+  class_8: 0.478039
+Per-class F1 (Valid):
+  class_0: 0.000000
+  class_1: 0.237824
+  class_2: 0.494659
+  class_3: 0.497776
+  class_4: 0.200470
+  class_5: 0.584338
+  class_6: 0.837809
+  class_7: 0.662167
+  class_8: 0.464005
+
+Epoch: 29 (lr: 0.00025, 0.00025)
+Train Loss: 2.214404, Valid Loss: 2.204269
+Train IoU: 0.271045, Valid IoU: 0.312074
+Train Dice: 0.394333, Valid Dice: 0.437848
+Train Acc: 0.488699, Valid Acc: 0.535463
+Train Prec: 0.417798, Valid Prec: 0.450232
+Train Rec: 0.387067, Valid Rec: 0.439554
+Train F1: 0.394333, Valid F1: 0.437848
+Per-class IoU (Train):
+  class_0: 0.000000
+  class_1: 0.100413
+  class_2: 0.321385
+  class_3: 0.313460
+  class_4: 0.043345
+  class_5: 0.362116
+  class_6: 0.545679
+  class_7: 0.465457
+  class_8: 0.287547
+Per-class IoU (Valid):
+  class_0: 0.000000
+  class_1: 0.124865
+  class_2: 0.337537
+  class_3: 0.358547
+  class_4: 0.098635
+  class_5: 0.398470
+  class_6: 0.704478
+  class_7: 0.504875
+  class_8: 0.281262
+Per-class F1 (Train):
+  class_0: 0.000000
+  class_1: 0.182501
+  class_2: 0.486436
+  class_3: 0.477304
+  class_4: 0.083088
+  class_5: 0.531697
+  class_6: 0.706070
+  class_7: 0.635238
+  class_8: 0.446658
+Per-class F1 (Valid):
+  class_0: 0.000000
+  class_1: 0.222009
+  class_2: 0.504714
+  class_3: 0.527839
+  class_4: 0.179560
+  class_5: 0.569865
+  class_6: 0.826620
+  class_7: 0.670986
+  class_8: 0.439039
+
+Epoch: 30 (lr: 0.00025, 0.00025)
+Train Loss: 2.219418, Valid Loss: 2.208599
+Train IoU: 0.271788, Valid IoU: 0.312935
+Train Dice: 0.395535, Valid Dice: 0.437773
+Train Acc: 0.487637, Valid Acc: 0.537296
+Train Prec: 0.418881, Valid Prec: 0.446561
+Train Rec: 0.391524, Valid Rec: 0.437630
+Train F1: 0.395534, Valid F1: 0.437773
+Per-class IoU (Train):
+  class_0: 0.000000
+  class_1: 0.109238
+  class_2: 0.313536
+  class_3: 0.318468
+  class_4: 0.043509
+  class_5: 0.362444
+  class_6: 0.566972
+  class_7: 0.438947
+  class_8: 0.292978
+Per-class IoU (Valid):
+  class_0: 0.000000
+  class_1: 0.119396
+  class_2: 0.341830
+  class_3: 0.356304
+  class_4: 0.103961
+  class_5: 0.388254
+  class_6: 0.743903
+  class_7: 0.475312
+  class_8: 0.287456
+Per-class F1 (Train):
+  class_0: 0.000000
+  class_1: 0.196961
+  class_2: 0.477393
+  class_3: 0.483088
+  class_4: 0.083390
+  class_5: 0.532050
+  class_6: 0.723653
+  class_7: 0.610094
+  class_8: 0.453184
+Per-class F1 (Valid):
+  class_0: 0.000000
+  class_1: 0.213322
+  class_2: 0.509498
+  class_3: 0.525404
+  class_4: 0.188342
+  class_5: 0.559341
+  class_6: 0.853147
+  class_7: 0.644355
+  class_8: 0.446549
+
+Epoch: 31 (lr: 0.00025, 0.00025)
+Train Loss: 2.198357, Valid Loss: 2.231158
+Train IoU: 0.278572, Valid IoU: 0.301417
+Train Dice: 0.400420, Valid Dice: 0.424068
+Train Acc: 0.503579, Valid Acc: 0.529254
+Train Prec: 0.427058, Valid Prec: 0.446685
+Train Rec: 0.392304, Valid Rec: 0.426940
+Train F1: 0.400420, Valid F1: 0.424068
+Per-class IoU (Train):
+  class_0: 0.000000
+  class_1: 0.076979
+  class_2: 0.337906
+  class_3: 0.316526
+  class_4: 0.042467
+  class_5: 0.392159
+  class_6: 0.568386
+  class_7: 0.466036
+  class_8: 0.306688
+Per-class IoU (Valid):
+  class_0: 0.000000
+  class_1: 0.130902
+  class_2: 0.341241
+  class_3: 0.344441
+  class_4: 0.042776
+  class_5: 0.392368
+  class_6: 0.690032
+  class_7: 0.472001
+  class_8: 0.298991
+Per-class F1 (Train):
+  class_0: 0.000000
+  class_1: 0.142953
+  class_2: 0.505126
+  class_3: 0.480851
+  class_4: 0.081473
+  class_5: 0.563382
+  class_6: 0.724803
+  class_7: 0.635777
+  class_8: 0.469412
+Per-class F1 (Valid):
+  class_0: 0.000000
+  class_1: 0.231500
+  class_2: 0.508843
+  class_3: 0.512393
+  class_4: 0.082042
+  class_5: 0.563598
+  class_6: 0.816591
+  class_7: 0.641305
+  class_8: 0.460344
+
+Epoch: 32 (lr: 0.00025, 0.00025)
+Train Loss: 2.191669, Valid Loss: 2.227904
+Train IoU: 0.285731, Valid IoU: 0.309489
+Train Dice: 0.412178, Valid Dice: 0.431254
+Train Acc: 0.499940, Valid Acc: 0.542819
+Train Prec: 0.429773, Valid Prec: 0.457889
+Train Rec: 0.410409, Valid Rec: 0.423319
+Train F1: 0.412178, Valid F1: 0.431254
+Per-class IoU (Train):
+  class_0: 0.000000
+  class_1: 0.136182
+  class_2: 0.325594
+  class_3: 0.311844
+  class_4: 0.055296
+  class_5: 0.388353
+  class_6: 0.581363
+  class_7: 0.473021
+  class_8: 0.299930
+Per-class IoU (Valid):
+  class_0: 0.000000
+  class_1: 0.122302
+  class_2: 0.355952
+  class_3: 0.364412
+  class_4: 0.067197
+  class_5: 0.384617
+  class_6: 0.739243
+  class_7: 0.489834
+  class_8: 0.261842
+Per-class F1 (Train):
+  class_0: 0.000000
+  class_1: 0.239719
+  class_2: 0.491242
+  class_3: 0.475428
+  class_4: 0.104797
+  class_5: 0.559445
+  class_6: 0.735268
+  class_7: 0.642246
+  class_8: 0.461455
+Per-class F1 (Valid):
+  class_0: 0.000000
+  class_1: 0.217948
+  class_2: 0.525021
+  class_3: 0.534167
+  class_4: 0.125932
+  class_5: 0.555557
+  class_6: 0.850075
+  class_7: 0.657568
+  class_8: 0.415016
+
+Epoch: 33 (lr: 0.000125, 0.000125)
+Train Loss: 2.178442, Valid Loss: 2.230050
+Train IoU: 0.282125, Valid IoU: 0.308479
+Train Dice: 0.401668, Valid Dice: 0.434376
+Train Acc: 0.506845, Valid Acc: 0.527134
+Train Prec: 0.422576, Valid Prec: 0.447643
+Train Rec: 0.394491, Valid Rec: 0.435314
+Train F1: 0.401668, Valid F1: 0.434376
+Per-class IoU (Train):
+  class_0: 0.000000
+  class_1: 0.060634
+  class_2: 0.339800
+  class_3: 0.316958
+  class_4: 0.045280
+  class_5: 0.384551
+  class_6: 0.611874
+  class_7: 0.477991
+  class_8: 0.302035
+Per-class IoU (Valid):
+  class_0: 0.000000
+  class_1: 0.143493
+  class_2: 0.347184
+  class_3: 0.326556
+  class_4: 0.103469
+  class_5: 0.365707
+  class_6: 0.730648
+  class_7: 0.486399
+  class_8: 0.272858
+Per-class F1 (Train):
+  class_0: 0.000000
+  class_1: 0.114335
+  class_2: 0.507240
+  class_3: 0.481349
+  class_4: 0.086638
+  class_5: 0.555489
+  class_6: 0.759209
+  class_7: 0.646812
+  class_8: 0.463943
+Per-class F1 (Valid):
+  class_0: 0.000000
+  class_1: 0.250972
+  class_2: 0.515422
+  class_3: 0.492337
+  class_4: 0.187534
+  class_5: 0.535557
+  class_6: 0.844364
+  class_7: 0.654467
+  class_8: 0.428732
+
+Epoch: 34 (lr: 0.000125, 0.000125)
+Train Loss: 2.186394, Valid Loss: 2.219858
+Train IoU: 0.285370, Valid IoU: 0.315813
+Train Dice: 0.409722, Valid Dice: 0.441649
+Train Acc: 0.505331, Valid Acc: 0.538793
+Train Prec: 0.428672, Valid Prec: 0.449947
+Train Rec: 0.404627, Valid Rec: 0.445655
+Train F1: 0.409722, Valid F1: 0.441649
+Per-class IoU (Train):
+  class_0: 0.000000
+  class_1: 0.103805
+  class_2: 0.336845
+  class_3: 0.314304
+  class_4: 0.051994
+  class_5: 0.388230
+  class_6: 0.585593
+  class_7: 0.474757
+  class_8: 0.312800
+Per-class IoU (Valid):
+  class_0: 0.000000
+  class_1: 0.127341
+  class_2: 0.337569
+  class_3: 0.355991
+  class_4: 0.113101
+  class_5: 0.412730
+  class_6: 0.744182
+  class_7: 0.471383
+  class_8: 0.280022
+Per-class F1 (Train):
+  class_0: 0.000000
+  class_1: 0.188085
+  class_2: 0.503941
+  class_3: 0.478282
+  class_4: 0.098849
+  class_5: 0.559316
+  class_6: 0.738642
+  class_7: 0.643844
+  class_8: 0.476538
+Per-class F1 (Valid):
+  class_0: 0.000000
+  class_1: 0.225914
+  class_2: 0.504750
+  class_3: 0.525064
+  class_4: 0.203219
+  class_5: 0.584301
+  class_6: 0.853331
+  class_7: 0.640735
+  class_8: 0.437527
+
+Epoch: 35 (lr: 0.000125, 0.000125)
+Train Loss: 2.177504, Valid Loss: 2.210308
+Train IoU: 0.281719, Valid IoU: 0.312113
+Train Dice: 0.406592, Valid Dice: 0.438001
+Train Acc: 0.497221, Valid Acc: 0.542888
+Train Prec: 0.424619, Valid Prec: 0.453522
+Train Rec: 0.403938, Valid Rec: 0.440969
+Train F1: 0.406592, Valid F1: 0.438001
+Per-class IoU (Train):
+  class_0: 0.000000
+  class_1: 0.111762
+  class_2: 0.316968
+  class_3: 0.321526
+  class_4: 0.052846
+  class_5: 0.383837
+  class_6: 0.569091
+  class_7: 0.478955
+  class_8: 0.300485
+Per-class IoU (Valid):
+  class_0: 0.000000
+  class_1: 0.151261
+  class_2: 0.355655
+  class_3: 0.364536
+  class_4: 0.073112
+  class_5: 0.383727
+  class_6: 0.710533
+  class_7: 0.479720
+  class_8: 0.290474
+Per-class F1 (Train):
+  class_0: 0.000000
+  class_1: 0.201053
+  class_2: 0.481360
+  class_3: 0.486598
+  class_4: 0.100387
+  class_5: 0.554743
+  class_6: 0.725376
+  class_7: 0.647694
+  class_8: 0.462112
+Per-class F1 (Valid):
+  class_0: 0.000000
+  class_1: 0.262775
+  class_2: 0.524699
+  class_3: 0.534301
+  class_4: 0.136261
+  class_5: 0.554629
+  class_6: 0.830774
+  class_7: 0.648393
+  class_8: 0.450181
+
+Epoch: 36 (lr: 0.000125, 0.000125)
+Train Loss: 2.187271, Valid Loss: 2.225107
+Train IoU: 0.282192, Valid IoU: 0.300747
+Train Dice: 0.405439, Valid Dice: 0.424226
+Train Acc: 0.500753, Valid Acc: 0.533098
+Train Prec: 0.426436, Valid Prec: 0.444040
+Train Rec: 0.397475, Valid Rec: 0.427159
+Train F1: 0.405439, Valid F1: 0.424226
+Per-class IoU (Train):
+  class_0: 0.000000
+  class_1: 0.091726
+  class_2: 0.336987
+  class_3: 0.309202
+  class_4: 0.056227
+  class_5: 0.365678
+  class_6: 0.606308
+  class_7: 0.460204
+  class_8: 0.313393
+Per-class IoU (Valid):
+  class_0: 0.000000
+  class_1: 0.123976
+  class_2: 0.330598
+  class_3: 0.366712
+  class_4: 0.068969
+  class_5: 0.413312
+  class_6: 0.710719
+  class_7: 0.422834
+  class_8: 0.269598
+Per-class F1 (Train):
+  class_0: 0.000000
+  class_1: 0.168039
+  class_2: 0.504099
+  class_3: 0.472351
+  class_4: 0.106468
+  class_5: 0.535526
+  class_6: 0.754909
+  class_7: 0.630328
+  class_8: 0.477226
+Per-class F1 (Valid):
+  class_0: 0.000000
+  class_1: 0.220602
+  class_2: 0.496916
+  class_3: 0.536634
+  class_4: 0.129039
+  class_5: 0.584885
+  class_6: 0.830901
+  class_7: 0.594355
+  class_8: 0.424699
+
+Epoch: 37 (lr: 0.000125, 0.000125)
+Train Loss: 2.175795, Valid Loss: 2.202076
+Train IoU: 0.286899, Valid IoU: 0.316169
+Train Dice: 0.410738, Valid Dice: 0.444658
+Train Acc: 0.502848, Valid Acc: 0.538553
+Train Prec: 0.431609, Valid Prec: 0.450454
+Train Rec: 0.404851, Valid Rec: 0.451645
+Train F1: 0.410738, Valid F1: 0.444658
+Per-class IoU (Train):
+  class_0: 0.000000
+  class_1: 0.113128
+  class_2: 0.322800
+  class_3: 0.318489
+  class_4: 0.046495
+  class_5: 0.385786
+  class_6: 0.596317
+  class_7: 0.491698
+  class_8: 0.307375
+Per-class IoU (Valid):
+  class_0: 0.000000
+  class_1: 0.134192
+  class_2: 0.337491
+  class_3: 0.358601
+  class_4: 0.123614
+  class_5: 0.413941
+  class_6: 0.710292
+  class_7: 0.474901
+  class_8: 0.292491
+Per-class F1 (Train):
+  class_0: 0.000000
+  class_1: 0.203261
+  class_2: 0.488055
+  class_3: 0.483112
+  class_4: 0.088858
+  class_5: 0.556776
+  class_6: 0.747116
+  class_7: 0.659246
+  class_8: 0.470216
+Per-class F1 (Valid):
+  class_0: 0.000000
+  class_1: 0.236629
+  class_2: 0.504663
+  class_3: 0.527898
+  class_4: 0.220029
+  class_5: 0.585514
+  class_6: 0.830609
+  class_7: 0.643976
+  class_8: 0.452601
+
+Epoch: 38 (lr: 0.000125, 0.000125)
+Train Loss: 2.192140, Valid Loss: 2.219109
+Train IoU: 0.282249, Valid IoU: 0.312714
+Train Dice: 0.407216, Valid Dice: 0.440511
+Train Acc: 0.496587, Valid Acc: 0.532001
+Train Prec: 0.426270, Valid Prec: 0.441239
+Train Rec: 0.401912, Valid Rec: 0.447032
+Train F1: 0.407216, Valid F1: 0.440511
+Per-class IoU (Train):
+  class_0: 0.000000
+  class_1: 0.102509
+  class_2: 0.328647
+  class_3: 0.312444
+  class_4: 0.064699
+  class_5: 0.380215
+  class_6: 0.587049
+  class_7: 0.465393
+  class_8: 0.299283
+Per-class IoU (Valid):
+  class_0: 0.000000
+  class_1: 0.115648
+  class_2: 0.324216
+  class_3: 0.345838
+  class_4: 0.141991
+  class_5: 0.422317
+  class_6: 0.718663
+  class_7: 0.459179
+  class_8: 0.286572
+Per-class F1 (Train):
+  class_0: 0.000000
+  class_1: 0.185955
+  class_2: 0.494709
+  class_3: 0.476125
+  class_4: 0.121536
+  class_5: 0.550951
+  class_6: 0.739799
+  class_7: 0.635178
+  class_8: 0.460690
+Per-class F1 (Valid):
+  class_0: 0.000000
+  class_1: 0.207320
+  class_2: 0.489672
+  class_3: 0.513937
+  class_4: 0.248672
+  class_5: 0.593843
+  class_6: 0.836304
+  class_7: 0.629366
+  class_8: 0.445481
+
+Epoch: 39 (lr: 0.000125, 0.000125)
+Train Loss: 2.190257, Valid Loss: 2.181022
+Train IoU: 0.282289, Valid IoU: 0.319348
+Train Dice: 0.406380, Valid Dice: 0.444982
+Train Acc: 0.502988, Valid Acc: 0.546219
+Train Prec: 0.420960, Valid Prec: 0.457008
+Train Rec: 0.403349, Valid Rec: 0.447465
+Train F1: 0.406380, Valid F1: 0.444982
+Per-class IoU (Train):
+  class_0: 0.000000
+  class_1: 0.089380
+  class_2: 0.329373
+  class_3: 0.329307
+  class_4: 0.055639
+  class_5: 0.378801
+  class_6: 0.568923
+  class_7: 0.474941
+  class_8: 0.314241
+Per-class IoU (Valid):
+  class_0: 0.000000
+  class_1: 0.126077
+  class_2: 0.347619
+  class_3: 0.365342
+  class_4: 0.102950
+  class_5: 0.407493
+  class_6: 0.733638
+  class_7: 0.499092
+  class_8: 0.291924
+Per-class F1 (Train):
+  class_0: 0.000000
+  class_1: 0.164094
+  class_2: 0.495531
+  class_3: 0.495457
+  class_4: 0.105413
+  class_5: 0.549464
+  class_6: 0.725240
+  class_7: 0.644014
+  class_8: 0.478209
+Per-class F1 (Valid):
+  class_0: 0.000000
+  class_1: 0.223923
+  class_2: 0.515901
+  class_3: 0.535166
+  class_4: 0.186680
+  class_5: 0.579034
+  class_6: 0.846357
+  class_7: 0.665859
+  class_8: 0.451921
+
+Epoch: 40 (lr: 0.000125, 0.000125)
+Train Loss: 2.169085, Valid Loss: 2.181455
+Train IoU: 0.281161, Valid IoU: 0.314037
+Train Dice: 0.401367, Valid Dice: 0.438772
+Train Acc: 0.509070, Valid Acc: 0.550602
+Train Prec: 0.426257, Valid Prec: 0.469261
+Train Rec: 0.392842, Valid Rec: 0.428074
+Train F1: 0.401367, Valid F1: 0.438772
+Per-class IoU (Train):
+  class_0: 0.000000
+  class_1: 0.061339
+  class_2: 0.341790
+  class_3: 0.326093
+  class_4: 0.050771
+  class_5: 0.370244
+  class_6: 0.610925
+  class_7: 0.470847
+  class_8: 0.298442
+Per-class IoU (Valid):
+  class_0: 0.000000
+  class_1: 0.079164
+  class_2: 0.366731
+  class_3: 0.356863
+  class_4: 0.118537
+  class_5: 0.417907
+  class_6: 0.693635
+  class_7: 0.504548
+  class_8: 0.288943
+Per-class F1 (Train):
+  class_0: 0.000000
+  class_1: 0.115588
+  class_2: 0.509454
+  class_3: 0.491810
+  class_4: 0.096635
+  class_5: 0.540406
+  class_6: 0.758477
+  class_7: 0.640240
+  class_8: 0.459693
+Per-class F1 (Valid):
+  class_0: 0.000000
+  class_1: 0.146714
+  class_2: 0.536655
+  class_3: 0.526012
+  class_4: 0.211950
+  class_5: 0.589471
+  class_6: 0.819108
+  class_7: 0.670697
+  class_8: 0.448341
+
+Epoch: 41 (lr: 0.000125, 0.000125)
+Train Loss: 2.186606, Valid Loss: 2.218648
+Train IoU: 0.284027, Valid IoU: 0.310868
+Train Dice: 0.405765, Valid Dice: 0.433654
+Train Acc: 0.508043, Valid Acc: 0.540771
+Train Prec: 0.425390, Valid Prec: 0.452303
+Train Rec: 0.397868, Valid Rec: 0.426897
+Train F1: 0.405765, Valid F1: 0.433654
+Per-class IoU (Train):
+  class_0: 0.000000
+  class_1: 0.066011
+  class_2: 0.346706
+  class_3: 0.321685
+  class_4: 0.057924
+  class_5: 0.390556
+  class_6: 0.592199
+  class_7: 0.481139
+  class_8: 0.300024
+Per-class IoU (Valid):
+  class_0: 0.000000
+  class_1: 0.070085
+  class_2: 0.366245
+  class_3: 0.337752
+  class_4: 0.133393
+  class_5: 0.415253
+  class_6: 0.726327
+  class_7: 0.494660
+  class_8: 0.254096
+Per-class F1 (Train):
+  class_0: 0.000000
+  class_1: 0.123847
+  class_2: 0.514894
+  class_3: 0.486780
+  class_4: 0.109506
+  class_5: 0.561726
+  class_6: 0.743876
+  class_7: 0.649687
+  class_8: 0.461567
+Per-class F1 (Valid):
+  class_0: 0.000000
+  class_1: 0.130990
+  class_2: 0.536133
+  class_3: 0.504954
+  class_4: 0.235386
+  class_5: 0.586825
+  class_6: 0.841471
+  class_7: 0.661903
+  class_8: 0.405225
+
+Epoch: 42 (lr: 0.000125, 0.000125)
+Train Loss: 2.190661, Valid Loss: 2.202571
+Train IoU: 0.277311, Valid IoU: 0.298881
+Train Dice: 0.398577, Valid Dice: 0.422278
+Train Acc: 0.505557, Valid Acc: 0.537565
+Train Prec: 0.423682, Valid Prec: 0.447641
+Train Rec: 0.389444, Valid Rec: 0.414226
+Train F1: 0.398577, Valid F1: 0.422278
+Per-class IoU (Train):
+  class_0: 0.000000
+  class_1: 0.066369
+  class_2: 0.345317
+  class_3: 0.318497
+  class_4: 0.045728
+  class_5: 0.393251
+  class_6: 0.572069
+  class_7: 0.454916
+  class_8: 0.299655
+Per-class IoU (Valid):
+  class_0: 0.000000
+  class_1: 0.087653
+  class_2: 0.359874
+  class_3: 0.357323
+  class_4: 0.070725
+  class_5: 0.401983
+  class_6: 0.654721
+  class_7: 0.468544
+  class_8: 0.289110
+Per-class F1 (Train):
+  class_0: 0.000000
+  class_1: 0.124477
+  class_2: 0.513361
+  class_3: 0.483121
+  class_4: 0.087458
+  class_5: 0.564509
+  class_6: 0.727791
+  class_7: 0.625350
+  class_8: 0.461130
+Per-class F1 (Valid):
+  class_0: 0.000000
+  class_1: 0.161178
+  class_2: 0.529275
+  class_3: 0.526511
+  class_4: 0.132107
+  class_5: 0.573449
+  class_6: 0.791337
+  class_7: 0.638107
+  class_8: 0.448542
+
+Epoch: 43 (lr: 0.000125, 0.000125)
+Train Loss: 2.149952, Valid Loss: 2.179417
+Train IoU: 0.290080, Valid IoU: 0.313265
+Train Dice: 0.412600, Valid Dice: 0.436136
+Train Acc: 0.511634, Valid Acc: 0.548833
+Train Prec: 0.434593, Valid Prec: 0.462790
+Train Rec: 0.405358, Valid Rec: 0.428758
+Train F1: 0.412600, Valid F1: 0.436136
+Per-class IoU (Train):
+  class_0: 0.000000
+  class_1: 0.083332
+  class_2: 0.344350
+  class_3: 0.332062
+  class_4: 0.055946
+  class_5: 0.383655
+  class_6: 0.592521
+  class_7: 0.521071
+  class_8: 0.297786
+Per-class IoU (Valid):
+  class_0: 0.000000
+  class_1: 0.049771
+  class_2: 0.373286
+  class_3: 0.340038
+  class_4: 0.134779
+  class_5: 0.408061
+  class_6: 0.709600
+  class_7: 0.502638
+  class_8: 0.301210
+Per-class F1 (Train):
+  class_0: 0.000000
+  class_1: 0.153844
+  class_2: 0.512292
+  class_3: 0.498568
+  class_4: 0.105964
+  class_5: 0.554553
+  class_6: 0.744130
+  class_7: 0.685137
+  class_8: 0.458914
+Per-class F1 (Valid):
+  class_0: 0.000000
+  class_1: 0.094822
+  class_2: 0.543639
+  class_3: 0.507505
+  class_4: 0.237542
+  class_5: 0.579606
+  class_6: 0.830135
+  class_7: 0.669007
+  class_8: 0.462969
+
+Epoch: 44 (lr: 6.25e-05, 6.25e-05)
+Train Loss: 2.169340, Valid Loss: 2.205423
+Train IoU: 0.290233, Valid IoU: 0.311112
+Train Dice: 0.411476, Valid Dice: 0.438800
+Train Acc: 0.515186, Valid Acc: 0.538384
+Train Prec: 0.434517, Valid Prec: 0.446294
+Train Rec: 0.401951, Valid Rec: 0.435918
+Train F1: 0.411476, Valid F1: 0.438800
+Per-class IoU (Train):
+  class_0: 0.000000
+  class_1: 0.059627
+  class_2: 0.349618
+  class_3: 0.319808
+  class_4: 0.064395
+  class_5: 0.398263
+  class_6: 0.608882
+  class_7: 0.504428
+  class_8: 0.307080
+Per-class IoU (Valid):
+  class_0: 0.000000
+  class_1: 0.102129
+  class_2: 0.346952
+  class_3: 0.338834
+  class_4: 0.135502
+  class_5: 0.417626
+  class_6: 0.692487
+  class_7: 0.471659
+  class_8: 0.294824
+Per-class F1 (Train):
+  class_0: 0.000000
+  class_1: 0.112543
+  class_2: 0.518099
+  class_3: 0.484628
+  class_4: 0.120998
+  class_5: 0.569654
+  class_6: 0.756901
+  class_7: 0.670591
+  class_8: 0.469872
+Per-class F1 (Valid):
+  class_0: 0.000000
+  class_1: 0.185330
+  class_2: 0.515166
+  class_3: 0.506163
+  class_4: 0.238664
+  class_5: 0.589190
+  class_6: 0.818307
+  class_7: 0.640989
+  class_8: 0.455388
+
+Epoch: 45 (lr: 6.25e-05, 6.25e-05)
+Train Loss: 2.158687, Valid Loss: 2.206941
+Train IoU: 0.287392, Valid IoU: 0.309306
+Train Dice: 0.411669, Valid Dice: 0.436812
+Train Acc: 0.509478, Valid Acc: 0.539423
+Train Prec: 0.436831, Valid Prec: 0.445526
+Train Rec: 0.401765, Valid Rec: 0.431856
+Train F1: 0.411669, Valid F1: 0.436812
+Per-class IoU (Train):
+  class_0: 0.000000
+  class_1: 0.092129
+  class_2: 0.342132
+  class_3: 0.324997
+  class_4: 0.066043
+  class_5: 0.389187
+  class_6: 0.600518
+  class_7: 0.475668
+  class_8: 0.295852
+Per-class IoU (Valid):
+  class_0: 0.000000
+  class_1: 0.099592
+  class_2: 0.358083
+  class_3: 0.351297
+  class_4: 0.127843
+  class_5: 0.403475
+  class_6: 0.687915
+  class_7: 0.461104
+  class_8: 0.294448
+Per-class F1 (Train):
+  class_0: 0.000000
+  class_1: 0.168714
+  class_2: 0.509834
+  class_3: 0.490563
+  class_4: 0.123903
+  class_5: 0.560309
+  class_6: 0.750405
+  class_7: 0.644681
+  class_8: 0.456614
+Per-class F1 (Valid):
+  class_0: 0.000000
+  class_1: 0.181143
+  class_2: 0.527336
+  class_3: 0.519941
+  class_4: 0.226703
+  class_5: 0.574966
+  class_6: 0.815106
+  class_7: 0.631172
+  class_8: 0.454939
+
+Epoch: 46 (lr: 6.25e-05, 6.25e-05)
+Train Loss: 2.143430, Valid Loss: 2.202921
+Train IoU: 0.292945, Valid IoU: 0.301971
+Train Dice: 0.415833, Valid Dice: 0.428835
+Train Acc: 0.514455, Valid Acc: 0.534886
+Train Prec: 0.436153, Valid Prec: 0.440239
+Train Rec: 0.408655, Valid Rec: 0.423700
+Train F1: 0.415833, Valid F1: 0.428835
+Per-class IoU (Train):
+  class_0: 0.000000
+  class_1: 0.096374
+  class_2: 0.349088
+  class_3: 0.320123
+  class_4: 0.052353
+  class_5: 0.386571
+  class_6: 0.614423
+  class_7: 0.510061
+  class_8: 0.307516
+Per-class IoU (Valid):
+  class_0: 0.000000
+  class_1: 0.094683
+  class_2: 0.370589
+  class_3: 0.340254
+  class_4: 0.112845
+  class_5: 0.397285
+  class_6: 0.647538
+  class_7: 0.476718
+  class_8: 0.277822
+Per-class F1 (Train):
+  class_0: 0.000000
+  class_1: 0.175805
+  class_2: 0.517517
+  class_3: 0.484990
+  class_4: 0.099497
+  class_5: 0.557593
+  class_6: 0.761167
+  class_7: 0.675550
+  class_8: 0.470382
+Per-class F1 (Valid):
+  class_0: 0.000000
+  class_1: 0.172988
+  class_2: 0.540774
+  class_3: 0.507746
+  class_4: 0.202804
+  class_5: 0.568653
+  class_6: 0.786067
+  class_7: 0.645645
+  class_8: 0.434836
+
+Epoch: 47 (lr: 6.25e-05, 6.25e-05)
+Train Loss: 2.149605, Valid Loss: 2.200130
+Train IoU: 0.289764, Valid IoU: 0.311142
+Train Dice: 0.415480, Valid Dice: 0.440132
+Train Acc: 0.512875, Valid Acc: 0.536547
+Train Prec: 0.438533, Valid Prec: 0.448510
+Train Rec: 0.405684, Valid Rec: 0.442037
+Train F1: 0.415480, Valid F1: 0.440132
+Per-class IoU (Train):
+  class_0: 0.000000
+  class_1: 0.116826
+  class_2: 0.347900
+  class_3: 0.328219
+  class_4: 0.056443
+  class_5: 0.383566
+  class_6: 0.583698
+  class_7: 0.488107
+  class_8: 0.303113
+Per-class IoU (Valid):
+  class_0: 0.000000
+  class_1: 0.133786
+  class_2: 0.351830
+  class_3: 0.347552
+  class_4: 0.113602
+  class_5: 0.404109
+  class_6: 0.668215
+  class_7: 0.492197
+  class_8: 0.288990
+Per-class F1 (Train):
+  class_0: 0.000000
+  class_1: 0.209211
+  class_2: 0.516211
+  class_3: 0.494224
+  class_4: 0.106855
+  class_5: 0.554460
+  class_6: 0.737133
+  class_7: 0.656010
+  class_8: 0.465213
+Per-class F1 (Valid):
+  class_0: 0.000000
+  class_1: 0.235999
+  class_2: 0.520524
+  class_3: 0.515827
+  class_4: 0.204026
+  class_5: 0.575609
+  class_6: 0.801114
+  class_7: 0.659694
+  class_8: 0.448397
+
+Epoch: 48 (lr: 3.125e-05, 3.125e-05)
+Train Loss: 2.163399, Valid Loss: 2.208558
+Train IoU: 0.291492, Valid IoU: 0.311665
+Train Dice: 0.414646, Valid Dice: 0.441957
+Train Acc: 0.513488, Valid Acc: 0.533392
+Train Prec: 0.431452, Valid Prec: 0.444498
+Train Rec: 0.410098, Valid Rec: 0.446013
+Train F1: 0.414646, Valid F1: 0.441956
+Per-class IoU (Train):
+  class_0: 0.000000
+  class_1: 0.091907
+  class_2: 0.336189
+  class_3: 0.319715
+  class_4: 0.053147
+  class_5: 0.410515
+  class_6: 0.603787
+  class_7: 0.492679
+  class_8: 0.315490
+Per-class IoU (Valid):
+  class_0: 0.000000
+  class_1: 0.132132
+  class_2: 0.352676
+  class_3: 0.330536
+  class_4: 0.133019
+  class_5: 0.413146
+  class_6: 0.659268
+  class_7: 0.492201
+  class_8: 0.292009
+Per-class F1 (Train):
+  class_0: 0.000000
+  class_1: 0.168342
+  class_2: 0.503206
+  class_3: 0.484522
+  class_4: 0.100930
+  class_5: 0.582078
+  class_6: 0.752951
+  class_7: 0.660127
+  class_8: 0.479654
+Per-class F1 (Valid):
+  class_0: 0.000000
+  class_1: 0.233422
+  class_2: 0.521449
+  class_3: 0.496847
+  class_4: 0.234804
+  class_5: 0.584718
+  class_6: 0.794649
+  class_7: 0.659698
+  class_8: 0.452023
+
+Epoch: 49 (lr: 3.125e-05, 3.125e-05)
+Train Loss: 2.188556, Valid Loss: 2.192118
+Train IoU: 0.280287, Valid IoU: 0.310114
+Train Dice: 0.403826, Valid Dice: 0.439566
+Train Acc: 0.500554, Valid Acc: 0.535963
+Train Prec: 0.421682, Valid Prec: 0.449211
+Train Rec: 0.398202, Valid Rec: 0.436447
+Train F1: 0.403826, Valid F1: 0.439566
+Per-class IoU (Train):
+  class_0: 0.000000
+  class_1: 0.088757
+  class_2: 0.341500
+  class_3: 0.301879
+  class_4: 0.056339
+  class_5: 0.377426
+  class_6: 0.578999
+  class_7: 0.468316
+  class_8: 0.309371
+Per-class IoU (Valid):
+  class_0: 0.000000
+  class_1: 0.135250
+  class_2: 0.356700
+  class_3: 0.347255
+  class_4: 0.116507
+  class_5: 0.393931
+  class_6: 0.660370
+  class_7: 0.494632
+  class_8: 0.286381
+Per-class F1 (Train):
+  class_0: 0.000000
+  class_1: 0.163043
+  class_2: 0.509132
+  class_3: 0.463759
+  class_4: 0.106668
+  class_5: 0.548016
+  class_6: 0.733374
+  class_7: 0.637895
+  class_8: 0.472549
+Per-class F1 (Valid):
+  class_0: 0.000000
+  class_1: 0.238274
+  class_2: 0.525835
+  class_3: 0.515500
+  class_4: 0.208698
+  class_5: 0.565209
+  class_6: 0.795449
+  class_7: 0.661878
+  class_8: 0.445251
+
+Epoch: 50 (lr: 3.125e-05, 3.125e-05)
+Train Loss: 2.160537, Valid Loss: 2.192187
+Train IoU: 0.285004, Valid IoU: 0.312176
+Train Dice: 0.406415, Valid Dice: 0.439586
+Train Acc: 0.513711, Valid Acc: 0.545130
+Train Prec: 0.426898, Valid Prec: 0.450247
+Train Rec: 0.400987, Valid Rec: 0.434165
+Train F1: 0.406415, Valid F1: 0.439585
+Per-class IoU (Train):
+  class_0: 0.000000
+  class_1: 0.057978
+  class_2: 0.343681
+  class_3: 0.328233
+  class_4: 0.056593
+  class_5: 0.396399
+  class_6: 0.598966
+  class_7: 0.461694
+  class_8: 0.321492
+Per-class IoU (Valid):
+  class_0: 0.000000
+  class_1: 0.100489
+  class_2: 0.367007
+  class_3: 0.342566
+  class_4: 0.117425
+  class_5: 0.416367
+  class_6: 0.668697
+  class_7: 0.492649
+  class_8: 0.304385
+Per-class F1 (Train):
+  class_0: 0.000000
+  class_1: 0.109601
+  class_2: 0.511551
+  class_3: 0.494240
+  class_4: 0.107123
+  class_5: 0.567744
+  class_6: 0.749191
+  class_7: 0.631724
+  class_8: 0.486559
+Per-class F1 (Valid):
+  class_0: 0.000000
+  class_1: 0.182627
+  class_2: 0.536949
+  class_3: 0.510315
+  class_4: 0.210171
+  class_5: 0.587937
+  class_6: 0.801460
+  class_7: 0.660101
+  class_8: 0.466710
+
+Epoch: 51 (lr: 3.125e-05, 3.125e-05)
+Train Loss: 2.152108, Valid Loss: 2.202748
+Train IoU: 0.290741, Valid IoU: 0.314245
+Train Dice: 0.413528, Valid Dice: 0.443436
+Train Acc: 0.513345, Valid Acc: 0.542046
+Train Prec: 0.435636, Valid Prec: 0.451466
+Train Rec: 0.405555, Valid Rec: 0.441792
+Train F1: 0.413528, Valid F1: 0.443436
+Per-class IoU (Train):
+  class_0: 0.000000
+  class_1: 0.089343
+  class_2: 0.337462
+  class_3: 0.325041
+  class_4: 0.054867
+  class_5: 0.396882
+  class_6: 0.610019
+  class_7: 0.497829
+  class_8: 0.305230
+Per-class IoU (Valid):
+  class_0: 0.000000
+  class_1: 0.128958
+  class_2: 0.357475
+  class_3: 0.347965
+  class_4: 0.118778
+  class_5: 0.416438
+  class_6: 0.670528
+  class_7: 0.491941
+  class_8: 0.296120
+Per-class F1 (Train):
+  class_0: 0.000000
+  class_1: 0.164031
+  class_2: 0.504630
+  class_3: 0.490612
+  class_4: 0.104026
+  class_5: 0.568240
+  class_6: 0.757779
+  class_7: 0.664734
+  class_8: 0.467703
+Per-class F1 (Valid):
+  class_0: 0.000000
+  class_1: 0.228455
+  class_2: 0.526676
+  class_3: 0.516282
+  class_4: 0.212335
+  class_5: 0.588007
+  class_6: 0.802774
+  class_7: 0.659465
+  class_8: 0.456933
+
+Epoch: 52 (lr: 1.5625e-05, 1.5625e-05)
+Train Loss: 2.146518, Valid Loss: 2.189694
+Train IoU: 0.290906, Valid IoU: 0.317118
+Train Dice: 0.413123, Valid Dice: 0.446867
+Train Acc: 0.518215, Valid Acc: 0.539303
+Train Prec: 0.436057, Valid Prec: 0.452348
+Train Rec: 0.405615, Valid Rec: 0.448481
+Train F1: 0.413123, Valid F1: 0.446867
+Per-class IoU (Train):
+  class_0: 0.000000
+  class_1: 0.078766
+  class_2: 0.345900
+  class_3: 0.333522
+  class_4: 0.053675
+  class_5: 0.400842
+  class_6: 0.616477
+  class_7: 0.479143
+  class_8: 0.309829
+Per-class IoU (Valid):
+  class_0: 0.000000
+  class_1: 0.135400
+  class_2: 0.354027
+  class_3: 0.338230
+  class_4: 0.125446
+  class_5: 0.415050
+  class_6: 0.677273
+  class_7: 0.502167
+  class_8: 0.306466
+Per-class F1 (Train):
+  class_0: 0.000000
+  class_1: 0.146030
+  class_2: 0.514006
+  class_3: 0.500212
+  class_4: 0.101881
+  class_5: 0.572287
+  class_6: 0.762741
+  class_7: 0.647866
+  class_8: 0.473083
+Per-class F1 (Valid):
+  class_0: 0.000000
+  class_1: 0.238506
+  class_2: 0.522924
+  class_3: 0.505489
+  class_4: 0.222926
+  class_5: 0.586623
+  class_6: 0.807588
+  class_7: 0.668590
+  class_8: 0.469153
+
+Epoch: 53 (lr: 1.5625e-05, 1.5625e-05)
+Train Loss: 2.169254, Valid Loss: 2.187880
+Train IoU: 0.286121, Valid IoU: 0.318301
+Train Dice: 0.408641, Valid Dice: 0.445646
+Train Acc: 0.511885, Valid Acc: 0.547295
+Train Prec: 0.429925, Valid Prec: 0.453744
+Train Rec: 0.401354, Valid Rec: 0.442371
+Train F1: 0.408641, Valid F1: 0.445646
+Per-class IoU (Train):
+  class_0: 0.000000
+  class_1: 0.086475
+  class_2: 0.347046
+  class_3: 0.320226
+  class_4: 0.050735
+  class_5: 0.402524
+  class_6: 0.596028
+  class_7: 0.479946
+  class_8: 0.292111
+Per-class IoU (Valid):
+  class_0: 0.000000
+  class_1: 0.111475
+  class_2: 0.361154
+  class_3: 0.342517
+  class_4: 0.124572
+  class_5: 0.422035
+  class_6: 0.700591
+  class_7: 0.502528
+  class_8: 0.299837
+Per-class F1 (Train):
+  class_0: 0.000000
+  class_1: 0.159185
+  class_2: 0.515270
+  class_3: 0.485108
+  class_4: 0.096571
+  class_5: 0.573999
+  class_6: 0.746889
+  class_7: 0.648600
+  class_8: 0.452145
+Per-class F1 (Valid):
+  class_0: 0.000000
+  class_1: 0.200589
+  class_2: 0.530658
+  class_3: 0.510261
+  class_4: 0.221546
+  class_5: 0.593565
+  class_6: 0.823938
+  class_7: 0.668910
+  class_8: 0.461346
+
+Epoch: 54 (lr: 1.5625e-05, 1.5625e-05)
+Train Loss: 2.162773, Valid Loss: 2.192977
+Train IoU: 0.286663, Valid IoU: 0.315266
+Train Dice: 0.411646, Valid Dice: 0.444408
+Train Acc: 0.508979, Valid Acc: 0.541766
+Train Prec: 0.434205, Valid Prec: 0.449736
+Train Rec: 0.405328, Valid Rec: 0.446613
+Train F1: 0.411646, Valid F1: 0.444408
+Per-class IoU (Train):
+  class_0: 0.000000
+  class_1: 0.103900
+  class_2: 0.334819
+  class_3: 0.323066
+  class_4: 0.057457
+  class_5: 0.400383
+  class_6: 0.590547
+  class_7: 0.458667
+  class_8: 0.311129
+Per-class IoU (Valid):
+  class_0: 0.000000
+  class_1: 0.125724
+  class_2: 0.357703
+  class_3: 0.347159
+  class_4: 0.121858
+  class_5: 0.415991
+  class_6: 0.675181
+  class_7: 0.492255
+  class_8: 0.301519
+Per-class F1 (Train):
+  class_0: 0.000000
+  class_1: 0.188241
+  class_2: 0.501670
+  class_3: 0.488360
+  class_4: 0.108669
+  class_5: 0.571819
+  class_6: 0.742571
+  class_7: 0.628885
+  class_8: 0.474597
+Per-class F1 (Valid):
+  class_0: 0.000000
+  class_1: 0.223366
+  class_2: 0.526924
+  class_3: 0.515395
+  class_4: 0.217244
+  class_5: 0.587562
+  class_6: 0.806099
+  class_7: 0.659746
+  class_8: 0.463334
+

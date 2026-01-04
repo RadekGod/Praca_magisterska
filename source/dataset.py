@@ -1,7 +1,6 @@
 import numpy as np
 import rasterio
 from torch.utils.data import Dataset as BaseDataset
-import os
 from typing import Optional
 
 from . import transforms as T
