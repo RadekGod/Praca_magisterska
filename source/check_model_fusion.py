@@ -30,7 +30,7 @@ IMAGENET_STD = np.array([0.229, 0.224, 0.225], dtype=np.float32)
 
 
 def build_model(num_classes: int, device: str = "cuda"):
-    """Buduje model fuzji (RGB+SAR = 4 kanały) zgodny z train_fusion.py."""
+    """Buduje model fuzji (RGB+SAR = 4 kanały) zgodny z train_early_fusion.py."""
     model = smp.Unet(
         classes=num_classes,
         in_channels=4,
