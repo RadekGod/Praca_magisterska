@@ -3,9 +3,9 @@ import os
 from collections import OrderedDict
 
 import torch
-import segmentation_models_pytorch as smp
 
 from source import transforms as T
+from source.train_late_fusion import LateFusionUnet
 from source.check_fusion_utils import (
     load_rgb_sar_pair_from_rgb_path,
     preprocess_rgb_sar_to_4ch_tensor,
@@ -29,48 +29,31 @@ CLASS_COLORS = {
 }
 
 
-def build_model(num_classes: int, device: str = "cuda"):
-    """Buduje model early-fusion (RGB+SAR = 4 kanały) zgodny z train_early_fusion.py."""
-    model = smp.Unet(
-        classes=num_classes,
-        in_channels=4,
-        activation=None,
-        encoder_weights=None,  # wagi i tak wczytamy z .pth
+def build_model(num_classes: int, device: str = "cuda", fusion_mode: str = "mean"):
+    """Buduje model LateFusion zgodny z train_late_fusion.py (fuzja na logitach)."""
+    model = LateFusionUnet(
+        num_classes=num_classes,
         encoder_name=encoder_name,
+        encoder_weights_rgb=None,   # wagi i tak wczytamy z checkpointu .pth
+        encoder_weights_sar=None,
         decoder_attention_type="scse",
+        fusion_mode=fusion_mode,
     )
     model.to(device)
     model.eval()
     return model
 
 
-def _print_first_conv_diagnostics(model: torch.nn.Module):
-    """Wypisuje diagnostykę pierwszej konwolucji (czy faktycznie 4 kanały, statystyki wag)."""
-    target = model.module if hasattr(model, "module") else model
-    for name, p in target.named_parameters():
-        if p.dim() == 4 and any(k in name.lower() for k in ["conv_stem", "conv1", "stem", "conv_first"]):
-            w = p.detach().cpu()
-            print(f"First conv param: {name} shape: {tuple(w.shape)}")
-            print(f"  mean: {float(w.mean().item()):.6f} std: {float(w.std().item()):.6f}")
-            ww = w.numpy()
-            if ww.ndim == 4:
-                ch_means = ww.mean(axis=(0, 2, 3))
-                print("  Per-channel means:", ", ".join(f"{v:.6f}" for v in ch_means))
-            return
-    print("[WARN] Nie znaleziono parametru pierwszej konwolucji do diagnostyki.")
-
-
 def run_inference(
     model,
-    image_path: str,
+    rgb_path: str,
     output_path: str,
     device: str,
     sar_normalize: str = "global",
     sar_mean: float | None = None,
     sar_std: float | None = None,
 ):
-    """Inferencja dla pojedynczego obrazu fusion (para RGB+SAR) i zapis kolorowej maski."""
-    rgb, sar, georef_path = load_rgb_sar_pair_from_rgb_path(image_path)
+    rgb, sar, georef_path = load_rgb_sar_pair_from_rgb_path(rgb_path)
 
     x = preprocess_rgb_sar_to_4ch_tensor(
         rgb,
@@ -81,7 +64,7 @@ def run_inference(
     ).to(device)
 
     with torch.no_grad():
-        logits = model(x)
+        logits = model(x)  # (1,C,H,W)
 
     pred = torch.argmax(logits[0], dim=0).cpu().numpy().astype('uint8')
     print_pred_distribution(pred, num_classes=len(CLASS_COLORS))
@@ -91,13 +74,15 @@ def run_inference(
 
 
 def main():
-    parser = argparse.ArgumentParser(description="check_model_fusion: inferencja + zapis kolorowej maski (RGB+SAR)")
+    parser = argparse.ArgumentParser(
+        description="check_model_late_fusion: LateFusion (logit fusion) inferencja + zapis kolorowej maski"
+    )
     parser.add_argument(
         "--image_path",
         type=str,
         default="results/obrazy/fusion/oryginalne",
         help=(
-            "Ścieżka do FOLDERU z parami plików: *_RGB.tif oraz *_SAR.tif (np. TrainArea_3902_RGB.tif i TrainArea_3902_SAR.tif). "
+            "Ścieżka do FOLDERU z parami plików: *_RGB.tif oraz *_SAR.tif. "
             "Tryb pojedynczego pliku nie jest obsługiwany."
         ),
     )
@@ -106,14 +91,15 @@ def main():
         "--model_path",
         type=str,
         default="model/fusion/" + main_model_name + model_name_variant + ".pth",
-        help="Ścieżka do modelu .pth",
+        help="Ścieżka do checkpointu late-fusion (.pth) zapisanego przez train_late_fusion.py",
     )
     parser.add_argument(
         "--output_path",
         type=str,
-        default="results/obrazy/fusion/model/" + encoder_name + "/" + model_name_variant,
-        help="Ścieżka wyjściowa (folder).",
+        default="results/obrazy/fusion/model/" + encoder_name + "/" + model_name_variant + "/" + model_fusion_variant,
+        help="Folder wyjściowy na maski .tif",
     )
+    parser.add_argument("--fusion_mode", type=str, default="mean", choices=["mean", "sum", "weighted"], help="Tryb fuzji logitów")
 
     parser.add_argument(
         "--sar_normalize",
@@ -155,7 +141,7 @@ def main():
 
     # build + load
     num_classes = len(CLASS_COLORS)
-    model = build_model(num_classes=num_classes, device=device)
+    model = build_model(num_classes=num_classes, device=device, fusion_mode=args.fusion_mode)
 
     state_dict = torch.load(args.model_path, map_location=device)
     new_state_dict = OrderedDict()
@@ -181,25 +167,20 @@ def main():
         if len(unexpected) > 50:
             print(f"  ... and {len(unexpected) - 50} more")
 
-    _print_first_conv_diagnostics(model)
-    if sar_mean is not None and sar_std is not None:
-        print(f"SAR mean/std used: mean={float(sar_mean):.6f} std={float(sar_std):.6f} (scale [0,1])")
-
     # Wejściem musi być folder
     if not os.path.isdir(args.image_path):
-        raise ValueError(
-            "Wymagany jest folder z parami *_RGB.tif + *_SAR.tif. "
-            f"Podano: {args.image_path}"
-        )
+        raise ValueError(f"Wymagany jest folder z parami *_RGB.tif + *_SAR.tif. Podano: {args.image_path}")
 
     in_dir = args.image_path
     out_dir = args.output_path
     os.makedirs(out_dir, exist_ok=True)
 
+    # Przetwarzamy tylko *_RGB.tif
     rgb_files = [fn for fn in sorted(os.listdir(in_dir)) if fn.lower().endswith("_rgb.tif")]
     if not rgb_files:
         raise FileNotFoundError(f"Nie znaleziono plików *_RGB.tif w folderze: {in_dir}")
 
+    # walidacja par
     missing_sar = []
     for fn in rgb_files:
         sar_fn = fn[:-8] + "_SAR.tif"
@@ -217,7 +198,7 @@ def main():
         print(f"Przetwarzam: {in_path} -> {out_path}")
         run_inference(
             model=model,
-            image_path=in_path,
+            rgb_path=in_path,
             output_path=out_path,
             device=device,
             sar_normalize=args.sar_normalize,
@@ -228,6 +209,7 @@ def main():
 
 if __name__ == "__main__":
     model_name_variant = "T1V1"
+    model_fusion_variant = "LATE_MEAN"
     encoder_name = "efficientnet-b4"
-    main_model_name = "FUSION_Unet_" + encoder_name + "_WCEPlusDice_ce1.0_dice1.0_lr_0.001_augm"
+    main_model_name = "LATE_FUSION_Unet_" + encoder_name + "_WCEPlusDice_ce1.0_dice1.0_lr_0.001_fusion_mean_augm"
     main()
