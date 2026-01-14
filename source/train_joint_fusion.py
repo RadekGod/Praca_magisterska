@@ -6,9 +6,12 @@ import warnings
 import numpy as np
 import torch
 import torch.nn as nn
-import segmentation_models_pytorch as smp
 from torch.optim.lr_scheduler import ReduceLROnPlateau
 import wandb
+
+from segmentation_models_pytorch.encoders import get_encoder
+from segmentation_models_pytorch.decoders.unet.decoder import UnetDecoder
+from segmentation_models_pytorch.base import SegmentationHead
 
 import source
 from source import streaming as S
@@ -20,22 +23,26 @@ warnings.filterwarnings("ignore")
 
 
 # =============================================
-#   Late Fusion model
+#   Joint Fusion (feature-level) model
 # =============================================
 
-class LateFusionUnet(nn.Module):
-    """Late Fusion dla segmentacji:
+class JointFusionUnet(nn.Module):
+    """Joint/Intermediate Fusion: 2 encodery + wspólny dekoder.
 
-    - oddzielny model RGB (3ch) i SAR (1ch)
-    - fuzja na poziomie LOGITÓW: (logits_rgb + logits_sar) / 2 lub ważona suma
+    - encoder_rgb: EfficientNet-B4 (lub inny z SMP) dla RGB (3 kanały)
+    - encoder_sar: EfficientNet-B4 (lub inny z SMP) dla SAR (1 kanał)
+    - na każdym poziomie (skip + bottleneck) łączymy feature maps
+    - wspólny decoder UNet odtwarza maskę
 
-    Kontrakt wejścia:
-    - `x` ma mieć 4 kanały w kolejności dokładnie jak `FusionDataset` w `source/dataset.py`:
-        img = np.dstack([rgb, sar[..., None]])  -> [R,G,B,SAR]
-      czyli w tensorze: x[:, 0:3] = RGB, x[:, 3:4] = SAR.
+    Wejście:
+      x: (B,4,H,W) w kolejności [R,G,B,SAR] (zgodnie z FusionDataset)
 
-    Wejście: x (B,4,H,W) gdzie kanały: [R,G,B,SAR]
-    Wyjście: logits_fused (B,C,H,W)
+    feature_fusion:
+      - 'concat' (domyślnie): cat po kanałach + 1x1 conv do kanałów RGB
+      - 'sum': sumujemy (po wyrównaniu kanałów paddingiem) + 1x1 conv do kanałów RGB
+      - 'mean': jak sum, ale /2
+
+    Dzięki wspólnemu decoderowi gradienty przechodzą do obu encoderów jednocześnie.
     """
 
     def __init__(
@@ -45,31 +52,107 @@ class LateFusionUnet(nn.Module):
         encoder_weights_rgb: str | None = "imagenet",
         encoder_weights_sar: str | None = None,
         decoder_attention_type: str | None = "scse",
-        fusion_mode: str = "mean",  # mean | sum | weighted
+        feature_fusion: str = "concat",
+        encoder_depth: int = 5,
+        decoder_channels: tuple[int, ...] = (256, 128, 64, 32, 16),
+        decoder_use_norm: str | bool | dict = "batchnorm",
+        decoder_add_center_block: bool = False,
+        safe_nan_to_num: bool = True,
     ):
         super().__init__()
-        self.fusion_mode = fusion_mode
 
-        self.rgb_model = smp.Unet(
-            classes=num_classes,
+        self.safe_nan_to_num = bool(safe_nan_to_num)
+
+        self.feature_fusion = str(feature_fusion).lower()
+        if self.feature_fusion not in ("concat", "sum", "mean"):
+            raise ValueError(f"feature_fusion must be one of concat/sum/mean, got {feature_fusion}")
+
+        # 2 encodery
+        self.encoder_rgb = get_encoder(
+            encoder_name,
             in_channels=3,
-            activation=None,
-            encoder_name=encoder_name,
-            encoder_weights=None if str(encoder_weights_rgb).lower() == "none" else encoder_weights_rgb,
-            decoder_attention_type=decoder_attention_type,
+            depth=int(encoder_depth),
+            weights=None if str(encoder_weights_rgb).lower() == "none" else encoder_weights_rgb,
         )
-
-        self.sar_model = smp.Unet(
-            classes=num_classes,
+        self.encoder_sar = get_encoder(
+            encoder_name,
             in_channels=1,
-            activation=None,
-            encoder_name=encoder_name,
-            encoder_weights=None if str(encoder_weights_sar).lower() == "none" else encoder_weights_sar,
-            decoder_attention_type=decoder_attention_type,
+            depth=int(encoder_depth),
+            weights=None if str(encoder_weights_sar).lower() == "none" else encoder_weights_sar,
         )
 
-        # Uczone wagi dla fuzji (tylko dla fusion_mode='weighted')
-        self.logit_alpha = nn.Parameter(torch.tensor(0.0))  # po sigmoidzie: waga RGB w [0,1]
+        encoder_channel_rgb = list(self.encoder_rgb.out_channels)
+        encoder_channel_sar = list(self.encoder_sar.out_channels)
+        if len(encoder_channel_rgb) != len(encoder_channel_sar):
+            raise ValueError(
+                f"Encoder channel lists differ: rgb={len(encoder_channel_rgb)} sar={len(encoder_channel_sar)}"
+            )
+
+        # warstwy fuzji per-level -> sprowadzamy do kanałów RGB (żeby decoder był spójny)
+        # UWAGA: channel_sar NIE jest ignorowany — wpływa na in_channels tej projekcji.
+        # out_channels ustawiamy na channel_rgb celowo: UnetDecoder dostaje encoder_channels=encoder_channel_rgb,
+        # więc fused feature maps muszą mieć takie same liczby kanałów jak gałąź RGB.
+        # 1x1 conv uczy się "wymieszać" (połączyć) informację z RGB+SAR do tej wspólnej przestrzeni.
+        self.fuse_convs = nn.ModuleList()
+        for channel_rgb, channel_sar in zip(encoder_channel_rgb, encoder_channel_sar):
+            in_channel = (channel_rgb + channel_sar) if self.feature_fusion == "concat" else max(channel_rgb, channel_sar)
+            # GroupNorm jest stabilniejszy niż BatchNorm przy batch_size=1 (valid) i AMP.
+            # Dobieramy liczbę grup tak, aby dzieliła channel_rgb.
+            g = 32
+            while g > 1 and (channel_rgb % g) != 0:
+                g //= 2
+            if g < 1:
+                g = 1
+            self.fuse_convs.append(
+                nn.Sequential(
+                    nn.Conv2d(in_channel, channel_rgb, kernel_size=1, bias=False),
+                    nn.GroupNorm(num_groups=g, num_channels=channel_rgb),
+                    nn.ReLU(inplace=True),
+                )
+            )
+
+        # wspólny decoder
+        self.decoder = UnetDecoder(
+            encoder_channels=encoder_channel_rgb,
+            decoder_channels=decoder_channels,
+            n_blocks=int(encoder_depth),
+            use_norm=decoder_use_norm,
+            attention_type=decoder_attention_type,
+            add_center_block=bool(decoder_add_center_block),
+            interpolation_mode="nearest",
+        )
+
+        self.segmentation_head = SegmentationHead(
+            in_channels=int(decoder_channels[-1]),
+            out_channels=int(num_classes),
+            activation=None,
+            kernel_size=3,
+        )
+
+    @staticmethod
+    def _pad_channels(t: torch.Tensor, c: int) -> torch.Tensor:
+        if t.size(1) == c:
+            return t
+        if t.size(1) > c:
+            return t[:, :c]
+        pad = torch.zeros(
+            (t.size(0), c - t.size(1), t.size(2), t.size(3)),
+            device=t.device,
+            dtype=t.dtype,
+        )
+        return torch.cat([t, pad], dim=1)
+
+    def _fuse(self, fr: torch.Tensor, fs: torch.Tensor, conv: nn.Module) -> torch.Tensor:
+        if self.feature_fusion == "concat":
+            x = torch.cat([fr, fs], dim=1)
+        else:
+            max_c = max(fr.size(1), fs.size(1))
+            frp = self._pad_channels(fr, max_c)
+            fsp = self._pad_channels(fs, max_c)
+            x = frp + fsp
+            if self.feature_fusion == "mean":
+                x = 0.5 * x
+        return conv(x)
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
         if x.ndim != 4 or x.size(1) != 4:
@@ -78,18 +161,17 @@ class LateFusionUnet(nn.Module):
         x_rgb = x[:, :3]
         x_sar = x[:, 3:4]
 
-        logits_rgb = self.rgb_model(x_rgb)
-        logits_sar = self.sar_model(x_sar)
+        feats_rgb = self.encoder_rgb(x_rgb)
+        feats_sar = self.encoder_sar(x_sar)
 
-        if self.fusion_mode == "sum":
-            return logits_rgb + logits_sar
+        fused_feats = [self._fuse(fr, fs, conv) for fr, fs, conv in zip(feats_rgb, feats_sar, self.fuse_convs)]
 
-        if self.fusion_mode == "weighted":
-            w_rgb = torch.sigmoid(self.logit_alpha)  # 0..1
-            return w_rgb * logits_rgb + (1.0 - w_rgb) * logits_sar
-
-        # default: mean
-        return 0.5 * (logits_rgb + logits_sar)
+        # SMP 0.5.0: UnetDecoder.forward(features: list[Tensor])
+        dec = self.decoder(fused_feats)
+        logits = self.segmentation_head(dec)
+        if self.safe_nan_to_num:
+            logits = torch.nan_to_num(logits, nan=0.0, posinf=50.0, neginf=-50.0)
+        return logits
 
 
 # =============================================
@@ -103,6 +185,7 @@ def main(args):
     torch.cuda.manual_seed_all(seed)
     torch.backends.cudnn.deterministic = True
     torch.backends.cudnn.benchmark = False
+
     if torch.cuda.is_available():
         try:
             torch.cuda.set_per_process_memory_fraction(0.5, device=0)
@@ -112,29 +195,20 @@ def main(args):
 
     num_classes = len(args.classes) + 1
 
-    model = LateFusionUnet(
+    model = JointFusionUnet(
         num_classes=num_classes,
         encoder_name=args.encoder_name,
         encoder_weights_rgb=args.encoder_weights,
-        encoder_weights_sar=None,  # SAR: domyślnie bez imagenet
+        encoder_weights_sar=None,
         decoder_attention_type="scse",
-        fusion_mode=args.fusion_mode,
+        feature_fusion=args.feature_fusion,
+        encoder_depth=5,
     )
 
     log_number_of_parameters(model)
 
     classes_wt = np.array(
-        [
-            3.0,
-            5.0,
-            1.0,
-            1.0,
-            1.5,
-            1.0,
-            1.0,
-            1.5,
-            1.0,
-        ],
+        [3.0, 5.0, 1.0, 1.0, 1.5, 1.0, 1.0, 1.5, 1.0],
         dtype=np.float32,
     )
     if classes_wt.shape[0] != num_classes:
@@ -158,7 +232,7 @@ def main(args):
         print("Number of GPUs :", torch.cuda.device_count())
         model = torch.nn.DataParallel(model)
 
-    # Optimizer - wspólne grupowanie parametrów jak w innych skryptach
+    # Optimizer - grupowanie parametrów jak w innych skryptach
     target = model.module if hasattr(model, "module") else model
     decay_params = []
     no_decay_params = []
@@ -217,26 +291,25 @@ def main(args):
             "t_max": int(args.t_max),
             "amp": bool(args.amp),
             "grad_clip": float(args.grad_clip) if args.grad_clip is not None else None,
-            "model_name": f"LateFusion_Unet_{args.encoder_name}",
+            "model_name": f"JointFusion_Unet_{args.encoder_name}",
             "criterion": criterion.name if hasattr(criterion, "name") else type(criterion).__name__,
-            "model_type": "late_fusion",
+            "model_type": "joint_fusion",
             "encoder_name": args.encoder_name,
             "encoder_weights_rgb": args.encoder_weights,
             "encoder_weights_sar": None,
-            "class_weights": classes_wt.tolist(),
-            "fusion_mode": args.fusion_mode,
+            "feature_fusion": args.feature_fusion,
         }
 
         run_name = (
-            f"LATEFUSION_Unet_{args.encoder_name}_"
+            f"JOINTFUSION_Unet_{args.encoder_name}_"
             f"{criterion.name if hasattr(criterion, 'name') else type(criterion).__name__}"
             f"_lr-{args.learning_rate}_"
-            f"fusion-{args.fusion_mode}_"
+            f"feat-{args.feature_fusion}_"
             f"augmT{getattr(args, 'train_augm', 'NA')}V{getattr(args, 'valid_augm', 'NA')}"
         )
 
         wandb_run = wandb.init(
-            project=getattr(args, "wandb_project", "LATEFUSION-train"),
+            project=getattr(args, "wandb_project", "FUSION-train"),
             entity=getattr(args, "wandb_entity", None),
             config=wandb_config,
             name=run_name,
@@ -250,12 +323,15 @@ def main(args):
     print("Grad clip          :", args.grad_clip)
     print("Encoder name       :", args.encoder_name)
     print("Encoder weights(RGB):", args.encoder_weights)
-    print("Fusion mode        :", args.fusion_mode)
+    print("Feature fusion     :", args.feature_fusion)
 
     train_model(args, model, optimizer, criterion, device, scheduler, wandb_run=wandb_run)
 
     if wandb_run is not None:
-        wandb_run.finish()
+        try:
+            wandb.finish()
+        except Exception:
+            pass
 
 
 # =============================================
@@ -263,16 +339,15 @@ def main(args):
 # =============================================
 
 def train_model(args, model, optimizer, criterion, device, scheduler=None, wandb_run=None):
-    # Używamy FusionDataset, bo zwraca x z 4 kanałami [R,G,B,SAR]
     train_loader, valid_loader = build_data_loaders(args, FusionDataset)
     os.makedirs(args.save_model, exist_ok=True)
     os.makedirs(args.save_results, exist_ok=True)
 
     model_name = (
-        f"LATE_FUSION_Unet_{args.encoder_name}_"
+        f"JOINT_FUSION_Unet_{args.encoder_name}_"
         f"{criterion.name if hasattr(criterion, 'name') else type(criterion).__name__}"
         f"_lr_{args.learning_rate}_"
-        f"fusion_{args.fusion_mode}_"
+        f"feat_{args.feature_fusion}_"
         f"augmT{getattr(args, 'train_augm', 'NA')}V{getattr(args, 'valid_augm', 'NA')}"
     )
 
@@ -280,7 +355,7 @@ def train_model(args, model, optimizer, criterion, device, scheduler=None, wandb
     bad_epochs = 0
     num_classes = len(args.classes) + 1
 
-    log_path = os.path.join(args.save_results, "train_late_fusion.txt")
+    log_path = os.path.join(args.save_results, "train_joint_fusion.txt")
 
     for epoch in range(args.n_epochs):
         logs_train = S.train_epoch_streaming(
@@ -305,7 +380,7 @@ def train_model(args, model, optimizer, criterion, device, scheduler=None, wandb
         log_epoch_results(log_path, epoch + 1, _get_lr(optimizer), logs_train, logs_valid)
 
         if wandb_run is not None:
-            log_dict = {"epoch": epoch + 1}
+            log_dict: dict[str, float] = {"epoch": float(epoch + 1)}
             try:
                 log_dict["lr"] = float(optimizer.param_groups[0]["lr"])
             except Exception:
@@ -378,7 +453,7 @@ if __name__ == "__main__":
     os.environ["PYTORCH_CUDA_ALLOC_CONF"] = "max_split_size_mb:24"
     os.environ["NO_ALBUMENTATIONS_UPDATE"] = "1"
 
-    parser = argparse.ArgumentParser(description="Training Late Fusion (RGB + SAR) - streaming")
+    parser = argparse.ArgumentParser(description="Training Joint Fusion (2 encoders + shared UNet decoder)")
     parser.add_argument("--seed", type=int, default=0)
     parser.add_argument("--n_epochs", type=int, default=100)
     parser.add_argument("--batch_size", type=int, default=4)
@@ -398,9 +473,23 @@ if __name__ == "__main__":
     parser.add_argument("--encoder_name", type=str, default="efficientnet-b4")
     parser.add_argument("--encoder_weights", type=str, default="imagenet")
 
-    # LATE FUSION SPECIFIC
-    parser.add_argument("--fusion_mode", type=str, default="mean", choices=["mean", "sum", "weighted"],
-        help="Jak łączyć logity: mean (średnia), sum (suma), weighted (uczony blending).")
+    # JOINT FUSION SPECIFIC
+    parser.add_argument(
+        "--feature_fusion",
+        type=str,
+        default="concat",
+        choices=["concat", "sum", "mean"],
+        help="Jak łączyć cechy (skip+bottleneck): concat / sum / mean",
+    )
+
+    # SAR normalizacja (dla FusionDataset)
+    parser.add_argument(
+        "--sar_normalize",
+        type=str,
+        default="global",
+        choices=["global", "per_sample", "none"],
+        help="Normalizacja SAR: global (mean/std z datasetu), per_sample, none",
+    )
 
     # SCHEDULER / EARLY STOPPING
     parser.add_argument("--scheduler", type=str, choices=["plateau", "cosine", "none"], default="plateau")

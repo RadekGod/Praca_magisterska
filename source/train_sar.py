@@ -112,7 +112,6 @@ def main(args):
             patience=int(args.lr_patience),
             threshold=float(args.min_delta),
             min_lr=float(args.min_lr),
-            verbose=True,
         )
     elif args.scheduler == "cosine":
         scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(
@@ -259,10 +258,15 @@ def train_model(args, model, optimizer, criterion, device, scheduler=None, wandb
 
         score = logs_valid["iou"]
         if scheduler is not None:
+            previous_learning_rates = [g["lr"] for g in optimizer.param_groups]
             if isinstance(scheduler, ReduceLROnPlateau):
                 scheduler.step(score)
             else:
                 scheduler.step()
+
+            new_learning_rates = [g["lr"] for g in optimizer.param_groups]
+            if new_learning_rates != previous_learning_rates:
+                print(f"LR changed: {previous_learning_rates} -> {new_learning_rates}")
 
         improvement = score - (max_score if max_score != -float("inf") else score)
 

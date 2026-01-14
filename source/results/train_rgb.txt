@@ -32926,3 +32926,101 @@ Per-class F1 (Valid):
   class_7: 0.784884
   class_8: 0.817709
 
+Epoch: 1 (lr: 0.001, 0.001)
+Train Loss: 2.341135, Valid Loss: 1.899603
+Train IoU: 0.264345, Valid IoU: 0.354910
+Train Dice: 0.386244, Valid Dice: 0.477576
+Train Acc: 0.449680, Valid Acc: 0.619619
+Train Prec: 0.400484, Valid Prec: 0.465624
+Train Rec: 0.393782, Valid Rec: 0.536850
+Train F1: 0.386243, Valid F1: 0.477576
+Per-class IoU (Train):
+  class_0: 0.610676
+  class_1: 0.021800
+  class_2: 0.309259
+  class_3: 0.295918
+  class_4: 0.130483
+  class_5: 0.329977
+  class_6: 0.400296
+  class_7: 0.012059
+  class_8: 0.268636
+Per-class IoU (Valid):
+  class_0: 0.206478
+  class_1: 0.049328
+  class_2: 0.455329
+  class_3: 0.414936
+  class_4: 0.254851
+  class_5: 0.618875
+  class_6: 0.727335
+  class_7: 0.000000
+  class_8: 0.467054
+Per-class F1 (Train):
+  class_0: 0.758286
+  class_1: 0.042670
+  class_2: 0.472419
+  class_3: 0.456692
+  class_4: 0.230844
+  class_5: 0.496214
+  class_6: 0.571731
+  class_7: 0.023832
+  class_8: 0.423504
+Per-class F1 (Valid):
+  class_0: 0.342282
+  class_1: 0.094019
+  class_2: 0.625740
+  class_3: 0.586509
+  class_4: 0.406186
+  class_5: 0.764574
+  class_6: 0.842147
+  class_7: 0.000000
+  class_8: 0.636724
+
+Epoch: 2 (lr: 0.001, 0.001)
+Train Loss: 2.080922, Valid Loss: 1.929609
+Train IoU: 0.346284, Valid IoU: 0.389525
+Train Dice: 0.471483, Valid Dice: 0.511265
+Train Acc: 0.533804, Valid Acc: 0.602505
+Train Prec: 0.472837, Valid Prec: 0.553256
+Train Rec: 0.475814, Valid Rec: 0.526873
+Train F1: 0.471483, Valid F1: 0.511265
+Per-class IoU (Train):
+  class_0: 0.782160
+  class_1: 0.059076
+  class_2: 0.388309
+  class_3: 0.327256
+  class_4: 0.233926
+  class_5: 0.452329
+  class_6: 0.547665
+  class_7: 0.000218
+  class_8: 0.325615
+Per-class IoU (Valid):
+  class_0: 0.705015
+  class_1: 0.064804
+  class_2: 0.444972
+  class_3: 0.387433
+  class_4: 0.331262
+  class_5: 0.648506
+  class_6: 0.693451
+  class_7: 0.000750
+  class_8: 0.229536
+Per-class F1 (Train):
+  class_0: 0.877766
+  class_1: 0.111561
+  class_2: 0.559399
+  class_3: 0.493131
+  class_4: 0.379157
+  class_5: 0.622902
+  class_6: 0.707731
+  class_7: 0.000436
+  class_8: 0.491266
+Per-class F1 (Valid):
+  class_0: 0.826989
+  class_1: 0.121720
+  class_2: 0.615890
+  class_3: 0.558489
+  class_4: 0.497666
+  class_5: 0.786780
+  class_6: 0.818980
+  class_7: 0.001498
+  class_8: 0.373369
+

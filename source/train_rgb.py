@@ -134,8 +134,7 @@ def main(args):
             factor=0.5,
             patience=int(args.lr_patience),
             threshold=float(args.min_delta),
-            min_lr=float(args.min_lr),
-            verbose=True,
+            min_lr=float(args.min_lr)
         )
     elif args.scheduler == "cosine":
         scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(
@@ -293,10 +292,15 @@ def train_model(args, model, optimizer, criterion, device, scheduler=None, wandb
         # --- LR scheduler ---
         score = logs_valid["iou"]
         if scheduler is not None:
+            previous_learning_rates = [g["lr"] for g in optimizer.param_groups]
             if isinstance(scheduler, ReduceLROnPlateau):
                 scheduler.step(score)
             else:
                 scheduler.step()
+
+            new_learning_rates = [g["lr"] for g in optimizer.param_groups]
+            if new_learning_rates != previous_learning_rates:
+                print(f"LR changed: {previous_learning_rates} -> {new_learning_rates}")
 
         # --- EARLY STOPPING + checkpoint ---
         # Jeśli nastąpi poprawa (większe IoU) zapisujemy checkpoint i resetujemy licznik "złych" epok.
@@ -343,7 +347,7 @@ def train_model(args, model, optimizer, criterion, device, scheduler=None, wandb
 # Parametry domyślne można nadpisać przez CLI.
 # =============================================
 if __name__ == "__main__":
-    os.environ["PYTORCH_CUDA_ALLOC_CONF"] = "max_split_size_mb:24"
+    os.environ["PYTORCH_ALLOC_CONF"] = "max_split_size_mb:24"
     os.environ["NO_ALBUMENTATIONS_UPDATE"] = "1"
     parser = argparse.ArgumentParser(description='Model Training RGB')
     parser.add_argument('--seed', type=int, default=0)
