@@ -25,7 +25,7 @@ from source.utils import log_epoch_results, _get_lr, log_number_of_parameters
 # Funkcja `main` inicjalizuje wszystkie komponenty potrzebne do treningu:
 # - ustawia ziarno losowości (reproducibility), opcje cudnn
 # - tworzy model (UNet z EfficientNet-B4) i kryterium strat
-# - przenosi model na GPU(y) i opakowuje w DataParallel jeśli jest więcej niż 1 GPU
+# - przenosi model na GPU i opakowuje w DataParallel jeśli jest więcej niż 1 GPU
 # - tworzy optimizer (AdamW z grupowaniem parametrów) oraz scheduler
 # - opcjonalnie inicjalizuje Weights & Biases (wandb)
 # - uruchamia pętlę treningową `train_model`
@@ -68,6 +68,8 @@ def main(args):
     ],
         dtype=np.float32,
     )
+
+    #Sprawdzamy czy długość wag klas zgadza się z liczbą klas
     if classes_wt.shape[0] != len(args.classes) + 1:
         raise ValueError(f"classes_wt length {classes_wt.shape[0]} != num_classes {len(args.classes) + 1}")
 
