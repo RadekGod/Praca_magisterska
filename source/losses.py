@@ -1,3 +1,28 @@
+"""Lossy do segmentacji (moduł.
+
+Zawiera implementacje strat używanych w projekcie:
+
+- DiceLoss: miękki (soft) Dice loss dla segmentacji wieloklasowej.
+  Oczekuje, że 'logits' to surowe wyjścia sieci (bez softmax) o kształcie [B, C, H, W],
+  a 'target' to one-hot [B, C, H, W].
+
+- WeightedCEPlusDice: kombinacja ważonej CrossEntropy (liczonej na indeksach klas)
+  i Dice (liczonego na softmax + one-hot). Przydatne, gdy chcemy łączyć cechy obu strat.
+
+- CEWithLogitsLoss: wrapper na CrossEntropy, który przyjmuje target w formie one-hot
+  i robi argmax wewnątrz.
+
+Konwencje i uwagi:
+- "logits" to surowe wartości wyjściowe sieci (nieprobabilistyczne); DiceLoss sam
+  wykona softmax przed obliczeniami.
+- "target" powinien być one-hot [B, C, H, W] jeśli loss tego wymaga (Dice, WeightedCEPlusDice,
+  CEWithLogitsLoss). Jeśli używasz transformacji, upewnij się że target jest skonwertowany
+  do one-hot przed wywołaniem tych strat.
+- CrossEntropy w PyTorch oczekuje indeksów klas; klasy, które przyjmują one-hot,
+  konwertują go wewnętrznie przez argmax(dim=1).
+
+"""
+
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
@@ -5,11 +30,24 @@ import torch.nn.functional as F
 class DiceLoss(nn.Module):
     """Soft Dice loss dla segmentacji wieloklasowej.
 
-    Oczekuje:
-    - logits: [B, C, H, W]
-    - target: one-hot [B, C, H, W] (tak jak u Ciebie po ToTensor)
+    Opis:
+    - Liczy "miękki" Dice score na podstawie prawdopodobieństw (softmax(logits)) przeciw
+      one-hot target.
 
-    include_background=False zwykle pomaga, gdy background dominuje.
+    Argumenty konstrukora:
+    - smooth (float): czynnik stabilizujący w liczniku i mianowniku (domyślnie 1.0).
+    - include_background (bool): czy wliczać kanał tła (indeks 0). Jeżeli False i
+      jest więcej niż 1 klasa, tło zostanie wycięte (przydatne, gdy tło dominuje).
+
+    Kształty:
+    - logits: torch.Tensor o kształcie [B, C, H, W]
+    - target: torch.Tensor one-hot o kształcie [B, C, H, W]
+
+    Zwraca:
+    - skalarna strata (tensor) typu float.
+
+    Błędy:
+    - ValueError jeśli `target.ndim != 4` (oczekiwany one-hot [B,C,H,W]).
     """
 
     def __init__(self, smooth: float = 1.0, include_background: bool = False):
@@ -36,10 +74,26 @@ class DiceLoss(nn.Module):
 
 
 class WeightedCEPlusDice(nn.Module):
-    """Kombinacja: weighted CrossEntropy + Dice.
+    """Kombinacja: ważona CrossEntropy + Dice.
 
-    - WCE: liczone po indeksach klas (target.argmax(1))
-    - Dice: liczone na softmax i one-hot
+    Opis:
+    - CrossEntropy (ważona): liczone na indeksach klas (target.argmax(dim=1)).
+    - Dice: liczone na softmax(logits) i na one-hot target.
+
+    Argumenty konstrukora:
+    - class_weights: lista/ndarray/tensor wag dla CrossEntropy (długość = liczba klas).
+    - ce_weight (float): waga składowej CrossEntropy w łącznej stracie.
+    - dice_weight (float): waga składowej Dice w łącznej stracie.
+    - dice_smooth (float): parametr smooth przekazywany do DiceLoss.
+    - dice_include_background (bool): czy wliczać kanał tła w DiceLoss.
+    - device (str): device na którym umieszczone zostaną wagi (np. "cuda" lub "cpu").
+
+    Kształty i zachowanie:
+    - logits: [B, C, H, W]
+    - target: one-hot [B, C, H, W]
+
+    Zwraca:
+    - skalarna strata będąca sumą ważonych składowych CE i Dice.
     """
 
     def __init__(self, class_weights, ce_weight: float = 1.0, dice_weight: float = 1.0,
@@ -60,6 +114,24 @@ class WeightedCEPlusDice(nn.Module):
 
 
 class CEWithLogitsLoss(nn.Module):
+    """CrossEntropy loss, przyjmujący target w formie one-hot.
+
+    Opis:
+    - Przyjmuje w konstruktorze wagi (numpy array) i device.
+    - W forward robi argmax(target, dim=1) i wywołuje nn.CrossEntropyLoss.
+
+    Argumenty konstrukora:
+    - weights: numpy array wag dla klas.
+    - device: nazwa urządzenia, na które przeniesione są wagi (domyślnie "cuda").
+
+    Kształty:
+    - input / logits: [B, C, H, W]
+    - target: one-hot [B, C, H, W]
+
+    Zwraca:
+    - skalarna strata CrossEntropy.
+    """
+
     def __init__(self, weights, device="cuda"):
         super().__init__()
         self.weight = torch.from_numpy(weights).float().to(device)

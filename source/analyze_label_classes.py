@@ -1,3 +1,25 @@
+"""Analiza rozkładu klas w maskach etykiet (.tif).
+
+Skrypt przetwarza wszystkie pliki z maskami w zadanym katalogu i liczy
+wystąpienia wartości pikseli (klas). Wynikiem jest tabela z liczbą pikseli
+na klasę oraz udziałem procentowym względem wszystkich pikseli.
+
+Konwencje:
+- Maski powinny być 2D (H, W) z integer-ami reprezentującymi klasy (np. 0..C-1).
+- Skrypt używa PIL do wczytywania obrazów; jeżeli obraz ma tryb inny niż
+  "L" lub "I", zostanie przekonwertowany do 8-bitowego trybu szarości "L".
+- Funkcja `update_class_counts` oczekuje maski jako numpy.ndarray; wartości
+  są zliczane za pomocą np.unique.
+
+Przykład użycia:
+  python analyze_label_classes.py --labels-dir dataset/train/labels --ext .tif
+
+Zwracane informacje:
+- wypisywana jest liczba plików, liczba błędów wczytywania, a następnie
+  tabela: klasa | piksele | udział [%].
+
+"""
+
 import argparse
 from pathlib import Path
 from typing import List, Dict
@@ -7,6 +29,15 @@ from PIL import Image
 
 
 def parse_args() -> argparse.Namespace:
+    """Parsuje argumenty wiersza poleceń i zwraca Namespace.
+
+    Opcje:
+    - --labels-dir: katalog zawierający pliki etykiet (domyślnie ../dataset/train/labels)
+    - --ext: rozszerzenie plików (np. .tif)
+
+    Zwraca:
+    - argparse.Namespace z atrybutami labels_dir i ext.
+    """
     parser = argparse.ArgumentParser(
         description=(
             "Analiza rozkładu klas w maskach etykiet. "
@@ -35,8 +66,21 @@ def parse_args() -> argparse.Namespace:
 def find_label_files(labels_dir: Path, ext: str) -> List[Path]:
     """Zwraca posortowaną listę plików etykiet o zadanym rozszerzeniu.
 
-    Nie przeszukujemy rekurencyjnie ani nie filtrujemy po plikach ukrytych,
-    bo scenariusz jest prosty: pojedynczy katalog z ~4000 plików .tif.
+    Szczegóły:
+    - Nie przeszukujemy rekurencyjnie; oczekujemy jednego katalogu zawierającego
+      pliki z etykietami (np. ~4000 plików). Funkcja filtruje po rozszereniu
+      (case-insensitive) i zwraca posortowaną listę Path.
+
+    Parametry:
+    - labels_dir: Path do katalogu z plikami etykiet.
+    - ext: rozszerzenie plików, z lub bez kropki (np. '.tif' lub 'tif').
+
+    Zwraca:
+    - list[Path]: posortowana lista plików pasujących do wzorca.
+
+    Zachowanie w przypadku błędów:
+    - Jeżeli katalog nie istnieje lub nie jest katalogiem, funkcja wypisze komunikat
+      i zwróci pustą listę.
     """
 
     if not labels_dir.exists() or not labels_dir.is_dir():
@@ -58,8 +102,20 @@ def find_label_files(labels_dir: Path, ext: str) -> List[Path]:
 def load_mask_pil(path: Path) -> np.ndarray:
     """Wczytuje maskę jako obraz 2D (H, W) z zachowaniem wartości pikseli.
 
-    Używamy PIL i konwertujemy do trybu "L" (8-bit szarości), jeśli to konieczne.
-    To w zupełności wystarczy, jeśli klasy są zakodowane jako wartości 0..255.
+    Szczegóły:
+    - Używamy PIL i konwertujemy do trybu "L" (8-bit szarości), jeśli to konieczne.
+    - Jeżeli obraz ma więcej kanałów (np. RGB), bierzemy pierwszy kanał po konwersji.
+    - Funkcja zwraca numpy.ndarray z typem odpowiadającym wartościom pikseli (np. uint8).
+
+    Parametry:
+    - path: Path do pliku z maską.
+
+    Zwraca:
+    - np.ndarray o wymiarach (H, W) z wartościami klas jako integer.
+
+    Uwaga:
+    - Funkcja zakłada, że klasy mieszczą się w zakresie typów obsługiwanych przez PIL
+      (zwykle 0..255 dla trybu 'L'). Jeśli potrzebujesz innego zakresu, rozważ inny loader.
     """
 
     with Image.open(path) as img:
@@ -75,8 +131,13 @@ def load_mask_pil(path: Path) -> np.ndarray:
 def update_class_counts(counts: Dict[int, int], mask: np.ndarray) -> None:
     """Aktualizuje słownik `counts` o zliczenia wartości pikseli w `mask`.
 
-    Używa np.unique, więc jest bardzo szybkie i pamięciooszczędne
-    w porównaniu z iterowaniem po każdym pikselu w Pythonie.
+    Parametry:
+    - counts: słownik mapujący id_klasy -> liczba_pikseli; jest modyfikowany in-place.
+    - mask: numpy.ndarray 2D z wartościami klas (integer).
+
+    Szczegóły implementacji:
+    - Używa np.unique(mask, return_counts=True) do szybkiego zliczania unikatów.
+    - Pozwala skalować do dużych zestawów plików bez iteracji po pikselach w Pythonie.
     """
 
     values, pix_counts = np.unique(mask, return_counts=True)
@@ -86,6 +147,16 @@ def update_class_counts(counts: Dict[int, int], mask: np.ndarray) -> None:
 
 
 def main() -> None:
+    """Główna funkcja skryptu: parsuje argumenty, zlicza klasy i drukuje podsumowanie.
+
+    Efekt działania:
+    - Wczytuje listę plików z katalogu etykiet, iteruje po nich, zliczając wartości pikseli.
+    - Na końcu drukuje tabelę z liczbą pikseli na klasę i udziałem percentowym.
+
+    Obsługa błędów:
+    - Problemy z wczytaniem pojedynczego pliku są logowane jako ostrzeżenia i nie przerywają
+      działania skryptu (plik jest pomijany).
+    """
     args = parse_args()
 
     labels_dir = Path(args.labels_dir).resolve()

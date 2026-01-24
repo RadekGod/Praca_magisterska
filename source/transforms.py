@@ -1,11 +1,41 @@
+"""Moduł `transforms`.
+
+Zawiera narzędzia do przetwarzania obrazów i masek przed trenowaniem i ewaluacją.
+
+Główne elementy:
+- ToTensor: konwertuje próbkę (słownik z kluczami 'image' i 'mask') na tensory PyTorch
+  oraz normalizuje kanały. Obsługuje obrazy RGB, SAR (jednokanałowe) oraz kombinacje
+  (np. RGB + dodatkowy kanał SAR).
+
+- compute_sar_stats(paths, ...): oblicza globalne mean/std dla kanału SAR pośród podanych plików.
+
+- class_aware_random_crop / _random_crop_np: funkcje do losowego cropowania, z opcją
+  preferowania regionów zawierających daną klasę maski.
+
+- train_augm1/2/3 i valid_augm1/2/3: predefiniowanie pipeline'y augmentacji o różnym stopniu
+  agresywności (od minimalnego do mocnego). Zwracają obiekt z kluczami 'image' i 'mask'
+  zgodny ze zwracanym formatem przez albumentations.
+
+Format wejściowy `sample`:
+    sample: dict z kluczami:
+        - 'image': numpy.ndarray, kształt HxW lub HxWXC, wartości [0..255] lub float
+        - 'mask': numpy.ndarray, kształt HxW, typ integer (klasy)
+
+Zwracane formaty:
+    Większość funkcji zwraca słownik {'image': image, 'mask': mask} (tak jak albumentations).
+
+Uwaga:
+    Ten plik skupia się na kompatybilności pipeline'u z danymi satelitarnymi (RGB + SAR)
+    i zawiera konwencje normalizacji: ImageNet dla RGB, opcjonalnie globalne lub per-sample
+    dla SAR.
+"""
+
 import warnings
 import albumentations as A
 import numpy as np
 import torchvision.transforms.functional as TF
 import torch
 import rasterio
-
-# reference: https://albumentations.ai/
 
 warnings.simplefilter("ignore")
 
@@ -15,20 +45,46 @@ IMAGENET_STD = np.array([0.229, 0.224, 0.225], dtype=np.float32)
 
 
 class ToTensor:
-    def __init__(self, classes=None, sar_mean=None, sar_std=None, sar_normalize='global'):
-        """
-        Convert sample dict to tensors and apply normalization.
+    """Konwerter próbki do tensorów PyTorch i normalizator kanałów.
 
-        - classes: optional list of class values for mask one-hot encoding (keeps backward compat)
-        - sar_mean, sar_std: optional floats (on [0,1] scale) to normalize SAR channel globally
-        - sar_normalize: 'global' | 'per_sample' | 'none'
-        """
+    Przeznaczenie:
+        Przygotowuje dane wejściowe modelu: konwertuje maski do tensorów (opcjonalnie one-hot z
+        backgroundem na pierwszym kanale), konwertuje obrazy do postaci CxHxW oraz normalizuje
+        kanały:
+          - RGB: standard ImageNet (mean/std zdefiniowane w module)
+          - SAR: opcje normalizacji: 'global' (używa podanych sar_mean/sar_std), 'per_sample' (liczy
+                 mean/std na próbce), lub 'none'
+
+    Argumenty konstruktora (przekazywane do __init__):
+        classes: opcjonalna lista wartości klas (np. [1,2,3]) używana do konwersji maski na one-hot
+        sar_mean, sar_std: opcjonalne wartości float do globalnej normalizacji SAR (skala [0,1])
+        sar_normalize: 'global' | 'per_sample' | 'none'
+
+    Format wejściowy:
+        sample: dict z 'image' (H,W lub H,W,C) i 'mask' (H,W). Wartości obrazów w skali 0..255
+
+    Zwracane wartości:
+        Zmodyfikowany sample (dict) z polami:
+          - 'image': torch.FloatTensor CxHxW
+          - 'mask': torch.FloatTensor (jednokanałowa float lub one-hot CxHxW jeśli classes podane)
+    """
+
+    def __init__(self, classes=None, sar_mean=None, sar_std=None, sar_normalize='global'):
+        """Inicjalizuje konwerter."""
         self.classes = classes
         self.sar_mean = float(sar_mean) if sar_mean is not None else None
         self.sar_std = float(sar_std) if sar_std is not None else None
         self.sar_normalize = sar_normalize
 
     def __call__(self, sample):
+        """Wykonuje konwersję i normalizację na pojedynczej próbce.
+
+        Argumenty:
+            sample (dict): wejściowa próbka z kluczami 'image' (ndarray) i 'mask' (ndarray)
+
+        Zwraca:
+            dict: próbka z 'image' i 'mask' przekonwertowanymi na tensory PyTorch.
+        """
         # mask -> one-hot with background first if classes provided
         if self.classes:
             msks = [(sample["mask"] == v) for v in self.classes]
@@ -96,10 +152,11 @@ class ToTensor:
 def compute_sar_stats(paths, load_fn=None, replace_from='labels', replace_to='sar_images', max_files=None,
                       verbose=False):
     """
-    Compute global mean/std for SAR channel across provided list of paths.
-    - paths: list of label paths or SAR paths
-    - load_fn: optional function(path)->ndarray; if None, rasterio is used
-    Returns (mean, std) on [0,1] scale.
+    Oblicza globalne wartości średniej i odchylenia standardowego (mean/std) dla kanału SAR
+    na podstawie podanej listy ścieżek.
+    - paths: lista ścieżek do plików etykiet lub do plików SAR
+    - load_fn: opcjonalna funkcja load_fn(path) -> ndarray; jeśli None, używany jest rasterio
+    Zwraca (mean, std) w skali [0,1].
     """
     total = 0
     sum_ = 0.0
@@ -211,9 +268,19 @@ def class_aware_random_crop(sample, size: int, target_class: int = 1, p: float =
 
 
 # --- augmentations: proste, sensowne dla RGB i SAR ---
-
-# train_augm1: minimalne augmentacje – tylko pad + crop (baseline)
 def train_augm1(sample, size=512, crop_cfg=None):
+    """Minimalne augmentacje treningowe: tylko pad + crop.
+
+    Przydatne jako baseline – nie wprowadza losowych transformacji poza przycięciem.
+
+    Argumenty:
+        sample (dict): wejściowy słownik z 'image' i 'mask'
+        size (int): docelowy rozmiar cropu/resize
+        crop_cfg (dict|None): konfiguracja cropu (opcjonalne klucze: enabled, target_class, p, max_tries, min_pixels)
+
+    Zwraca:
+        dict: wynik działania pipeline albumentations z polami 'image' i 'mask'
+    """
     crop_cfg = crop_cfg or {}
     augms = [
         A.PadIfNeeded(size, size, border_mode=0, value=0, p=1.0),
@@ -235,12 +302,21 @@ def train_augm1(sample, size=512, crop_cfg=None):
 
 
 def valid_augm1(sample, size=512):
+    """Funkcja augmentacji dla walidacji odpowiadająca `train_augm1` bez losowości.
+
+    Zwraca obraz i maskę przeskalowane do `size` x `size`.
+    """
     augms = [A.Resize(height=size, width=size, p=1.0)]
     return A.Compose(augms)(image=sample['image'], mask=sample['mask'])
 
 
 # train_augm2: łagodne, uniwersalne augmentacje (geometria + lekka degradacja)
 def train_augm2(sample, size=512, crop_cfg=None):
+    """Łagodne augmentacje treningowe: geometria + lekka degradacja jakości.
+
+    Zawiera: przesunięcia, skalowanie, rotację, flipy, oraz opcjonalny blur/gauss noise.
+    Przydatne do zwiększenia różnorodności danych bez silnej zmiany kolorystyki.
+    """
     crop_cfg = crop_cfg or {}
     augms = [
         # prosta geometria
@@ -278,13 +354,19 @@ def train_augm2(sample, size=512, crop_cfg=None):
 
 
 def valid_augm2(sample, size=512):
-    # Walidacja: brak losowych augmentacji, tylko zmiana rozmiaru.
+    """Walidacyjne odpowiedniki `train_augm2` – deterministyczne (tylko resize).
+    """
     augms = [A.Resize(height=size, width=size, p=1.0)]
     return A.Compose(augms)(image=sample['image'], mask=sample['mask'])
 
 
 # train_augm3: mocniejsze augmentacje, nadal bez operacji typowo kolorystycznych
 def train_augm3(sample, size=512, crop_cfg=None):
+    """Mocniejsze augmentacje treningowe: większe transformacje geometryczne i degradacja obrazu.
+
+    Zawiera: silniejsze ShiftScaleRotate, Downscale, MaskDropout (usuwanie obiektów), oraz mieszankę
+    szumu/blur/sharpen. Nadaje się gdy chcemy mocniej uodpornić model na zakłócenia.
+    """
     crop_cfg = crop_cfg or {}
     augms = [
         A.ShiftScaleRotate(
@@ -332,5 +414,7 @@ def train_augm3(sample, size=512, crop_cfg=None):
 
 
 def valid_augm3(sample, size=512):
+    """Walidacyjne odpowiedniki `train_augm3` – deterministyczne (tylko resize).
+    """
     augms = [A.Resize(height=size, width=size, p=1.0)]
     return A.Compose(augms)(image=sample['image'], mask=sample['mask'])

@@ -1,3 +1,32 @@
+"""Datasety i narzędzia do ładowania obrazów i masek.
+
+Ten moduł zawiera:
+- funkcje pomocnicze do ładowania tiff-ów: `load_multiband`, `load_grayscale`,
+  `get_crs`, `save_img`.
+- funkcję `_pick_augm` wybierającą tryb augmentacji z modułu `transforms`.
+- klasę `Dataset` (rozszerzenie torch.utils.data.Dataset) oraz wyspecjalizowane
+  dataset'y: `SARDataset`, `RGBDataset`, `FusionDataset`.
+
+Konwencje i ważne uwagi:
+- Maski (labels) na wejściu w większości operacji są w formacie integer, tzn.
+  mapa etykiet z wartościami [0..C-1]. Transformacje i oversampling (class-aware crop)
+  działają na tej formie PRZED konwersją do one-hot.
+- One-hot w tym kontekście oznacza tensor o kształcie [B, C, H, W] (lub [C, H, W]
+  dla pojedynczego przykładu), gdzie dla każdej klasy jest oddzielny kanał z wartościami 0/1.
+  Większość strat (lossów) oczekuje target w formie one-hot lub konwertuje go przez argmax
+  przy użyciu CrossEntropy.
+- Opis działania "class-aware crop" (oversampling):
+  Działa na masce w formacie integer (przed one-hot). Jeśli żądanej klasy nie ma
+  w oknie lub nie uda się znaleźć odpowiedniego wycinka w `max_tries`, wykonany
+  zostanie zwykły losowy crop.
+
+Obsługiwane typy obrazów:
+- SAR: jednoskanalowy (H, W) — używane przez `SARDataset`.
+- RGB: wielokanałowy (H, W, 3) — używane przez `RGBDataset`.
+- Fuzja SAR+RGB: kanały sklejone wzdłuż osi kanałów (H, W, 4) — używane przez `FusionDataset`.
+
+"""
+
 import numpy as np
 import rasterio
 from torch.utils.data import Dataset as BaseDataset
@@ -38,9 +67,14 @@ def save_img(path, img, crs, transform):
 
 
 def _pick_augm(train: bool, train_augm: Optional[int], valid_augm: Optional[int]):
-    """Zwraca funkcję augmentacji z modułu transforms na podstawie numeru trybu.
+    """Zwraca funkcję augmentacji z modułu `transforms` na podstawie numeru trybu.
 
-    train_augm/valid_augm: 1,2,3 lub None (None => domyślnie 1).
+    Parametry:
+    - train (bool): czy dataset jest w trybie treningowym.
+    - train_augm / valid_augm: numer trybu augmentacji (1,2,3) lub None (domyślnie 1).
+
+    Zwraca:
+    - callable: funkcję augmentacji (np. T.train_augm1 / T.valid_augm2).
     """
     if train:
         idx = train_augm or 1
@@ -83,11 +117,42 @@ class Dataset(BaseDataset):
         oversample_min_pixels: int = 20,
         oversample_max_tries: int = 30,
     ):
-        """label_list: list of label file paths (contains 'labels' in path)
-        If compute_stats=True and train=True, dataset will compute global SAR mean/std
-        using T.compute_sar_stats and the module-level load_grayscale.
+        """Inicjalizacja datasetu.
 
-        train_augm / valid_augm - numery trybów augmentacji (1..3) dla treningu / walidacji.
+        Parametry wejściowe:
+        - label_list: lista ścieżek do plików z etykietami (ścieżka powinna zawierać
+          segment "labels" aby funkcje loadera mogły z niej wywnioskować ścieżki do
+          obrazów: "sar_images" i/lub "rgb_images").
+        - classes: lista klas (przekazywana do ToTensor, opcjonalnie używana przy one-hot).
+        - size: rozmiar cropu używany podczas treningu (domyślnie 128).
+        - train: czy dataset jest w trybie treningowym (wpływa na augmentacje i oversampling).
+        - sar_mean, sar_std: statystyki SAR (jeżeli compute_stats=True można je obliczyć automatycznie).
+        - compute_stats: jeżeli True i train=True, dataset policzy globalne średnie/std dla SAR
+          używając `T.compute_sar_stats` i funkcji `load_grayscale`.
+        - sar_normalize: tryb normalizacji SAR (np. 'global' lub 'per_image').
+        - train_augm / valid_augm: numer trybu augmentacji (1..3) dla treningu / walidacji.
+
+        Class-aware crop / oversampling (parametry):
+        - class_aware_crop (bool): włącza próbę cropów skoncentrowanych na danej klasie.
+        - oversample_class (int): indeks klasy docelowej, której próbujemy "oversamplować".
+        - oversample_p (float): prawdopodobieństwo, że dany sample będzie poddany class-aware crop.
+        - oversample_min_pixels (int): minimalna liczba pikseli klasy w oknie, żeby przyjąć crop.
+        - oversample_max_tries (int): maksymalna liczba prób znalezienia okna spełniającego warunek.
+
+        Uwaga:
+        - Konfiguracja cropów (`self.crop_cfg`) działa na masce w formacie integer (przed one-hot).
+          Jeśli żądanej klasy nie ma w oknie lub nie uda się znaleźć odpowiedniego wycinka
+          w `max_tries`, wykonywany jest zwykły losowy crop.
+
+        Metoda tworzy pomocnicze obiekty:
+        - self.augm: wybrana funkcja augmentacji z modułu `transforms`.
+        - self.to_tensor: obiekt `T.ToTensor` z informacjami o normalizacji SAR i listą klas.
+
+        Przykładowe kształty/formaty:
+        - obraz SAR ładowany przez `load_grayscale`: (H, W) -> po `ToTensor`: [1, H, W]
+        - obraz RGB ładowany przez `load_multiband`: (H, W, 3) -> po `ToTensor`: [3, H, W]
+        - maska ładowana jako (H, W) z wartościami int (0..C-1); `ToTensor` może zamienić
+          ją na one-hot [C, H, W] jeśli to wymagane przez dalsze przetwarzanie.
         """
         self.fns = label_list
         self.augm = _pick_augm(train=train, train_augm=train_augm, valid_augm=valid_augm)
@@ -137,6 +202,7 @@ class Dataset(BaseDataset):
 #   Dataset dla obrazów SAR (1 kanał)
 # =============================================
 class SARDataset(Dataset):
+    """Dataset dla obrazów SAR (1 kanał)."""
     def __getitem__(self, idx):
         img = self.load_grayscale(self.fns[idx].replace("labels", "sar_images"))
         msk = self.load_grayscale(self.fns[idx])
@@ -153,6 +219,7 @@ class SARDataset(Dataset):
 #   Dataset dla obrazów RGB (3 kanały)
 # =============================================
 class RGBDataset(Dataset):
+    """Dataset dla obrazów RGB (3 kanały)."""
     def __getitem__(self, idx):
         img = self.load_multiband(self.fns[idx].replace("labels", "rgb_images"))
         msk = self.load_grayscale(self.fns[idx])
@@ -167,6 +234,7 @@ class RGBDataset(Dataset):
 #   Dataset dla fuzji SAR+RGB (4 kanały: R,G,B,SAR)
 # =============================================
 class FusionDataset(Dataset):
+    """Dataset dla fuzji SAR+RGB; zwraca obraz z kanałami [R,G,B,SAR] (4 kanały)."""
     def __getitem__(self, idx):
         # Ścieżki obrazów bazując na etykiecie
         rgb_path = self.fns[idx].replace("labels", "rgb_images")

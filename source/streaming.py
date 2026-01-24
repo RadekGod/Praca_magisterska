@@ -1,3 +1,23 @@
+"""Moduł `streaming` — narzędzia do trenowania/ewaluacji w trybie strumieniowym.
+
+Zawiera pomocnicze funkcje i pętle epokowe zoptymalizowane pod względem pamięci:
+- Konwersje targetów (one-hot -> indeks klasy)
+- Aktualizacja macierzy pomyłek (z przetwarzaniem po kawałkach, by nie alokować dużych wektorów)
+- Wyliczanie metryk segmentacyjnych z macierzy pomyłek (IoU, Dice, Precision, Recall, F1, accuracy)
+- Pętle `train_epoch_streaming` i `valid_epoch_streaming` wspierające mixed precision (AMP)
+  oraz bezpieczne liczenie strat (z pomijaniem batchy z NaN/Inf)
+
+Konwencje i założenia:
+- Wejściowe tensory `y` mogą być one-hot (B, C, H, W) lub indeksowe (B, 1, H, W) —
+  funkcja `to_index_targets` konwertuje do indeksów klas.
+- `update_confusion_matrix` zakłada, że `preds` i `targets` to tensory z indeksami klas (int),
+  i że klasy należą do zakresu [0, num_classes-1]. Niepoprawne klasy są filtrowane.
+- Pętle epokowe zwracają słownik metryk (iou, dice, prec, rec, f1, acc, iou_per_class, f1_per_class)
+  oraz (opcjonalnie) średnią stratę pod kluczem 'loss'.
+
+Ten moduł skupia się na stabilności i pamięciooszczędności podczas trenowania modeli segmentacyjnych.
+"""
+
 import torch
 from tqdm.auto import tqdm
 from typing import Optional
@@ -10,12 +30,40 @@ __all__ = [
     "valid_epoch_streaming",
 ]
 
+
 def to_index_targets(y: torch.Tensor) -> torch.Tensor:
+    """Konwertuje tensor targetów do indeksów klas (shape BxHxW lub HxW zależnie od kontekstu).
+
+    Obsługuje przypadki:
+      - one-hot: tensor 4D (B, C, H, W) -> argmax po kanale -> (B, H, W)
+      - single-channel: tensor 3D/4D z kanałem 1 -> squeeze do (B, H, W) lub (H, W)
+
+    Zwraca tensor indeksów typu całkowitego (bez kanału klasyfikacyjnego).
+    """
     if y.ndim == 4 and y.size(1) > 1:
         return y.argmax(1)
     return y.squeeze(1)
 
+
 def update_confusion_matrix(cm: torch.Tensor, preds: torch.Tensor, targets: torch.Tensor, num_classes: int, chunk_size: int = 262144):
+    """Aktualizuje macierz pomyłek (confusion matrix) na podstawie predykcji i targetów.
+
+    Funkcja:
+      - spłaszcza predykcje i targety do wektora
+      - filtruje niepoprawne targety (poza zakresem [0, num_classes-1])
+      - przetwarza dane po kawałkach (chunk_size) aby uniknąć jednorazowych dużych alokacji
+      - aktualizuje przekazany tensor `cm` (modyfikacja in-place)
+
+    Argumenty:
+      cm: tensor kształtu (num_classes, num_classes) typu całkowitego
+      preds: tensor przewidywań (indeksy klas)
+      targets: tensor prawdziwych etykiet (indeksy klas)
+      num_classes: liczba klas
+      chunk_size: maksymalna liczba elementów przetwarzana naraz (domyślnie ~256k)
+
+    Zwraca:
+      Zaktualizowany tensor `cm` (ten sam obiekt, na którym operowano).
+    """
     preds = preds.reshape(-1)
     targets = targets.reshape(-1)
     # filtr: zachowujemy tylko poprawne klasy (0..num_classes-1)
@@ -42,6 +90,18 @@ def update_confusion_matrix(cm: torch.Tensor, preds: torch.Tensor, targets: torc
 # Zwraca słownik z uśrednionymi (mean) wartościami między klasami oraz accuracy.
 
 def metrics_from_cm(cm: torch.Tensor):
+    """Oblicza metryki segmentacyjne z macierzy pomyłek.
+
+    Argumenty:
+      cm: macierz pomyłek (num_classes x num_classes)
+
+    Zwraca słownik z kluczami:
+      - 'iou','dice','acc','prec','rec','f1' : uśrednione (mean) wartości po klasach (float)
+      - 'iou_per_class','f1_per_class': listy wartości per-klasa
+
+    Uwaga:
+      Funkcja dodaje małe eps dla stabilności numerycznej.
+    """
     tp = cm.diag().float()
     fp = cm.sum(0).float() - tp
     fn = cm.sum(1).float() - tp
@@ -64,6 +124,7 @@ def metrics_from_cm(cm: torch.Tensor):
     }
 
 
+
 # =============================================
 #   Pętla treningowa (streaming) - per-epoch
 # `train_epoch_streaming` wykonuje jedną epokę treningową na danych strumieniowych:
@@ -75,6 +136,26 @@ def metrics_from_cm(cm: torch.Tensor):
 # - zwraca słownik metryk oraz średnią straty na batch
 # =============================================
 def train_epoch_streaming(model, optimizer, criterion, dataloader, device, num_classes: int, use_amp: bool = True, grad_clip: Optional[float] = None):
+    """Wykonuje jedną epokę treningową na strumieniowych danych (memory-efficient).
+
+    Argumenty:
+      model: moduł PyTorch
+      optimizer: optymalizator
+      criterion: funkcja straty (może zwracać tensor skalar)
+      dataloader: iterator zwracający batch'e słowników z kluczami 'x' i 'y'
+      device: urządzenie (np. 'cuda')
+      num_classes: liczba klas do zbudowania cm
+      use_amp: czy używać torch.cuda.amp (domyślnie True)
+      grad_clip: opcjonalna wartość do clipowania normy gradientu
+
+    Zwraca:
+      słownik metryk (tak jak w `metrics_from_cm`) z dodatkowym kluczem 'loss' zawierającym średnią stratę
+      na batch (jeśli wystąpiły poprawne batch'e z obliczoną stratą).
+
+    Zachowanie szczególne:
+      - batch'e z NaN/Inf w loss są pomijane (funkcja _safe_loss_value zwraca None)
+      - predykcje i targety są przenoszone na CPU przed aktualizacją macierzy pomyłek
+    """
     model.train()
     cm = torch.zeros((num_classes, num_classes), dtype=torch.int64)
     total_loss = 0.0
@@ -128,6 +209,19 @@ def train_epoch_streaming(model, optimizer, criterion, dataloader, device, num_c
 # - aktualizuje macierz pomyłek i sumuje straty (jeśli criterion != None)
 # - zwraca słownik metryk oraz średnią straty
 def valid_epoch_streaming(model, criterion, dataloader, device, num_classes: int, use_amp: bool = True):
+    """Wykonuje jedną epokę walidacyjną (memory-efficient).
+
+    Argumenty:
+      model: moduł PyTorch ustawiony do ewaluacji
+      criterion: funkcja straty lub None
+      dataloader: iterator batch'y z 'x' i 'y'
+      device: urządzenie (np. 'cuda')
+      num_classes: liczba klas do zbudowania cm
+      use_amp: czy używać AMP
+
+    Zwraca:
+      słownik metryk (jak w `metrics_from_cm`) oraz (opcjonalnie) 'loss' jeśli criterion nie jest None
+    """
     model.eval()
     cm = torch.zeros((num_classes, num_classes), dtype=torch.int64)
     total_loss = 0.0
@@ -164,6 +258,7 @@ def valid_epoch_streaming(model, criterion, dataloader, device, num_classes: int
         mets["loss"] = total_loss / n_loss_batches
     return mets
 
+
 def _safe_loss_value(loss: torch.Tensor) -> Optional[float]:
     """Zwraca bezpieczną wartość loss jako float lub None jeśli loss jest NaN/Inf."""
     if loss is None:
@@ -183,6 +278,11 @@ def _safe_loss_value(loss: torch.Tensor) -> Optional[float]:
 
 
 def _debug_invalid_loss(prefix: str, logits: torch.Tensor, y: torch.Tensor, y_idx: torch.Tensor):
+    """Drukuje pomocnicze informacje diagnostyczne, gdy wykryto niepoprawną wartość straty.
+
+    Wyświetla zakres wartości logits, zakres indeksów targetów oraz kształty tensorów.
+    Przydaje się do zdiagnozowania przyczyny NaN/Inf w loss.
+    """
     try:
         lg_min = float(logits.detach().min().item())
         lg_max = float(logits.detach().max().item())

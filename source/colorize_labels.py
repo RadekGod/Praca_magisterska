@@ -1,3 +1,27 @@
+"""Narzędzie do konwersji masek etykiet (.tif) na kolorowe maski RGB.
+
+Plik zawiera funkcje pomocnicze do zamiany mapy etykiet (value map, dtype integer)
+na kolorowy obraz 3-kanałowy, wykorzystując mapowanie `CLASS_COLORS`
+(zdefiniowane w `source.check_model_rgb`).
+
+Zastosowanie:
+- Przydatne do wizualizacji wyników segmentacji.
+- Zachowuje georeferencję, jeśli plik wejściowy ją posiada (CRS i transformację).
+
+Konwencje wejściowe:
+- Maska etykiet przyjmowana przez `labels_to_color_mask` oczekiwana jest jako
+  tablica 2D (H, W) zawierająca wartości całkowite w zakresie klas (0..C-1)
+  lub jako (1, H, W) — wówczas pierwszy kanał jest traktowany jako maska.
+- Zwracana tablica ma kształt (3, H, W) i dtype uint8 (kanały RGB).
+
+Funkcje:
+- labels_to_color_mask(labels): konwersja jednej maski na RGB.
+- process_file(input_path, output_path): konwersja pojedynczego pliku .tif z
+  zachowaniem georeferencji (jeżeli dostępna).
+- process_directory(input_dir, output_dir, suffix): przetwarzanie wszystkich plików
+  .tif w katalogu wejściowym.
+"""
+
 import argparse
 import os
 from pathlib import Path
@@ -10,9 +34,22 @@ from source.dataset import get_crs, save_img
 
 
 def labels_to_color_mask(labels: np.ndarray) -> np.ndarray:
-    """Konwertuje maskę etykiet (H, W) lub (1, H, W) na kolorową maskę (3, H, W).
+    """Konwertuje maskę etykiet na kolorową maskę RGB.
 
-    Używa mapowania klas z CLASS_COLORS.
+    Parametry:
+    - labels: numpy.ndarray o wymiarach (H, W) z wartościami int reprezentującymi klasy
+      lub (1, H, W) — wówczas używany jest pierwszy kanał.
+
+    Zwraca:
+    - rgb: numpy.ndarray o kształcie (3, H, W) i dtype uint8, gdzie każdy kanał to R,G,B.
+
+    Zachowanie i uwagi:
+    - Mapowanie wartości klas -> kolorów pobierane jest z `CLASS_COLORS`.
+    - Jeżeli pewne klasy nie występują w masce, po prostu nie pojawią się w wyniku.
+    - Funkcja nie modyfikuje georeferencji ani metadanych — tylko mapuje kolory.
+
+    Wyjątki:
+    - ValueError jeśli wejściowy `labels` ma nieoczekiwany kształt.
     """
     # Upewniamy się, że mamy kształt (H, W)
     if labels.ndim == 3 and labels.shape[0] == 1:
@@ -36,7 +73,20 @@ def labels_to_color_mask(labels: np.ndarray) -> np.ndarray:
 
 
 def process_file(input_path: Path, output_path: Path) -> None:
-    """Wczytuje pojedynczy plik .tif z etykietami i zapisuje kolorową wersję."""
+    """Wczytuje pojedynczy plik .tif z etykietami i zapisuje kolorową wersję.
+
+    Parametry:
+    - input_path: Path do pliku .tif zawierającego maskę etykiet.
+    - output_path: Path do pliku wyjściowego .tif (kolorowa maska).
+
+    Zachowanie:
+    - Jeżeli plik wejściowy zawiera georeferencję (CRS i transform), zostaną one
+      zachowane w pliku wyjściowym (zapis przez `save_img`). W przeciwnym razie
+      zapisany zostanie prosty plik .tif bez georeferencji.
+
+    Wyjątki:
+    - Propaguje wyjątki IO/odczytu pliku gdy rasterio zgłosi błąd przy wczytywaniu.
+    """
     with rasterio.open(input_path) as src:
         data = src.read()  # (bands, H, W) – oczekujemy 1 kanału z etykietami
 
@@ -72,11 +122,17 @@ def process_file(input_path: Path, output_path: Path) -> None:
 
 
 def process_directory(input_dir: str, output_dir: str, suffix: str = "_color") -> None:
-    """Przetwarza wszystkie pliki .tif w podanym katalogu.
+    """Przetwarza wszystkie pliki .tif w podanym katalogu i zapisuje wersje kolorowe.
 
-    - input_dir: katalog z plikami etykiet (.tif), np. dataset/train/labels
-    - output_dir: katalog wyjściowy; struktura nazw plików zostanie zachowana
-    - suffix: dodawany przed rozszerzeniem, np. label.tif -> label_color.tif
+    Parametry:
+    - input_dir: ścieżka do katalogu z plikami etykiet (.tif), np. dataset/train/labels
+    - output_dir: katalog wyjściowy; pliki zostaną zapisane bez hierarchii podkatalogów,
+      nazwy plików zostaną zmodyfikowane przez dodanie `suffix` przed rozszerzeniem.
+    - suffix: przyrostek dodawany do nazwy pliku przed rozszerzeniem (domyślnie '_color').
+
+    Zachowanie:
+    - Jeżeli katalog wejściowy nie istnieje lub nie ma plików .tif, funkcja wypisze komunikat
+      i zakończy działanie bez błędu.
     """
     in_dir = Path(input_dir)
     out_dir = Path(output_dir)
@@ -102,6 +158,13 @@ def process_directory(input_dir: str, output_dir: str, suffix: str = "_color") -
 
 
 def main():
+    """Interfejs CLI do konwersji masek na kolorowe.
+
+    Argumenty CLI:
+    - --input_dir: katalog z plikami .tif do konwersji (domyślnie results/obrazy/etykiety/)
+    - --output_dir: katalog wyjściowy (jeżeli nie podano, zostanie użyty podkatalog 'color' w input_dir)
+    - --suffix: przyrostek dodawany do nazw plików (domyślnie '_color')
+    """
     parser = argparse.ArgumentParser(
         description="Konwersja masek etykiet .tif na kolorowe maski wg CLASS_COLORS z check_model_rgb.py"
     )

@@ -1,66 +1,45 @@
 import numpy as np
-import matplotlib.pyplot as plt
 import os
 
+"""Moduł pomocniczy `utils`.
 
-def progress(train_logs, valid_logs, loss_nm, metric_nm, nepochs, outdir, fn_out):
-    loss_t = [dic[loss_nm] for dic in train_logs]
-    loss_v = [dic[loss_nm] for dic in valid_logs]
-    score_t = [dic[metric_nm] for dic in train_logs]
-    score_v = [dic[metric_nm] for dic in valid_logs]
+Zawiera funkcje pomocnicze używane przy trenowaniu i ewaluacji modeli:
 
-    epochs = range(0, len(score_t))
-    plt.figure(figsize=(12, 5))
+- log_epoch_results(log_path, epoch_idx, lr_str, train_logs, valid_logs)
+  Loguje metryki epoki (do pliku oraz na stdout). Obsługuje także metryki per-class jeśli są dostępne.
 
-    # Train and validation metric
-    # ---------------------------
-    plt.subplot(1, 2, 1)
+- _get_lr(optimizer)
+  Zwraca sformatowany łańcuch z wartościami learning rate grup parametrów optymalizera.
 
-    idx = np.nonzero(score_t == max(score_t))[0][0]
-    label = f"Train, {metric_nm}={max(score_t):6.4f} in Epoch={idx}"
-    plt.plot(epochs, score_t, "b", label=label)
+- log_number_of_parameters(model)
+  Wypisuje liczbę trenowalnych parametrów modelu.
 
-    idx = np.nonzero(score_v == max(score_v))[0][0]
-    label = f"Valid, {metric_nm}={max(score_v):6.4f} in Epoch={idx}"
-    plt.plot(epochs, score_v, "r", label=label)
+Przykład użycia:
+    from source.utils import log_epoch_results
 
-    plt.title("Training and Validation Metric")
-    plt.xlabel("Epochs")
-    plt.xlim(0, nepochs)
-    plt.ylabel(metric_nm)
-    plt.ylim(0, 1)
-    plt.legend()
-
-    # Train and validation loss
-    # -------------------------
-    plt.subplot(1, 2, 2)
-    ymax = max(max(loss_t), max(loss_v))
-    ymin = min(min(loss_t), min(loss_v))
-    ymax = 1 if ymax <= 1 else ymax + 0.5
-    ymin = 0 if ymin <= 0.5 else ymin - 0.5
-
-    idx = np.nonzero(loss_t == min(loss_t))[0][0]
-    label = f"Train {loss_nm}={min(loss_t):6.4f} in Epoch:{idx}"
-    plt.plot(epochs, loss_t, "b", label=label)
-
-    idx = np.nonzero(loss_v == min(loss_v))[0][0]
-    label = f"Valid {loss_nm}={min(loss_v):6.4f} in Epoch:{idx}"
-    plt.plot(epochs, loss_v, "r", label=label)
-
-    plt.title("Training and Validation Loss")
-    plt.xlabel("Epochs")
-    plt.xlim(0, nepochs)
-    plt.ylabel("Loss")
-    plt.ylim(ymin, ymax)
-    plt.legend()
-    plt.savefig(f"{outdir}/{fn_out}.png", bbox_inches="tight")
-    plt.clf()
-    plt.close()
-
-    return
-
+Ten plik nie modyfikuje zachowania modeli — dostarcza tylko narzędzia pomocnicze do logowania
+i diagnostyki podczas treningu.
+"""
 
 def log_epoch_results(log_path: str, epoch_idx: int, lr_str: str, train_logs: dict, valid_logs: dict):
+    """Zapisuje i wypisuje metryki dla danej epoki treningowej.
+
+    Funkcja dopisuje do pliku tekstowego (tworzy katalog jeśli potrzeba) podsumowanie metryk
+    dla zbioru treningowego i walidacyjnego oraz wypisuje te same informacje na standardowe wyjście.
+
+    Argumenty:
+        log_path (str): Ścieżka do pliku logu (plik zostanie dopisany).
+        epoch_idx (int): Numer epoki (liczba całkowita).
+        lr_str (str): Reprezentacja learning rate (np. zwrócona przez `_get_lr`).
+        train_logs (dict): Słownik metryk treningowych. Oczekiwane klucze: 'loss','iou','dice','acc','prec','rec','f1',
+                           opcjonalnie 'iou_per_class' i 'f1_per_class' jako listy/ndarray.
+        valid_logs (dict): Słownik metryk walidacyjnych (te same klucze co wyżej).
+
+    Zachowanie i uwagi:
+        - Brakujące metryki są traktowane jako NaN.
+        - Metryki per-class (jeśli dostępne) są zapisywane w kolejnych wierszach.
+        - Funkcja nie zwraca wartości; generuje wyjście do pliku i na stdout.
+    """
     os.makedirs(os.path.dirname(log_path), exist_ok=True)
 
     def _g(d: dict, k: str):
@@ -128,10 +107,23 @@ def log_epoch_results(log_path: str, epoch_idx: int, lr_str: str, train_logs: di
 
 
 def _get_lr(optimizer):
+    """Zwraca sformatowany string z wartości learning rate dla każdej grupy parametrów.
+
+    Argumenty:
+        optimizer: obiekt optymalizera (np. torch.optim.Optimizer).
+
+    Zwraca:
+        str: wartości lr oddzielone przecinkami.
+    """
     return ", ".join(f"{g['lr']:.6g}" for g in optimizer.param_groups)
 
 
 def log_number_of_parameters(model):
+    """Wypisuje liczbę trenowalnych parametrów modelu.
+
+    Argumenty:
+        model: obiekt modelu udostępniający `parameters()` (np. moduł PyTorch).
+    """
     params = 0
     for p in model.parameters():
         if p.requires_grad:
