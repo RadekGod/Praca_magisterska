@@ -168,7 +168,7 @@ def main(args):
         }
 
         run_name = (
-            f"FUSION_Unet_{args.encoder_name}_"
+            f"EARLY_FUSION_Unet_Batch_8_{args.encoder_name}_"
             f"{criterion.name if hasattr(criterion, 'name') else type(criterion).__name__}"
             f"_lr-{args.learning_rate}_"
             f"augmT{getattr(args, 'train_augm', 'NA')}V{getattr(args, 'valid_augm', 'NA')}"
@@ -207,7 +207,7 @@ def train_model(args, model, optimizer, criterion, device, scheduler=None, wandb
     os.makedirs(args.save_results, exist_ok=True)
 
     model_name = (
-        f"FUSION_Unet_{args.encoder_name}_"
+        f"EARLY_FUSION_Unet_Batch_8_{args.encoder_name}_"
         f"{criterion.name if hasattr(criterion, 'name') else type(criterion).__name__}"
         f"_lr_{args.learning_rate}_"
         f"augmT{getattr(args, 'train_augm', 'NA')}V{getattr(args, 'valid_augm', 'NA')}"
@@ -360,7 +360,7 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='Training Fusion (RGB+SAR) - streaming, memory-efficient')
     parser.add_argument('--seed', type=int, default=0)
     parser.add_argument('--n_epochs', type=int, default=100)
-    parser.add_argument('--batch_size', type=int, default=4)
+    parser.add_argument('--batch_size', type=int, default=8)
     parser.add_argument('--num_workers', type=int, default=4)
     parser.add_argument('--crop_size', type=int, default=256)
     parser.add_argument('--learning_rate', type=float, default=0.001)

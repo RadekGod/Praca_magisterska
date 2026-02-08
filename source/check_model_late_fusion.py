@@ -96,7 +96,7 @@ def main():
     parser.add_argument(
         "--output_path",
         type=str,
-        default="results/obrazy/fusion/model/" + encoder_name + "/" + model_name_variant + "/" + model_fusion_variant,
+        default="results/obrazy/fusion/model/" + encoder_name + "/" + model_name_variant + "/" + batch_size + "/" + model_fusion_variant,
         help="Folder wyjściowy na maski .tif",
     )
     parser.add_argument("--fusion_mode", type=str, default="mean", choices=["mean", "sum", "weighted"], help="Tryb fuzji logitów")
@@ -211,5 +211,6 @@ if __name__ == "__main__":
     model_name_variant = "T1V1"
     model_fusion_variant = "LATE_MEAN"
     encoder_name = "efficientnet-b4"
-    main_model_name = "LATE_FUSION_Unet_" + encoder_name + "_WCEPlusDice_ce1.0_dice1.0_lr_0.001_fusion_mean_augm"
+    batch_size = "Batch_4"
+    main_model_name = "LATE_FUSION_Unet_" + batch_size + "_" + encoder_name + "_WCEPlusDice_ce1.0_dice1.0_lr_0.001_fusion_mean_augm"
     main()

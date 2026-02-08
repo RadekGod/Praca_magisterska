@@ -111,7 +111,7 @@ def main():
     parser.add_argument(
         "--output_path",
         type=str,
-        default="results/obrazy/fusion/model/" + encoder_name + "/" + model_name_variant,
+        default="results/obrazy/fusion/model/" + encoder_name + "/" + model_name_variant + "/" + batch_size + "/" + model_fusion_variant,
         help="Ścieżka wyjściowa (folder).",
     )
 
@@ -228,6 +228,8 @@ def main():
 
 if __name__ == "__main__":
     model_name_variant = "T1V1"
+    model_fusion_variant = "EARLY"
     encoder_name = "efficientnet-b4"
-    main_model_name = "FUSION_Unet_" + encoder_name + "_WCEPlusDice_ce1.0_dice1.0_lr_0.001_augm"
+    batch_size = "Batch_16"
+    main_model_name = "EARLY_FUSION_Unet_" + batch_size + "_" + encoder_name + "_WCEPlusDice_ce1.0_dice1.0_lr_0.001_augm"
     main()

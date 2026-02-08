@@ -217,7 +217,7 @@ def main(args):
             "t_max": int(args.t_max),
             "amp": bool(args.amp),
             "grad_clip": float(args.grad_clip) if args.grad_clip is not None else None,
-            "model_name": f"LateFusion_Unet_{args.encoder_name}",
+            "model_name": f"Late_Fusion_Unet_{args.encoder_name}",
             "criterion": criterion.name if hasattr(criterion, "name") else type(criterion).__name__,
             "model_type": "late_fusion",
             "encoder_name": args.encoder_name,
@@ -228,7 +228,7 @@ def main(args):
         }
 
         run_name = (
-            f"LATEFUSION_Unet_{args.encoder_name}_"
+            f"LATE_FUSION_Unet_Batch_16_{args.encoder_name}_"
             f"{criterion.name if hasattr(criterion, 'name') else type(criterion).__name__}"
             f"_lr-{args.learning_rate}_"
             f"fusion-{args.fusion_mode}_"
@@ -269,7 +269,7 @@ def train_model(args, model, optimizer, criterion, device, scheduler=None, wandb
     os.makedirs(args.save_results, exist_ok=True)
 
     model_name = (
-        f"LATE_FUSION_Unet_{args.encoder_name}_"
+        f"LATE_FUSION_Unet_Batch_16_{args.encoder_name}_"
         f"{criterion.name if hasattr(criterion, 'name') else type(criterion).__name__}"
         f"_lr_{args.learning_rate}_"
         f"fusion_{args.fusion_mode}_"
@@ -381,7 +381,7 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Training Late Fusion (RGB + SAR) - streaming")
     parser.add_argument("--seed", type=int, default=0)
     parser.add_argument("--n_epochs", type=int, default=100)
-    parser.add_argument("--batch_size", type=int, default=4)
+    parser.add_argument("--batch_size", type=int, default=16)
     parser.add_argument("--num_workers", type=int, default=4)
     parser.add_argument("--crop_size", type=int, default=256)
     parser.add_argument("--learning_rate", type=float, default=0.001)
